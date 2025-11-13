@@ -1,0 +1,15 @@
+{
+  "name": "sera-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "functions/index.js",
+  "scripts": {
+    "start": "node functions/index.js",
+    "dev": "PORT=8080 node functions/index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "node-fetch": "^3.3.2"
+  }
+}
