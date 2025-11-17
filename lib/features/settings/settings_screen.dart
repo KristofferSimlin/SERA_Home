@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../theme/app_theme.dart';
+
 import '../chat/chat_controller.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -11,8 +11,16 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  final _proxyCtrl = TextEditingController();
-  final _keyCtrl = TextEditingController();
+  late final TextEditingController _proxyCtrl;
+  late final TextEditingController _keyCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    final s = ref.read(settingsProvider);
+    _proxyCtrl = TextEditingController(text: s.proxyUrl ?? '');
+    _keyCtrl = TextEditingController(text: s.directApiKey ?? '');
+  }
 
   @override
   void dispose() {
@@ -24,14 +32,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
-    _proxyCtrl.text = settings.proxyUrl ?? '';
-    _keyCtrl.text = settings.directApiKey ?? '';
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Inställningar')),
+      appBar: AppBar(
+        title: const Text('Inställningar'),
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         children: [
+          // Anslutning (proxy/direkt)
           Card(
             child: Padding(
               padding: const EdgeInsets.all(14),
@@ -43,64 +53,91 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
                     title: const Text('Proxy-läge (rekommenderas)'),
-                    subtitle: const Text('Döljer servernycklar. Använd i produktion.'),
+                    subtitle: const Text('Döljer API-nyckel och kan lägga till webbsök /search'),
                     value: settings.proxyEnabled,
                     onChanged: (v) => ref.read(settingsProvider.notifier).setProxyEnabled(v),
                   ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _proxyCtrl,
-                    onChanged: (v) => ref.read(settingsProvider.notifier).setProxyUrl(v),
+                    onChanged: (v) => ref.read(settingsProvider.notifier).setProxyUrl(v.trim()),
                     decoration: const InputDecoration(
-                      labelText: 'PROXY_URL (ex. https://din-proxy.example/chat)',
-                      hintText: 'https://…/chat',
+                      labelText: 'PROXY_URL',
+                      hintText: 'http://127.0.0.1:8080/chat',
+                      helperText: 'Ange ENDAST URL:en (inte "PROXY_URL=" framför).',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _keyCtrl,
+                    onChanged: (v) => ref.read(settingsProvider.notifier).setDirectKey(v.trim()),
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'OPENAI_API_KEY (direktläge)',
+                      hintText: 'sk-********',
+                      helperText: 'Använd bara för lokal test. Lägg aldrig nyckeln i produktion.',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: cs.surfaceVariant.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Tips: Kör proxy-läge i produktion. Direktläge exponerar nyckeln i klienten.',
+                      style: TextStyle(fontSize: 12.5),
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 12),
+
+          // Webbsök (beta)
           Card(
             child: Padding(
               padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Direktläge (endast lokal test)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const Text('Webbsök (beta)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Varning: Lägg aldrig API-nycklar i produktionsklient. Detta fält är endast för lokal utveckling.',
-                    style: TextStyle(color: Colors.white70),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Aktivera webbsök via proxy /search'),
+                    subtitle: const Text('Kräver PROXY_SEARCH_URL i .env och route /search i proxyn'),
+                    value: settings.webLookupEnabled,
+                    onChanged: (v) => ref.read(settingsProvider.notifier).setWebLookup(v),
                   ),
                   const SizedBox(height: 8),
-                  TextField(
-                    controller: _keyCtrl,
-                    onChanged: (v) => ref.read(settingsProvider.notifier).setDirectKey(v),
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'OPENAI_API_KEY (lokal dev)',
-                    ),
+                  const Text(
+                    'När detta är på försöker SERA hämta relevanta källor (manualer, forum, tekniska sidor) '
+                    'för ditt märke/modell/årsmodell och väver in fynden i svaret.',
+                    style: TextStyle(fontSize: 12.5),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Inställningar uppdaterade')),
-              );
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.check),
-            label: const Text('Spara'),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Tips: Du kan även fylla .env för defaultvärden. Runtime-inmatning här sparas endast i minnet för demo.',
-            style: TextStyle(fontSize: 12.5, color: Colors.white70),
+
+          // Info
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text('Säkerhet', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  SizedBox(height: 8),
+                  Text(
+                    'Informationen är vägledande. Följ alltid tillverkarens instruktioner och lokala säkerhetsregler. Egen risk.',
+                    style: TextStyle(fontSize: 12.5),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

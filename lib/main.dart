@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'theme/app_theme.dart';
-import 'features/chats/chat_list_screen.dart';
+import 'features/home/home_shell.dart';
 import 'features/settings/settings_screen.dart';
 
 Future<void> main() async {
@@ -21,10 +21,11 @@ class SeraApp extends StatelessWidget {
       theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
       routes: {
-        '/': (_) => const ChatListScreen(),     // ← landningssida (som ChatGPT)
+        '/': (_) => const HomeShell(),
         '/settings': (_) => const SettingsScreen(),
       },
       initialRoute: '/',
     );
   }
 }
+

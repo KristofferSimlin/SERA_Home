@@ -3,16 +3,59 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../features/chat/chat_controller.dart';
 
-const String _systemPrompt =
-    'Du är SERA – en säkerhetsmedveten felsökningsassistent. '
-    'Ställ följdfrågor först, börja med enkla kontroller, lägg alltid till '
-    'Säkerhetsfilter vid el/hydraulik/bränsle/tryck/värme. '
-    'Svara kort, på svenska, i punktlistor när det passar.'
-    'Börja alltid med att presentera dig och vad ditt syfte är.';
+const String _baseSystemPrompt =
+  'Du är SERA – en säkerhetsmedveten felsökningsassistent för maskiner.'
+  '\nSTIL: Rak, professionell, jordnära. Inga artighetsfraser.'
+  '\nEKO: Upprepa inte användarens text. Citera kort endast vid behov.'
+  '\nTON: Svenska. Korta stycken, punktlistor när det passar.'
+  '\nBETEENDE: Ställ 1–2 följdfrågor vid oklarheter. Ge tydliga nästa steg.'
+  '\nSÄKERHET: Lägg alltid till Säkerhetsfilter om el/hydraulik/bränsle/tryck/värme berörs.'
+  '\nUNDVIK: "Som en AI", överdriven artighet, ursäkter.';
+
+String _expertiseAddon(int? level) {
+  switch (level) {
+    case 1:
+      return '\nEXPERTIS=1 (nybörjare): Förklara enkelt, steg-för-steg och inkludera grundkontroller.';
+    case 2:
+      return '\nEXPERTIS=2 (medel): Anta viss vana. Balansera grundkontroller och mätpunkter.';
+    case 3:
+      return '\nEXPERTIS=3 (expert): Hoppa över triviala kontroller. Gå direkt på sannolika orsaker, mätvärden, toleranser.';
+    default:
+      return '\nEXPERTIS=okänd: fråga kort om nivå, annars anta medel.';
+  }
+}
+
+String _equipmentAddon({String? brand, String? model, String? year}) {
+  final parts = <String>[];
+  if ((brand ?? '').isNotEmpty) parts.add('Märke: $brand');
+  if ((model ?? '').isNotEmpty) parts.add('Modell: $model');
+  if ((year ?? '').isNotEmpty) parts.add('Årsmodell: $year');
+  if (parts.isEmpty) {
+    return '\nUTRUSTNING: okänd (be användaren om märke, modell, årsmodell).';
+  }
+  return '\nUTRUSTNING: ${parts.join(', ')}';
+}
+
+String _webNotesAddon(String? webNotes) {
+  if (webNotes == null || webNotes.trim().isEmpty) return '';
+  return '\nWEBB-TRÄFFAR (sammanfattning, använd om relevant):\n$webNotes';
+}
+
+String _postProcess(String s) {
+  final polite = RegExp(
+    r'^(tack(?: så mycket)?(?: för att du| för info| för information)?|'
+    r'hoppas allt är bra|tack för ditt meddelande|tack för att du hör av dig)[\.\!\,\s\-–—:]*',
+    caseSensitive: false,
+  );
+  var out = s.trimLeft().replaceFirst(polite, '');
+  final echo = RegExp(r'^(du (säger|skriver|nämner) att[:\s]+)', caseSensitive: false);
+  out = out.replaceFirst(echo, '');
+  return out.trimLeft();
+}
 
 class OpenAIClient {
   final bool useProxy;
-  final String? proxyUrl;
+  final String? proxyUrl;    // /chat
   final String? directKey;
 
   OpenAIClient({
@@ -31,7 +74,20 @@ class OpenAIClient {
     );
   }
 
-  Future<String> completeChat(List<(bool, String)> history, String newUserMessage) async {
+  Future<String> completeChat(
+    List<(bool, String)> history,
+    String newUserMessage, {
+    int? expertise,
+    String? brand,
+    String? model,
+    String? year,
+    String? webNotes, // sammanfattning från webbsök
+  }) async {
+    final systemPrompt = _baseSystemPrompt
+        + _expertiseAddon(expertise)
+        + _equipmentAddon(brand: brand, model: model, year: year)
+        + _webNotesAddon(webNotes);
+
     if (useProxy) {
       if (proxyUrl == null || proxyUrl!.isEmpty) {
         throw 'PROXY_URL saknas. Ange i inställningar eller .env';
@@ -41,24 +97,19 @@ class OpenAIClient {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'messages': [
-            {'role': 'system', 'content': _systemPrompt},
-            ...history.map((e) => {
-                  'role': e.$1 ? 'user' : 'assistant',
-                  'content': e.$2,
-                }),
+            {'role': 'system', 'content': systemPrompt},
+            ...history.map((e) => {'role': e.$1 ? 'user' : 'assistant', 'content': e.$2}),
             {'role': 'user', 'content': newUserMessage},
           ],
           'model': 'gpt-4o-mini',
+          'temperature': 0.2,
         }),
       );
-      if (res.statusCode == 401) {
-        throw '401 (otillåten). Kontrollera proxy-konfiguration.';
-      }
-      if (res.statusCode >= 400) {
-        throw 'Proxyfel ${res.statusCode}: ${res.body}';
-      }
+      if (res.statusCode == 401) throw '401 (otillåten). Kontrollera proxy-konfiguration.';
+      if (res.statusCode >= 400) throw 'Proxyfel ${res.statusCode}: ${res.body}';
       final data = jsonDecode(res.body) as Map<String, dynamic>;
-      return (data['text'] as String?) ?? data['content'] ?? data['reply'] ?? '[Tomt svar]';
+      final text = (data['text'] as String?) ?? data['content'] ?? data['reply'] ?? '';
+      return _postProcess(text.isEmpty ? '[Tomt svar]' : text);
     } else {
       if (directKey == null || directKey!.isEmpty) {
         throw 'OPENAI_API_KEY saknas. Ange i Inställningar eller .env';
@@ -72,29 +123,20 @@ class OpenAIClient {
         body: jsonEncode({
           'model': 'gpt-4o-mini',
           'messages': [
-            {'role': 'system', 'content': _systemPrompt},
-            ...history.map((e) => {
-                  'role': e.$1 ? 'user' : 'assistant',
-                  'content': e.$2,
-                }),
+            {'role': 'system', 'content': systemPrompt},
+            ...history.map((e) => {'role': e.$1 ? 'user' : 'assistant', 'content': e.$2}),
             {'role': 'user', 'content': newUserMessage},
           ],
           'temperature': 0.2,
           'stream': false,
         }),
       );
-      if (res.statusCode == 401) {
-        throw '401 (otillåten). Kontrollera API-nyckeln.';
-      }
-      if (res.statusCode >= 400) {
-        throw 'OpenAI-fel ${res.statusCode}: ${res.body}';
-      }
+      if (res.statusCode == 401) throw '401 (otillåten). Kontrollera API-nyckeln.';
+      if (res.statusCode >= 400) throw 'OpenAI-fel ${res.statusCode}: ${res.body}';
       final data = jsonDecode(res.body) as Map<String, dynamic>;
       final choices = (data['choices'] as List?) ?? const [];
-      final content = choices.isNotEmpty
-          ? (choices.first['message']?['content'] as String? ?? '')
-          : '';
-      return content.isEmpty ? '[Tomt svar]' : content;
+      final content = choices.isNotEmpty ? (choices.first['message']?['content'] as String? ?? '') : '';
+      return _postProcess(content.isEmpty ? '[Tomt svar]' : content);
     }
   }
 }
