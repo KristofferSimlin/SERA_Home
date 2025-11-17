@@ -7,7 +7,8 @@ import 'widgets/chat_bubble.dart';
 import 'widgets/safety_banner.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
-  const ChatScreen({super.key});
+  final String sessionId;
+  const ChatScreen({super.key, required this.sessionId});
 
   @override
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
@@ -30,7 +31,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _inputCtrl.clear();
 
     try {
-      await ref.read(chatControllerProvider.notifier).send(text);
+      await ref.read(chatControllerProvider(widget.sessionId).notifier).send(text);
       unawaited(Future.delayed(const Duration(milliseconds: 100), () {
         if (_scrollCtrl.hasClients) {
           _scrollCtrl.animateTo(
@@ -51,7 +52,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(chatControllerProvider);
+    final state = ref.watch(chatControllerProvider(widget.sessionId));
     final dateFmt = DateFormat('HH:mm');
 
     return Scaffold(
