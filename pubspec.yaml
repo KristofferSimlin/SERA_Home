@@ -1,23 +1,33 @@
 name: sera
-description: SERA – Service & Equipment Repair Assistant
+description: SERA – Service & Equipment Repair Assistant (Flutter)
+publish_to: "none"
+
 environment:
-  sdk: '>=3.4.0 <4.0.0'
+  sdk: ">=3.3.0 <4.0.0"
+
+# Flutter config
+flutter:
+  uses-material-design: true
+  assets:
+    - .env
+    # Lägg till dina assets här vid behov:
+    # - assets/images/
 
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.2.2
+
+  # UI / tema
+  google_fonts: ^6.2.1
+
+  # State & verktyg
   flutter_riverpod: ^2.5.1
-  shared_preferences: ^2.2.3
-  flutter_dotenv: ^5.1.0
+  http: ^1.2.2
   intl: ^0.19.0
+  flutter_dotenv: ^5.1.0
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
-
-flutter:
-  uses-material-design: true
-  assets:
-    - .env

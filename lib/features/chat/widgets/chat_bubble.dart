@@ -1,79 +1,67 @@
 import 'package:flutter/material.dart';
-import '../../../../theme/app_theme.dart';
+import 'package:intl/intl.dart';
 
 class ChatBubble extends StatelessWidget {
-  final bool isUser;
-  final String text;
-  final String timeLabel;
-  final bool showDisclaimer;
-
   const ChatBubble({
     super.key,
     required this.isUser,
     required this.text,
-    required this.timeLabel,
-    this.showDisclaimer = false,
+    this.time,
   });
+
+  final bool isUser;
+  final String text;
+  final DateTime? time;
 
   @override
   Widget build(BuildContext context) {
-    final align = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-    final bubbleColor = isUser
-        ? AppTheme.electricBlue.withOpacity(0.12)
-        : const Color(0xFF1C2228);
+    final bg = isUser
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.4);
+    final fg = isUser
+        ? Theme.of(context).colorScheme.onPrimary
+        : Theme.of(context).colorScheme.onSurface;
 
-    return Column(
-      crossAxisAlignment: align,
-      children: [
-        Container(
-          constraints: const BoxConstraints(maxWidth: 720),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: bubbleColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isUser
-                  ? AppTheme.electricBlue.withOpacity(0.5)
-                  : const Color(0xFF2A3138),
-            ),
-          ),
+    final align = isUser ? Alignment.centerRight : Alignment.centerLeft;
+    final radius = BorderRadius.only(
+      topLeft: const Radius.circular(14),
+      topRight: const Radius.circular(14),
+      bottomLeft: isUser ? const Radius.circular(14) : const Radius.circular(4),
+      bottomRight: isUser ? const Radius.circular(4) : const Radius.circular(14),
+    );
+
+    final ts = time != null ? DateFormat('HH:mm').format(time!) : null;
+
+    return Align(
+      alignment: align,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 720),
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(color: bg, borderRadius: radius),
           child: Column(
-            crossAxisAlignment: align,
+            crossAxisAlignment:
+                isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
               SelectableText(
-                text,
-                style: const TextStyle(height: 1.35, fontSize: 15),
+                text.trim().isEmpty ? ' ' : text,
+                style: TextStyle(color: fg, height: 1.35, fontSize: 15.0),
               ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isUser ? Icons.person : Icons.smart_toy_outlined,
-                    size: 14,
-                    color: Colors.white70,
+              if (ts != null) ...[
+                const SizedBox(height: 6),
+                Text(
+                  ts,
+                  style: TextStyle(
+                    color: fg.withOpacity(0.75),
+                    fontSize: 11.5,
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    timeLabel,
-                    style: const TextStyle(fontSize: 12, color: Colors.white70),
-                  ),
-                ],
-              ),
-              if (showDisclaimer) ...[
-                const SizedBox(height: 10),
-                const Divider(height: 1, color: Color(0xFF2A3138)),
-                const SizedBox(height: 8),
-                const Text(
-                  'Källor/Disclaimer:\n• Informationen är vägledande. '
-                  'Följ alltid tillverkarens instruktioner och lokala säkerhetsregler. Egen risk.',
-                  style: TextStyle(fontSize: 12.5, color: Colors.white70, height: 1.35),
                 ),
               ],
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

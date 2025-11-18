@@ -2,29 +2,40 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/openai_client.dart';
 import '../chats/chat_repository.dart';
 import '../chats/chat_models.dart';
 
-enum Role { user, assistant }
+/// Bytt namn för att undvika krockar med andra "Role"
+enum ChatRole { user, assistant }
 
 class Message {
-  final Role role;
+  final ChatRole role;
   final String text;
   final DateTime time;
 
-  Message({required this.role, required this.text, DateTime? time})
-      : time = time ?? DateTime.now();
+  Message({
+    required this.role,
+    required this.text,
+    DateTime? time,
+  }) : time = time ?? DateTime.now();
 
   Message copyWith({String? text}) =>
       Message(role: role, text: text ?? this.text, time: time);
 
-  ChatMessageDTO toDto() =>
-      ChatMessageDTO(role: role == Role.user ? 'user' : 'assistant', text: text, time: time);
+  ChatMessageDTO toDto() => ChatMessageDTO(
+        role: role == ChatRole.user ? 'user' : 'assistant',
+        text: text,
+        time: time,
+      );
 
-  static Message fromDto(ChatMessageDTO d) =>
-      Message(role: d.role == 'user' ? Role.user : Role.assistant, text: d.text, time: d.time);
+  static Message fromDto(ChatMessageDTO d) => Message(
+        role: d.role == 'user' ? ChatRole.user : ChatRole.assistant,
+        text: d.text,
+        time: d.time,
+      );
 }
 
 class ChatState {
@@ -33,14 +44,15 @@ class ChatState {
   final bool isSending;
   final bool hasSafetyRisk;
 
-  // Meta om användaren/utrustningen
-  final int? expertise;        // 1/2/3
+  // Meta
+  final int? expertise; // 1/2/3
   final String? brand;
   final String? model;
   final String? year;
 
-  // Lås som gör att vi inte frågar om utrustning igen när den väl är satt
+  // UI-beteende
   final bool equipmentLocked;
+  final bool askedEquipment;
 
   const ChatState({
     required this.sessionId,
@@ -52,6 +64,7 @@ class ChatState {
     required this.model,
     required this.year,
     required this.equipmentLocked,
+    required this.askedEquipment,
   });
 
   factory ChatState.initial(String sessionId) => ChatState(
@@ -64,6 +77,7 @@ class ChatState {
         model: null,
         year: null,
         equipmentLocked: false,
+        askedEquipment: false,
       );
 
   ChatState copyWith({
@@ -75,19 +89,19 @@ class ChatState {
     String? model,
     String? year,
     bool? equipmentLocked,
-    bool keepMeta = false,
+    bool? askedEquipment,
   }) {
     return ChatState(
       sessionId: sessionId,
       messages: messages ?? this.messages,
       isSending: isSending ?? this.isSending,
       hasSafetyRisk: hasSafetyRisk ?? this.hasSafetyRisk,
-      expertise: keepMeta ? this.expertise : (expertise ?? this.expertise),
-      brand: keepMeta ? this.brand : (brand ?? this.brand),
-      model: keepMeta ? this.model : (model ?? this.model),
-      year: keepMeta ? this.year : (year ?? this.year),
-      equipmentLocked:
-          keepMeta ? this.equipmentLocked : (equipmentLocked ?? this.equipmentLocked),
+      expertise: expertise ?? this.expertise,
+      brand: brand ?? this.brand,
+      model: model ?? this.model,
+      year: year ?? this.year,
+      equipmentLocked: equipmentLocked ?? this.equipmentLocked,
+      askedEquipment: askedEquipment ?? this.askedEquipment,
     );
   }
 }
@@ -95,7 +109,7 @@ class ChatState {
 /// Inställningar (proxy/direkt, webbsök)
 class SettingsState {
   final bool proxyEnabled;
-  final String? proxyUrl; // /chat
+  final String? proxyUrl; // t.ex. http://127.0.0.1:8080/chat
   final String? directApiKey;
   final bool webLookupEnabled;
 
@@ -141,7 +155,12 @@ final chatControllerProvider =
   final settings = ref.watch(settingsProvider);
   final client = OpenAIClient.fromSettings(settings);
   final repo = ref.read(chatRepoProvider);
-  return ChatController(sessionId: sessionId, client: client, repo: repo, settings: settings);
+  return ChatController(
+    sessionId: sessionId,
+    client: client,
+    repo: repo,
+    settings: settings,
+  );
 });
 
 class ChatController extends StateNotifier<ChatState> {
@@ -151,7 +170,7 @@ class ChatController extends StateNotifier<ChatState> {
     required this.repo,
     required this.settings,
   }) : super(ChatState.initial(sessionId)) {
-    _load();
+    _init(); // starta asynkront
   }
 
   final String sessionId;
@@ -159,203 +178,145 @@ class ChatController extends StateNotifier<ChatState> {
   final ChatRepository repo;
   SettingsState settings;
 
+  // ---- Persistensnycklar (per sessionId) ----
+  String get _kBrand     => 'equip_${sessionId}_brand';
+  String get _kModel     => 'equip_${sessionId}_model';
+  String get _kYear      => 'equip_${sessionId}_year';
+  String get _kLock      => 'equip_${sessionId}_locked';
+  String get _kExpertise => 'equip_${sessionId}_expertise';
+
+  // Säkerhetsord (el/hydraul/bränsle/tryck/värme)
   static final _safetyRegex = RegExp(
     r'(?:(?<!\p{L})(el|elektr(?:isk|icitet)|hydraul(?:ik|system)?|bränsle|diesel|bensin|tryck|högt\s+tryck|värme|heta\s+y(?:t|tor))(?!\p{L}))',
     caseSensitive: false,
     unicode: true,
   );
 
-  bool _lastMessageIsRisk(List<Message> msgs) =>
-      msgs.isNotEmpty && _safetyRegex.hasMatch(msgs.last.text);
+  bool _lastMessageIsRisk(List<Message> msgs) {
+    return msgs.isNotEmpty && _safetyRegex.hasMatch(msgs.last.text);
+  }
 
-  Future<void> _load() async {
+  Future<void> _init() async {
+    // 1) Läs historik från repo
     final raw = await repo.loadMessages(sessionId);
-    var msgs = raw.map(Message.fromDto).toList();
+    final msgs = raw.map(Message.fromDto).toList();
 
-    // Helt ny chatt → fråga först efter expertis 1/2/3
-    if (msgs.isEmpty) {
-      final ask = Message(
-        role: Role.assistant,
-        text: 'Välj nivå:\n1) Nybörjare\n2) Medel\n3) Expert\nSvara med 1, 2 eller 3.',
-      );
-      msgs = [ask];
-      await repo.appendMessages(sessionId, [ask.toDto()]);
+    // 2) Uppdatera state
+    state = state.copyWith(
+      messages: msgs,
+      hasSafetyRisk: _lastMessageIsRisk(msgs),
+    );
+
+    // 3) Läs utrustning + kunskapsnivå från prefs
+    await _loadMetaFromPrefs();
+  }
+
+  Future<void> _loadMetaFromPrefs() async {
+    final p = await SharedPreferences.getInstance();
+    final b = p.getString(_kBrand);
+    final m = p.getString(_kModel);
+    final y = p.getString(_kYear);
+    final l = p.getBool(_kLock);
+    final x = p.getInt(_kExpertise);
+    state = state.copyWith(
+      brand: b ?? state.brand,
+      model: m ?? state.model,
+      year:  y ?? state.year,
+      equipmentLocked: l ?? state.equipmentLocked,
+      expertise: x ?? state.expertise,
+    );
+  }
+
+  Future<void> _saveEquipmentToPrefs() async {
+    final p = await SharedPreferences.getInstance();
+    if (state.brand != null)  await p.setString(_kBrand, state.brand!);
+    if (state.model != null)  await p.setString(_kModel, state.model!);
+    if (state.year  != null)  await p.setString(_kYear,  state.year!);
+    await p.setBool(_kLock, state.equipmentLocked);
+  }
+
+  Future<void> _saveExpertiseToPrefs() async {
+    final p = await SharedPreferences.getInstance();
+    if (state.expertise == null) {
+      await p.remove(_kExpertise);
+    } else {
+      await p.setInt(_kExpertise, state.expertise!);
     }
-
-    state = state.copyWith(messages: msgs, hasSafetyRisk: _lastMessageIsRisk(msgs));
   }
 
-  int? _parseExpertiseSelection(String s) {
-    final m = RegExp(r'^\s*([123])\s*$').firstMatch(s);
-    return m == null ? null : int.parse(m.group(1)!);
+  // ---- Enda sättet att ändra utrustning: via UI-rutorna ----
+  void updateEquipment({String? brand, String? model, String? year, bool lock = false}) {
+    state = state.copyWith(
+      brand: brand ?? state.brand,
+      model: model ?? state.model,
+      year:  year  ?? state.year,
+      equipmentLocked: lock ? true : state.equipmentLocked,
+      askedEquipment: true,
+    );
+    _saveEquipmentToPrefs();
   }
 
-  // Tålig tolkning: funkar för "Volvo EC250E 2019" OCH "märke: volvo, modell: ec250e, år: 2019"
-  ({String? brand, String? model, String? year}) _extractEquipment(String s) {
-    final lower = s.toLowerCase();
+  void setEquipmentLocked(bool v) {
+    state = state.copyWith(equipmentLocked: v);
+    _saveEquipmentToPrefs();
+  }
 
-    // Nyckelordformat
-    final brandK = RegExp(r'\bmärke\s*:\s*([^\n,;]+)', caseSensitive: false).firstMatch(s);
-    final modelK = RegExp(r'\bmodell\s*:\s*([^\n,;]+)', caseSensitive: false).firstMatch(s);
-    final yearK  = RegExp(r'\b(år|årsmodell)\s*:\s*(\d{4})', caseSensitive: false).firstMatch(s);
-
-    String? brand = brandK?.group(1)?.trim();
-    String? model = modelK?.group(1)?.trim();
-    String? year  = yearK?.group(2)?.trim();
-
-    // Fritextformat som fallback
-    year ??= RegExp(r'\b(19|20)\d{2}\b').firstMatch(s)?.group(0);
-    if (brand == null || model == null) {
-      final words = s.trim().split(RegExp(r'\s+'));
-      if (words.isNotEmpty) brand ??= words.first;
-      if (words.length >= 2) {
-        final filtered = words.where((w) => w != year).toList();
-        if (filtered.length >= 2) {
-          model ??= filtered.sublist(1).join(' ');
-        }
-      }
+  // ---- Kunskapsnivå sätts från dropdown i UI ----
+  void setExpertise(int? level) {
+    int? valid;
+    if (level == null || level == 1 || level == 2 || level == 3) {
+      valid = level;
+    } else {
+      valid = null;
     }
-
-    // Städa triviala ord
-    if (brand != null && brand.toLowerCase().startsWith('märke')) brand = null;
-    if (model != null && model.toLowerCase().startsWith('modell')) model = null;
-
-    return (brand: _clean(brand), model: _clean(model), year: _clean(year));
+    state = state.copyWith(expertise: valid);
+    _saveExpertiseToPrefs();
   }
 
-  String? _clean(String? s) {
-    if (s == null) return null;
-    final t = s.trim();
-    return t.isEmpty ? null : t;
+  void suppressEquipmentQuestion() {
+    state = state.copyWith(askedEquipment: true);
   }
-
-  bool _hasEquipment(ChatState st) =>
-      (st.brand?.isNotEmpty == true) && (st.model?.isNotEmpty == true) && (st.year?.isNotEmpty == true);
 
   bool _isChangeEquipmentCommand(String s) {
     final x = s.toLowerCase().trim();
     return x.startsWith('/byt') ||
-           x.startsWith('byt utrustning') ||
-           x.startsWith('ändra utrustning') ||
-           x.startsWith('byta utrustning');
+        x.startsWith('byt utrustning') ||
+        x.startsWith('ändra utrustning') ||
+        x.startsWith('byta utrustning');
   }
 
   Future<void> send(String userText) async {
-    // 0) Special: användaren vill byta utrustning manuellt
+    // /byt: påminn att använda rutorna – ändra inget automatiskt
     if (_isChangeEquipmentCommand(userText)) {
-      final u = Message(role: Role.user, text: userText);
+      final u = Message(role: ChatRole.user, text: userText);
       final a = Message(
-        role: Role.assistant,
-        text: 'Ok, uppdatera märke, modell och årsmodell (t.ex. "Märke: Volvo, Modell: EC250E, År: 2019").',
+        role: ChatRole.assistant,
+        text: 'Uppdatera märke, modell och årsmodell i fälten ovan. Chatten ändrar inte utrustning.',
       );
       final msgs = [...state.messages, u, a];
       state = state.copyWith(
         messages: msgs,
         hasSafetyRisk: _safetyRegex.hasMatch(a.text),
-        brand: null, model: null, year: null,
-        equipmentLocked: false,
+        askedEquipment: true,
       );
       await repo.appendMessages(sessionId, [u.toDto(), a.toDto()]);
       return;
     }
 
-    // 1) Hantera första valet av expertis
-    if (state.expertise == null) {
-      final pick = _parseExpertiseSelection(userText);
-      if (pick != null) {
-        final userMsg = Message(role: Role.user, text: userText);
-        final confirm = Message(
-          role: Role.assistant,
-          text: switch (pick) {
-            1 => 'Ok. Jag förklarar stegvis. Vilket märke, modell och årsmodell?',
-            2 => 'Noterat. Ange märke, modell och årsmodell.',
-            _ => 'Klart. Ange märke, modell och årsmodell för exakt guidning.',
-          },
-        );
-        final next = [...state.messages, userMsg, confirm];
-        state = state.copyWith(
-          messages: next,
-          hasSafetyRisk: _safetyRegex.hasMatch(confirm.text),
-          expertise: pick,
-          equipmentLocked: false,
-        );
-        await repo.appendMessages(sessionId, [userMsg.toDto(), confirm.toDto()]);
-        return;
-      }
-    }
-
-    // 2) Lägg till användarens meddelande
-    final newUser = Message(role: Role.user, text: userText);
+    // Vanligt användarmeddelande
+    final newUser = Message(role: ChatRole.user, text: userText);
     var msgs = [...state.messages, newUser];
 
-    // 3) Uppdatera utrustning om den inte var låst än
-    String? brand = state.brand, model = state.model, year = state.year;
-    if (!state.equipmentLocked) {
-      final eq = _extractEquipment(userText);
-      brand ??= eq.brand;
-      model ??= eq.model;
-      year  ??= eq.year;
-    }
+    state = state.copyWith(
+      isSending: true,
+      messages: msgs,
+      hasSafetyRisk: _safetyRegex.hasMatch(newUser.text),
+    );
+    await repo.appendMessages(sessionId, [newUser.toDto()]);
 
-    // 4) Ska vi fråga efter saknade bitar? Endast om INTE låst ännu.
-    if (!state.equipmentLocked) {
-      final missing = <String>[];
-      if (brand == null || brand.isEmpty) missing.add('märke');
-      if (model == null || model.isEmpty) missing.add('modell');
-      if (year == null || year.isEmpty) missing.add('årsmodell');
-
-      // Spara användarens meddelande först
-      state = state.copyWith(
-        isSending: true,
-        messages: msgs,
-        hasSafetyRisk: _safetyRegex.hasMatch(newUser.text),
-        brand: brand, model: model, year: year,
-        keepMeta: true,
-      );
-      await repo.appendMessages(sessionId, [newUser.toDto()]);
-
-      if (missing.isNotEmpty) {
-        final ask = Message(
-          role: Role.assistant,
-          text: 'För att vara specifik, saknas: ${missing.join(', ')}. '
-                'Svara t.ex: "Märke: Volvo, Modell: EC250E, År: 2019". '
-                'Vill du byta senare, skriv "/byt".',
-        );
-        msgs = [...msgs, ask];
-        state = state.copyWith(
-          messages: msgs,
-          hasSafetyRisk: _safetyRegex.hasMatch(ask.text),
-          keepMeta: true,
-          isSending: false,
-        );
-        await repo.appendMessages(sessionId, [ask.toDto()]);
-        return;
-      } else {
-        // All utrustning finns → lås så vi inte frågar igen
-        state = state.copyWith(equipmentLocked: true, keepMeta: true);
-      }
-    } else {
-      // Utrustning är redan låst — bara spara användarens meddelande
-      state = state.copyWith(
-        isSending: true,
-        messages: msgs,
-        hasSafetyRisk: _safetyRegex.hasMatch(newUser.text),
-        keepMeta: true,
-      );
-      await repo.appendMessages(sessionId, [newUser.toDto()]);
-    }
-
-    // 5) Hämta ev. webbnotiser (om påslaget) och svara
-    String? webNotes;
-    if (settings.webLookupEnabled && _hasEquipment(state)) {
-      // Webbsök sköts i OpenAIClient via systempromptens "webNotes" om du kopplat in
-      // en faktisk webbsök-klient. Här håller vi oss till befintlig arkitektur.
-      // (Om du redan infört WebSearchClient i tidigare steg, skicka in webNotes via client.completeChat)
-      webNotes = null;
-    }
-
+    // Historik (user-flag + text)
     final history = state.messages
-        .map<(bool, String)>((m) => (m.role == Role.user, m.text))
+        .map<(bool, String)>((m) => (m.role == ChatRole.user, m.text))
         .toList(growable: false);
 
     try {
@@ -366,14 +327,13 @@ class ChatController extends StateNotifier<ChatState> {
         brand: state.brand,
         model: state.model,
         year: state.year,
-        webNotes: webNotes,
       );
 
-      var assistant = Message(role: Role.assistant, text: '');
+      var assistant = Message(role: ChatRole.assistant, text: '');
       msgs = [...msgs, assistant];
-      state = state.copyWith(messages: msgs, hasSafetyRisk: false, keepMeta: true);
+      state = state.copyWith(messages: msgs, hasSafetyRisk: false);
 
-      // Simulerad streaming
+      // Simulerad "streaming"
       const stepMs = 12;
       for (int i = 0; i < fullText.length; i++) {
         final chunk = fullText.substring(0, i + 1);
@@ -382,23 +342,24 @@ class ChatController extends StateNotifier<ChatState> {
         state = state.copyWith(
           messages: [...msgs],
           hasSafetyRisk: _safetyRegex.hasMatch(chunk),
-          keepMeta: true,
         );
         await Future.delayed(const Duration(milliseconds: stepMs));
       }
 
       await repo.appendMessages(sessionId, [assistant.toDto()]);
 
-      // Döp titel på första “riktiga” svaret
+      // Döp titel efter första riktiga svaret (frivilligt)
       if (msgs.length <= 3) {
         final firstLine = assistant.text.split('\n').first.trim();
         if (firstLine.isNotEmpty) {
-          final title = firstLine.length > 40 ? '${firstLine.substring(0, 40)}…' : firstLine;
+          final title = firstLine.length > 40
+              ? '${firstLine.substring(0, 40)}…'
+              : firstLine;
           await repo.renameSession(sessionId, title);
         }
       }
     } finally {
-      state = state.copyWith(isSending: false, keepMeta: true);
+      state = state.copyWith(isSending: false);
     }
   }
 }
