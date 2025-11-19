@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../chats/chat_list_screen.dart' show sessionsProvider;
 import '../chats/chat_repository.dart';
 import '../chat/chat_screen.dart';
+import '../start/widgets/floating_lines_background.dart';
 
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
@@ -170,73 +171,86 @@ class _LandingArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            cs.surface.withOpacity(0.0),
-            cs.surface.withOpacity(0.25),
-          ],
-        ),
-      ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 920),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Stor rubrik
-                Text(
-                  'Välkommen till SERA',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Service & Equipment Repair Assistant',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white70),
-                ),
-                const SizedBox(height: 24),
-
-                // Förslag ("prompt suggestions")
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: const [
-                    _SuggestionChip('Felsökning – motor startar inte'),
-                    _SuggestionChip('Läs felkod & nästa steg'),
-                    _SuggestionChip('Underhåll – checklista'),
-                    _SuggestionChip('Säkerhetsråd – hydraulik'),
-                  ],
-                ),
-                const SizedBox(height: 28),
-
-                FilledButton.icon(
-                  onPressed: onNewChat,
-                  icon: const Icon(Icons.add_comment),
-                  label: const Text('Starta ny chatt'),
-                ),
-
-                const SizedBox(height: 32),
-                const _Disclaimer(),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                cs.surfaceVariant.withValues(alpha: 0.65),
+                cs.surface.withValues(alpha: 0.85),
               ],
             ),
           ),
         ),
-      ),
+        const Positioned.fill(
+          child: FloatingLinesBackground(
+            enabledWaves: ['top', 'middle', 'bottom'],
+            lineCount: [8, 12, 16],
+            lineDistance: [7, 5, 4],
+            animationSpeed: 0.16,
+            opacity: 0.8,
+          ),
+        ),
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 920),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Stor rubrik
+                  Text(
+                    'Välkommen till SERA',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Service & Equipment Repair Assistant',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Förslag ("prompt suggestions")
+                  const Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      _SuggestionChip('Felsökning – motor startar inte'),
+                      _SuggestionChip('Läs felkod & nästa steg'),
+                      _SuggestionChip('Underhåll – checklista'),
+                      _SuggestionChip('Säkerhetsråd – hydraulik'),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+
+                  FilledButton.icon(
+                    onPressed: onNewChat,
+                    icon: const Icon(Icons.add_comment),
+                    label: const Text('Starta ny chatt'),
+                  ),
+
+                  const SizedBox(height: 32),
+                  const _Disclaimer(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
 
 class _SuggestionChip extends StatelessWidget {
-  const _SuggestionChip(this.text, {super.key});
+  const _SuggestionChip(this.text);
   final String text;
 
   @override

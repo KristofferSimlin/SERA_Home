@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   static const Color electricBlue = Color(0xFF00A3FF);
-  static const Color safetyOrange = Color(0xFFFF7A00);
+  static const Color safetyOrange = Color.fromARGB(255, 91, 3, 103);
   static const Color bgDark = Color(0xFF0E1113);
   static const Color surfaceDark = Color(0xFF151A1E);
 

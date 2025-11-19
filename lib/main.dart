@@ -7,6 +7,7 @@ import 'theme/app_theme.dart';
 import 'features/home/home_shell.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/chat/chat_screen.dart'; // ← lägg till
+import 'features/start/start_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +27,7 @@ class SeraApp extends StatelessWidget {
 
       // Befintliga named routes som du redan hade
       routes: {
+        '/start': (_) => const StartScreen(),
         '/': (_) => const HomeShell(),
         '/settings': (_) => const SettingsScreen(),
       },
@@ -46,7 +48,7 @@ class SeraApp extends StatelessWidget {
         return null; // låt övriga routes hanteras av 'routes' ovan
       },
 
-      initialRoute: '/',
+      initialRoute: '/start',
     );
   }
 }

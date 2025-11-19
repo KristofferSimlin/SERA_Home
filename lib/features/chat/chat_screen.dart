@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chat_controller.dart'; // <-- vanlig import, ingen show-filter
+import 'widgets/chat_backdrop.dart';
 import 'widgets/chat_bubble.dart';
 import 'widgets/safety_banner.dart';
 
@@ -130,8 +131,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
+        fit: StackFit.expand,
         children: [
+          const Positioned.fill(
+            child: ChatBackdrop(
+              speed: 1.5,
+              intensity: 1.6,
+            ),
+          ),
+          Column(
+            children: [
           // Utrustning + nivå + status
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
@@ -296,7 +306,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               padding: EdgeInsets.only(bottom: 4),
               child: Text(
                 'Informationen är vägledande. Följ alltid tillverkarens instruktioner och lokala säkerhetsregler. Egen risk.',
-                style: TextStyle(color: Colors.white70, fontSize: 12.5),
+                style: TextStyle(color: Color.fromARGB(179, 241, 238, 238), fontSize: 12.5),
               ),
             ),
           ),
@@ -328,6 +338,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ],
               ),
             ),
+          ),
+        ],
           ),
         ],
       ),
