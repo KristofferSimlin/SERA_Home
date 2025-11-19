@@ -4,24 +4,32 @@ class ChatSessionMeta {
   final String id;
   final String title;
   final DateTime updatedAt;
+  final bool customTitle;
 
   ChatSessionMeta({
     required this.id,
     required this.title,
     required this.updatedAt,
+    this.customTitle = false,
   });
 
-  ChatSessionMeta copyWith({String? title, DateTime? updatedAt}) =>
+  ChatSessionMeta copyWith({
+    String? title,
+    DateTime? updatedAt,
+    bool? customTitle,
+  }) =>
       ChatSessionMeta(
         id: id,
         title: title ?? this.title,
         updatedAt: updatedAt ?? this.updatedAt,
+        customTitle: customTitle ?? this.customTitle,
       );
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
         'updatedAt': updatedAt.toIso8601String(),
+        'customTitle': customTitle,
       };
 
   static ChatSessionMeta fromJson(Map<String, dynamic> j) => ChatSessionMeta(
@@ -29,6 +37,7 @@ class ChatSessionMeta {
         title: j['title'] as String? ?? 'Ny chatt',
         updatedAt: DateTime.tryParse(j['updatedAt'] as String? ?? '') ??
             DateTime.now(),
+        customTitle: j['customTitle'] as bool? ?? false,
       );
 }
 

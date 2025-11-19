@@ -82,7 +82,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: cs.surfaceVariant.withOpacity(0.25),
+                      color: cs.surfaceContainerHigh.withValues(alpha: 0.25),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Text(
@@ -123,12 +123,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
 
           // Info
-          Card(
+          const Card(
             child: Padding(
-              padding: const EdgeInsets.all(14),
+              padding: EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text('Säkerhet', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   SizedBox(height: 8),
                   Text(

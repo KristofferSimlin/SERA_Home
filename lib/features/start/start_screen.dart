@@ -78,13 +78,33 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Spacer(),
-                    Text(
-                      'SERA',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 6,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'SERA',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 6,
+                              ),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: cs.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(999),
                           ),
+                          child: Text(
+                            'BETA',
+                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                  letterSpacing: 2,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 24),
                     Text(

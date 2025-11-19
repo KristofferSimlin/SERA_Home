@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../chats/chat_list_screen.dart' show sessionsProvider;
+import '../chats/chat_models.dart';
+import '../chats/chat_providers.dart' show sessionsProvider;
 import '../chats/chat_repository.dart';
 import '../chat/chat_screen.dart';
 import '../start/widgets/floating_lines_background.dart';
@@ -18,11 +19,23 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Future<void> _newChat() async {
     final id = await ref.read(chatRepoProvider).createSession();
     if (!mounted) return;
-    Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(sessionId: id)));
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ChatScreen(sessionId: id)),
+    );
+    if (mounted) {
+      ref.invalidate(sessionsProvider);
+    }
   }
 
-  void _openChat(String id) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(sessionId: id)));
+  Future<void> _openChat(String id) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ChatScreen(sessionId: id)),
+    );
+    if (mounted) {
+      ref.invalidate(sessionsProvider);
+    }
   }
 
   @override
@@ -30,8 +43,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     // Responsiv layout: bred skärm -> fast sidofält, smal -> Drawer
     final isWide = MediaQuery.of(context).size.width >= 900;
     final sidebar = _Sidebar(
-      onNewChat: _newChat,
-      onOpenChat: _openChat,
+      onNewChat: () {
+        _newChat();
+      },
+      onOpenChat: (id) {
+        _openChat(id);
+      },
       searchCtrl: _search,
     );
 
@@ -44,7 +61,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               actions: [
                 IconButton(
                   tooltip: 'Ny chatt',
-                  onPressed: _newChat,
+                  onPressed: () {
+                    _newChat();
+                  },
                   icon: const Icon(Icons.add_comment),
                 ),
                 IconButton(
@@ -57,13 +76,21 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       body: Row(
         children: [
           if (isWide) SizedBox(width: 320, child: Material(color: Theme.of(context).colorScheme.surface, child: SafeArea(child: sidebar))),
-          Expanded(child: _LandingArea(onNewChat: _newChat)),
+          Expanded(
+            child: _LandingArea(
+              onNewChat: () {
+                _newChat();
+              },
+            ),
+          ),
         ],
       ),
       floatingActionButton: isWide
           ? null
           : FloatingActionButton.extended(
-              onPressed: _newChat,
+              onPressed: () {
+                _newChat();
+              },
               icon: const Icon(Icons.add),
               label: const Text('Ny chatt'),
             ),
@@ -90,6 +117,14 @@ class _Sidebar extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
+          const Row(
+            children: [
+              _NavButton(label: 'Academy', subtitle: 'Coming soon', icon: Icons.school),
+              SizedBox(width: 8),
+              _NavButton(label: 'Forum', subtitle: 'Coming soon', icon: Icons.forum),
+            ],
+          ),
+          const SizedBox(height: 12),
           // Topp: Ny chatt + Sök
           Row(
             children: [
@@ -142,13 +177,23 @@ class _Sidebar extends ConsumerWidget {
                       title: Text(s.title, maxLines: 1, overflow: TextOverflow.ellipsis),
                       subtitle: Text('${s.updatedAt}'),
                       onTap: () => onOpenChat(s.id),
-                      trailing: IconButton(
-                        tooltip: 'Radera',
-                        icon: const Icon(Icons.delete_outline),
-                        onPressed: () async {
-                          await ref.read(chatRepoProvider).deleteSession(s.id);
-                          ref.invalidate(sessionsProvider);
-                        },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: 'Byt namn',
+                            icon: const Icon(Icons.drive_file_rename_outline),
+                            onPressed: () => _renameSession(context, ref, s),
+                          ),
+                          IconButton(
+                            tooltip: 'Radera',
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () async {
+                              await ref.read(chatRepoProvider).deleteSession(s.id);
+                              ref.invalidate(sessionsProvider);
+                            },
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -159,6 +204,88 @@ class _Sidebar extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _renameSession(
+    BuildContext context,
+    WidgetRef ref,
+    ChatSessionMeta session,
+  ) async {
+    final controller = TextEditingController(text: session.title);
+    final newTitle = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Döp om chatt'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 48,
+          decoration: const InputDecoration(hintText: 'Ange nytt namn'),
+          onSubmitted: (value) => Navigator.of(ctx).pop(value),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Avbryt'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text),
+            child: const Text('Spara'),
+          ),
+        ],
+      ),
+    );
+    final trimmed = newTitle?.trim();
+    if (trimmed == null || trimmed.isEmpty) return;
+    await ref.read(chatRepoProvider).renameSession(session.id, trimmed);
+    ref.invalidate(sessionsProvider);
+  }
+}
+
+class _NavButton extends StatelessWidget {
+  const _NavButton({
+    required this.label,
+    required this.subtitle,
+    required this.icon,
+  });
+
+  final String label;
+  final String subtitle;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.onSurfaceVariant;
+
+    return Expanded(
+      child: OutlinedButton.icon(
+        style: OutlinedButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$label — $subtitle')),
+          );
+        },
+        icon: Icon(icon, size: 20, color: color),
+        label: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            Text(
+              subtitle,
+              style: theme.textTheme.bodySmall?.copyWith(color: color),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -180,7 +307,7 @@ class _LandingArea extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                cs.surfaceVariant.withValues(alpha: 0.65),
+                cs.surfaceContainerHighest.withValues(alpha: 0.65),
                 cs.surface.withValues(alpha: 0.85),
               ],
             ),
@@ -204,11 +331,31 @@ class _LandingArea extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Stor rubrik
-                  Text(
-                    'Välkommen till SERA',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Välkommen till SERA',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        'BETA',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              letterSpacing: 2,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
                   const SizedBox(height: 8),
                   Text(
                     'Service & Equipment Repair Assistant',

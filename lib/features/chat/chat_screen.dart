@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chat_controller.dart'; // <-- vanlig import, ingen show-filter
+import '../chats/chat_providers.dart' show sessionsProvider;
+import '../chats/chat_repository.dart';
 import 'widgets/chat_backdrop.dart';
 import 'widgets/chat_bubble.dart';
 import 'widgets/safety_banner.dart';
@@ -17,6 +19,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _input = TextEditingController();
+  final ScrollController _scrollCtrl = ScrollController();
 
   late final TextEditingController _brandCtrl;
   late final TextEditingController _modelCtrl;
@@ -29,8 +32,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   bool _lock = false;
 
   // Litet hjälp-API för att få en korrekt typad notifier
-  ChatController _ctrl() =>
-      (ref.read(chatControllerProvider(widget.sessionId).notifier) as ChatController);
+  ChatController _ctrl() => ref.read(chatControllerProvider(widget.sessionId).notifier);
 
   @override
   void initState() {
@@ -51,6 +53,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void dispose() {
     _input.dispose();
+    _scrollCtrl.dispose();
     _brandCtrl.dispose();
     _modelCtrl.dispose();
     _yearCtrl.dispose();
@@ -85,6 +88,44 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         .showSnackBar(const SnackBar(content: Text('Utrustning rensad')));
   }
 
+  Future<void> _promptRenameSession() async {
+    final repo = ref.read(chatRepoProvider);
+    final current = await repo.getSession(widget.sessionId);
+    if (!mounted) return;
+    final controller = TextEditingController(text: current?.title ?? '');
+    final newTitle = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Döp om chatt'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 48,
+          decoration: const InputDecoration(hintText: 'Ange nytt chattnamn'),
+          onSubmitted: (value) => Navigator.of(ctx).pop(value),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Avbryt'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text),
+            child: const Text('Spara'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    final trimmed = newTitle?.trim();
+    if (trimmed == null || trimmed.isEmpty) return;
+    await repo.renameSession(widget.sessionId, trimmed);
+    if (!mounted) return;
+    ref.invalidate(sessionsProvider);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Chatt döpt om till "$trimmed"')));
+  }
+
   Future<void> _send() async {
     final text = _input.text.trim();
     if (text.isEmpty) return;
@@ -95,6 +136,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(chatControllerProvider(widget.sessionId));
+
+    ref.listen<ChatState>(
+      chatControllerProvider(widget.sessionId),
+      (prev, next) {
+        final prevMessages = prev?.messages ?? const [];
+        final nextMessages = next.messages;
+        final lengthChanged = prevMessages.length != nextMessages.length;
+        final lastUpdated = !lengthChanged &&
+            nextMessages.isNotEmpty &&
+            prevMessages.isNotEmpty &&
+            nextMessages.last.text != prevMessages.last.text;
+        if (lengthChanged || lastUpdated) {
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => _scrollToBottom(animated: lengthChanged),
+          );
+        }
+      },
+    );
 
     // Synka fält ↔ state (skriv inte över när fältet är fokuserat)
     if (!_brandFocus.hasFocus && _brandCtrl.text != (state.brand ?? '')) {
@@ -118,6 +177,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       appBar: AppBar(
         title: Text('SERA – Chatt  •  ${widget.sessionId}'),
         actions: [
+          IconButton(
+            tooltip: 'Döp om chatt',
+            onPressed: _promptRenameSession,
+            icon: const Icon(Icons.drive_file_rename_outline),
+          ),
           IconButton(
             tooltip: _lock ? 'Lås av utrustning' : 'Lås utrustning',
             onPressed: () {
@@ -197,7 +261,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         SizedBox(
                           width: 180,
                           child: DropdownButtonFormField<int>(
-                            value: state.expertise,
+                            initialValue: state.expertise,
                             decoration: const InputDecoration(
                               labelText: 'Kunskapsnivå',
                             ),
@@ -267,7 +331,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         padding: const EdgeInsets.only(top: 6),
                         child: Text(
                           'debug → brand:${state.brand ?? "-"} | model:${state.model ?? "-"} | year:${state.year ?? "-"} | level:${state.expertise ?? "-"} | locked:${state.equipmentLocked}',
-                          style: TextStyle(fontSize: 11, color: cs.onSurface.withOpacity(0.6)),
+                          style: TextStyle(fontSize: 11, color: cs.onSurface.withValues(alpha: 0.6)),
                         ),
                       ),
                     ),
@@ -287,6 +351,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
           Expanded(
             child: ListView.builder(
+              controller: _scrollCtrl,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               itemCount: state.messages.length,
               itemBuilder: (_, i) {
@@ -344,6 +409,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ],
       ),
     );
+  }
+
+  void _scrollToBottom({bool animated = true}) {
+    if (!_scrollCtrl.hasClients) return;
+    final pos = _scrollCtrl.position.maxScrollExtent;
+    if (animated) {
+      _scrollCtrl.animateTo(
+        pos,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOut,
+      );
+    } else {
+      _scrollCtrl.jumpTo(pos);
+    }
   }
 
   String _statusText(ChatState st) {

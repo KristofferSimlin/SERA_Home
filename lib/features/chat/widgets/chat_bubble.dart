@@ -15,12 +15,13 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final bg = isUser
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.4);
+        ? colorScheme.primary
+        : colorScheme.surfaceContainerHighest.withValues(alpha: 0.4);
     final fg = isUser
-        ? Theme.of(context).colorScheme.onPrimary
-        : Theme.of(context).colorScheme.onSurface;
+        ? colorScheme.onPrimary
+        : colorScheme.onSurface;
 
     final align = isUser ? Alignment.centerRight : Alignment.centerLeft;
     final radius = BorderRadius.only(
@@ -53,7 +54,7 @@ class ChatBubble extends StatelessWidget {
                 Text(
                   ts,
                   style: TextStyle(
-                    color: fg.withOpacity(0.75),
+                    color: fg.withValues(alpha: 0.75),
                     fontSize: 11.5,
                   ),
                 ),

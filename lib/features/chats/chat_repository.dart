@@ -22,10 +22,13 @@ class ChatRepository {
 
   Future<String> createSession({String? title}) async {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
+    final trimmed = title?.trim();
+    final hasCustomTitle = trimmed?.isNotEmpty == true;
     final session = ChatSessionMeta(
       id: id,
-      title: title?.trim().isNotEmpty == true ? title!.trim() : 'Ny chatt',
+      title: hasCustomTitle ? trimmed! : 'Ny chatt',
       updatedAt: DateTime.now(),
+      customTitle: hasCustomTitle,
     );
     final all = await listSessions();
     await _saveSessions([session, ...all]);
@@ -34,10 +37,32 @@ class ChatRepository {
   }
 
   Future<void> renameSession(String id, String title) async {
+    final trimmed = title.trim();
+    if (trimmed.isEmpty) return;
     final all = await listSessions();
     final i = all.indexWhere((s) => s.id == id);
     if (i < 0) return;
-    all[i] = all[i].copyWith(title: title, updatedAt: DateTime.now());
+    all[i] = all[i].copyWith(
+      title: trimmed,
+      updatedAt: DateTime.now(),
+      customTitle: true,
+    );
+    await _saveSessions(all);
+  }
+
+  Future<void> renameSessionAuto(String id, String title) async {
+    final trimmed = title.trim();
+    if (trimmed.isEmpty) return;
+    final all = await listSessions();
+    final i = all.indexWhere((s) => s.id == id);
+    if (i < 0) return;
+    final session = all[i];
+    if (session.customTitle) return;
+    all[i] = session.copyWith(
+      title: trimmed,
+      updatedAt: DateTime.now(),
+      customTitle: false,
+    );
     await _saveSessions(all);
   }
 
@@ -62,6 +87,15 @@ class ChatRepository {
     final raw = sp.getString(_kMessagesKey(id));
     if (raw == null) return [];
     return decodeList(raw, ChatMessageDTO.fromJson);
+  }
+
+  Future<ChatSessionMeta?> getSession(String id) async {
+    final all = await listSessions();
+    try {
+      return all.firstWhere((s) => s.id == id);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> appendMessages(String id, List<ChatMessageDTO> msgs) async {

@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'chat_repository.dart';        // innehåller chatRepoProvider
 import 'chat_models.dart';
+import 'chat_providers.dart';
 import '../chat/chat_screen.dart';
-
-final sessionsProvider = FutureProvider<List<ChatSessionMeta>>((ref) {
-  return ref.read(chatRepoProvider).listSessions();
-});
 
 class ChatListScreen extends ConsumerStatefulWidget {
   const ChatListScreen({super.key});
@@ -26,10 +23,11 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   Future<void> _newChat() async {
     final id = await ref.read(chatRepoProvider).createSession();
     if (!mounted) return;
-    Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => ChatScreen(sessionId: id)),
-    ).then((_) => _refresh());
+    );
+    if (mounted) _refresh();
   }
 
   Future<void> _onSearch(String q) async {
@@ -125,12 +123,22 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                           title: Text(s.title, maxLines: 1, overflow: TextOverflow.ellipsis),
                           subtitle: Text('Uppdaterad: ${s.updatedAt}'),
                           leading: const Icon(Icons.chat_bubble_outline),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            onPressed: () async {
-                              await ref.read(chatRepoProvider).deleteSession(s.id);
-                              if (mounted) _refresh();
-                            },
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                tooltip: 'Byt namn',
+                                icon: const Icon(Icons.drive_file_rename_outline),
+                                onPressed: () => _renameSession(s),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline),
+                                onPressed: () async {
+                                  await ref.read(chatRepoProvider).deleteSession(s.id);
+                                  if (mounted) _refresh();
+                                },
+                              ),
+                            ],
                           ),
                           onTap: () {
                             Navigator.push(
@@ -165,5 +173,36 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
         label: const Text('Ny chatt'),
       ),
     );
+  }
+
+  Future<void> _renameSession(ChatSessionMeta session) async {
+    final controller = TextEditingController(text: session.title);
+    final newTitle = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Döp om chatt'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 48,
+          decoration: const InputDecoration(hintText: 'Ange nytt namn'),
+          onSubmitted: (value) => Navigator.of(ctx).pop(value),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Avbryt'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text),
+            child: const Text('Spara'),
+          ),
+        ],
+      ),
+    );
+    final trimmed = newTitle?.trim();
+    if (trimmed == null || trimmed.isEmpty) return;
+    await ref.read(chatRepoProvider).renameSession(session.id, trimmed);
+    if (mounted) _refresh();
   }
 }

@@ -1,6 +1,5 @@
 // lib/features/chat/chat_controller.dart
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -199,7 +198,18 @@ class ChatController extends StateNotifier<ChatState> {
   Future<void> _init() async {
     // 1) Läs historik från repo
     final raw = await repo.loadMessages(sessionId);
-    final msgs = raw.map(Message.fromDto).toList();
+    var msgs = raw.map(Message.fromDto).toList();
+
+    // För helt nya sessioner: hälsa och tipsa om utrustningsinfo
+    if (msgs.isEmpty) {
+      final intro = Message(
+        role: ChatRole.assistant,
+        text:
+            'Hej! Jag är SERA – Service & Equipment Repair Assistant. Fyll gärna i märke, modell, årsmodell och din kunskapsnivå så kan jag hjälpa dig mer träffsäkert.',
+      );
+      msgs = [intro];
+      await repo.appendMessages(sessionId, [intro.toDto()]);
+    }
 
     // 2) Uppdatera state
     state = state.copyWith(
@@ -254,6 +264,7 @@ class ChatController extends StateNotifier<ChatState> {
       askedEquipment: true,
     );
     _saveEquipmentToPrefs();
+    unawaited(_maybeRenameFromEquipment());
   }
 
   void setEquipmentLocked(bool v) {
@@ -355,11 +366,28 @@ class ChatController extends StateNotifier<ChatState> {
           final title = firstLine.length > 40
               ? '${firstLine.substring(0, 40)}…'
               : firstLine;
-          await repo.renameSession(sessionId, title);
+          await repo.renameSessionAuto(sessionId, title);
         }
       }
     } finally {
       state = state.copyWith(isSending: false);
     }
+  }
+
+  String? _buildEquipmentTitle() {
+    final brand = state.brand?.trim() ?? '';
+    final model = state.model?.trim() ?? '';
+    final year = state.year?.trim() ?? '';
+    final core = [brand, model].where((e) => e.isNotEmpty).join(' ');
+    if (core.isEmpty && year.isEmpty) return null;
+    if (year.isEmpty) return core;
+    if (core.isEmpty) return year;
+    return '$core ($year)';
+  }
+
+  Future<void> _maybeRenameFromEquipment() async {
+    final title = _buildEquipmentTitle();
+    if (title == null) return;
+    await repo.renameSessionAuto(sessionId, title);
   }
 }
