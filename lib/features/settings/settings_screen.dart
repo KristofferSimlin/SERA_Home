@@ -63,7 +63,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     onChanged: (v) => ref.read(settingsProvider.notifier).setProxyUrl(v.trim()),
                     decoration: const InputDecoration(
                       labelText: 'PROXY_URL',
-                      hintText: 'http://127.0.0.1:8080/chat',
+                      hintText: 'https://api.sera.chat/api/openai-proxy',
                       helperText: 'Ange ENDAST URL:en (inte "PROXY_URL=" framför).',
                     ),
                   ),

@@ -53,6 +53,62 @@ String _postProcess(String s) {
   return out.trimLeft();
 }
 
+String _contentFromList(List<dynamic> content) {
+  final buffer = StringBuffer();
+  for (final part in content) {
+    if (part is String) {
+      buffer.write(part);
+      continue;
+    }
+    if (part is Map<String, dynamic>) {
+      final textField = part['text'];
+      if (textField is String) {
+        buffer.write(textField);
+        continue;
+      }
+      if (textField is Map) {
+        final value = textField['value'] ?? textField['content'];
+        if (value is String) {
+          buffer.write(value);
+          continue;
+        }
+      }
+      final innerContent = part['content'];
+      if (innerContent is String) {
+        buffer.write(innerContent);
+      }
+    }
+  }
+  return buffer.toString();
+}
+
+String _extractText(Map<String, dynamic> data) {
+  final choices = data['choices'];
+  if (choices is List && choices.isNotEmpty) {
+    final first = choices.first;
+    final message = first is Map<String, dynamic> ? first['message'] : null;
+    if (message is Map<String, dynamic>) {
+      final content = message['content'];
+      if (content is String && content.trim().isNotEmpty) {
+        return content;
+      }
+      if (content is List && content.isNotEmpty) {
+        final combined = _contentFromList(content);
+        if (combined.trim().isNotEmpty) return combined;
+      }
+    }
+    if (message is String && message.trim().isNotEmpty) {
+      return message;
+    }
+    final text = first is Map<String, dynamic> ? first['text'] : null;
+    if (text is String && text.trim().isNotEmpty) return text;
+  }
+  final topLevel =
+      data['text'] ?? data['content'] ?? data['reply'] ?? data['response'];
+  if (topLevel is String) return topLevel;
+  return '';
+}
+
 class OpenAIClient {
   final bool useProxy;
   final String? proxyUrl;    // /chat
@@ -108,7 +164,7 @@ class OpenAIClient {
       if (res.statusCode == 401) throw '401 (otillåten). Kontrollera proxy-konfiguration.';
       if (res.statusCode >= 400) throw 'Proxyfel ${res.statusCode}: ${res.body}';
       final data = jsonDecode(res.body) as Map<String, dynamic>;
-      final text = (data['text'] as String?) ?? data['content'] ?? data['reply'] ?? '';
+      final text = _extractText(data);
       return _postProcess(text.isEmpty ? '[Tomt svar]' : text);
     } else {
       if (directKey == null || directKey!.isEmpty) {
@@ -134,9 +190,8 @@ class OpenAIClient {
       if (res.statusCode == 401) throw '401 (otillåten). Kontrollera API-nyckeln.';
       if (res.statusCode >= 400) throw 'OpenAI-fel ${res.statusCode}: ${res.body}';
       final data = jsonDecode(res.body) as Map<String, dynamic>;
-      final choices = (data['choices'] as List?) ?? const [];
-      final content = choices.isNotEmpty ? (choices.first['message']?['content'] as String? ?? '') : '';
-      return _postProcess(content.isEmpty ? '[Tomt svar]' : content);
+      final text = _extractText(data);
+      return _postProcess(text.isEmpty ? '[Tomt svar]' : text);
     }
   }
 }

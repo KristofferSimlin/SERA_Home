@@ -108,7 +108,7 @@ class ChatState {
 /// Inställningar (proxy/direkt, webbsök)
 class SettingsState {
   final bool proxyEnabled;
-  final String? proxyUrl; // t.ex. http://127.0.0.1:8080/chat
+  final String? proxyUrl; // t.ex. https://api.sera.chat/api/openai-proxy
   final String? directApiKey;
   final bool webLookupEnabled;
 

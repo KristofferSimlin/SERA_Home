@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class WebSearchClient {
-  final String? proxySearchUrl; // t.ex. http://127.0.0.1:8080/search
+  final String? proxySearchUrl; // t.ex. https://api.sera.chat/api/openai-search
 
   WebSearchClient() : proxySearchUrl = dotenv.env['PROXY_SEARCH_URL'];
 
