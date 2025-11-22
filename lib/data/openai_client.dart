@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../features/chat/chat_controller.dart';
@@ -163,6 +164,8 @@ class OpenAIClient {
       );
       if (res.statusCode == 401) throw '401 (otillåten). Kontrollera proxy-konfiguration.';
       if (res.statusCode >= 400) throw 'Proxyfel ${res.statusCode}: ${res.body}';
+      // Debug-logga proxysvaret för felsökning
+      debugPrint('Proxy response: ${res.body}');
       final data = jsonDecode(res.body) as Map<String, dynamic>;
       final text = _extractText(data);
       return _postProcess(text.isEmpty ? '[Tomt svar]' : text);
