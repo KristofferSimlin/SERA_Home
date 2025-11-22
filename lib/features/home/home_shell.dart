@@ -307,8 +307,8 @@ class _LandingArea extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                cs.surfaceContainerHighest.withValues(alpha: 0.65),
-                cs.surface.withValues(alpha: 0.85),
+                cs.surface.withOpacity(0.65),
+                cs.surface.withOpacity(0.85),
               ],
             ),
           ),
@@ -343,7 +343,7 @@ class _LandingArea extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.08),
+                        color: Colors.white.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(

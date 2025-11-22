@@ -58,9 +58,9 @@ class _ChatBackdropState extends State<ChatBackdrop>
     const baseTop = Color(0xFF0B0F14);
     const baseBottom = Color(0xFF0E1116);
 
-    final blue = cs.primary.withValues(alpha: 0.10 * clampedIntensity);
-    final orange = cs.secondary.withValues(alpha: 0.08 * clampedIntensity);
-    final teal = cs.tertiary.withValues(alpha: 0.06 * clampedIntensity);
+    final blue = cs.primary.withOpacity(0.10 * clampedIntensity);
+    final orange = cs.secondary.withOpacity(0.08 * clampedIntensity);
+    final teal = cs.tertiary.withOpacity(0.06 * clampedIntensity);
 
     return RepaintBoundary(
       child: AnimatedBuilder(
