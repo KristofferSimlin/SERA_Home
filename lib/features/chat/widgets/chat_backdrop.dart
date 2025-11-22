@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 /// Lägg denna som först i en Stack: Positioned.fill(child: ChatBackdrop())
 /// Den ger en mörk gradient + mycket subtila, långsamt rörliga orbs.
@@ -54,7 +55,8 @@ class _ChatBackdropState extends State<ChatBackdrop>
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final clampedIntensity = widget.intensity.clamp(0.2, 2.5);
+    final baseIntensity = widget.intensity.clamp(0.2, 2.5);
+    final clampedIntensity = kIsWeb ? (baseIntensity * 0.6) : baseIntensity;
     const baseTop = Color(0xFF0B0F14);
     const baseBottom = Color(0xFF0E1116);
 

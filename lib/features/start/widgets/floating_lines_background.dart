@@ -105,6 +105,7 @@ class _FloatingLinesBackgroundState extends State<FloatingLinesBackground>
             opacity: widget.opacity,
             lineGradient: widget.lineGradient,
             waves: waves,
+            lightMode: kIsWeb,
           ),
           size: Size.infinite,
         ),
@@ -219,12 +220,14 @@ class _FloatingLinesPainter extends CustomPainter {
     required this.lineGradient,
     required this.waves,
     required this.opacity,
+    required this.lightMode,
   });
 
   final double progress;
   final List<Color> lineGradient;
   final List<_WaveParams> waves;
   final double opacity;
+  final bool lightMode;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -232,9 +235,9 @@ class _FloatingLinesPainter extends CustomPainter {
 
     final rect = Offset.zero & size;
     final glowPaint = Paint()
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8)
+      ..maskFilter = lightMode ? null : const MaskFilter.blur(BlurStyle.normal, 8)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.3;
+      ..strokeWidth = lightMode ? 1.1 : 1.3;
 
     for (final wave in waves) {
       if (!wave.enabled || wave.lineCount <= 0) continue;
@@ -266,11 +269,12 @@ class _FloatingLinesPainter extends CustomPainter {
     }
 
     // Soft vignette for better blending with the background gradient.
+    final vignetteAlpha = lightMode ? 0.12 : 0.28;
     final vignette = Paint()
       ..shader = RadialGradient(
         colors: [
           Colors.transparent,
-          Colors.black.withOpacity(0.28),
+          Colors.black.withOpacity(vignetteAlpha),
         ],
       ).createShader(rect);
     canvas.drawRect(rect, vignette);
@@ -287,7 +291,9 @@ class _FloatingLinesPainter extends CustomPainter {
     final normalizedIndex = wave.lineCount <= 1 ? 0.0 : lineIndex / (wave.lineCount - 1);
     final baseY = centerY + (lineIndex - (wave.lineCount - 1) / 2) * spacing;
     final amplitude = size.height * wave.amplitudeScale * (0.7 + normalizedIndex * 0.4);
-    final steps = math.max(40, (size.width / 12).round());
+    final steps = lightMode
+        ? math.max(24, (size.width / 28).round())
+        : math.max(40, (size.width / 12).round());
     final double phase = progress * math.pi * 2 * (0.5 + wave.speed) + wave.position.rotate;
     for (int step = 0; step <= steps; step++) {
       final x = step / steps * size.width;
