@@ -62,6 +62,7 @@ class FloatingLinesBackground extends StatefulWidget {
 class _FloatingLinesBackgroundState extends State<FloatingLinesBackground>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late List<_WaveParams> _waves;
 
   Duration get _duration {
     final speed = widget.animationSpeed.clamp(0.05, 3.0);
@@ -74,6 +75,7 @@ class _FloatingLinesBackgroundState extends State<FloatingLinesBackground>
     super.initState();
     _controller = AnimationController(vsync: this, duration: _duration)
       ..repeat(reverse: true);
+    _waves = _buildWaveParams();
   }
 
   @override
@@ -85,6 +87,16 @@ class _FloatingLinesBackgroundState extends State<FloatingLinesBackground>
         ..reset()
         ..repeat(reverse: true);
     }
+
+    final wavesChanged = !listEquals(oldWidget.enabledWaves, widget.enabledWaves) ||
+        !listEquals(oldWidget.lineCount, widget.lineCount) ||
+        !listEquals(oldWidget.lineDistance, widget.lineDistance) ||
+        oldWidget.topWavePosition != widget.topWavePosition ||
+        oldWidget.middleWavePosition != widget.middleWavePosition ||
+        oldWidget.bottomWavePosition != widget.bottomWavePosition;
+    if (wavesChanged) {
+      _waves = _buildWaveParams();
+    }
   }
 
   @override
@@ -95,16 +107,16 @@ class _FloatingLinesBackgroundState extends State<FloatingLinesBackground>
 
   @override
   Widget build(BuildContext context) {
-    final waves = _buildWaveParams();
     return IgnorePointer(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, _) => CustomPaint(
+      child: RepaintBoundary(
+        child: CustomPaint(
+          isComplex: true,
+          willChange: true,
           painter: _FloatingLinesPainter(
-            progress: _controller.value,
+            animation: _controller,
             opacity: widget.opacity,
             lineGradient: widget.lineGradient,
-            waves: waves,
+            waves: _waves,
             lightMode: kIsWeb,
           ),
           size: Size.infinite,
@@ -216,14 +228,15 @@ class _WaveParams {
 
 class _FloatingLinesPainter extends CustomPainter {
   _FloatingLinesPainter({
-    required this.progress,
+    required Animation<double> animation,
     required this.lineGradient,
     required this.waves,
     required this.opacity,
     required this.lightMode,
-  });
+  })  : _animation = animation,
+        super(repaint: animation);
 
-  final double progress;
+  final Animation<double> _animation;
   final List<Color> lineGradient;
   final List<_WaveParams> waves;
   final double opacity;
@@ -232,6 +245,7 @@ class _FloatingLinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (size.isEmpty) return;
+    final progress = _animation.value;
 
     final rect = Offset.zero & size;
     final glowPaint = Paint()
@@ -258,6 +272,7 @@ class _FloatingLinesPainter extends CustomPainter {
           lineIndex: i,
           centerY: centerY,
           spacing: spacing,
+          progress: progress,
         );
 
         glowPaint
@@ -286,13 +301,15 @@ class _FloatingLinesPainter extends CustomPainter {
     required int lineIndex,
     required double centerY,
     required double spacing,
+    required double progress,
   }) {
     final path = Path();
     final normalizedIndex = wave.lineCount <= 1 ? 0.0 : lineIndex / (wave.lineCount - 1);
     final baseY = centerY + (lineIndex - (wave.lineCount - 1) / 2) * spacing;
     final amplitude = size.height * wave.amplitudeScale * (0.7 + normalizedIndex * 0.4);
+    // Lower sample count on web to reduce CanvasKit work on large viewports.
     final steps = lightMode
-        ? math.max(24, (size.width / 28).round())
+        ? math.max(20, (size.width / 36).round())
         : math.max(40, (size.width / 12).round());
     final double phase = progress * math.pi * 2 * (0.5 + wave.speed) + wave.position.rotate;
     for (int step = 0; step <= steps; step++) {
@@ -334,10 +351,10 @@ class _FloatingLinesPainter extends CustomPainter {
   bool shouldRepaint(covariant _FloatingLinesPainter oldDelegate) {
     final waveChanged = !_areWavesEqual(oldDelegate.waves, waves);
     final gradientChanged = !listEquals(oldDelegate.lineGradient, lineGradient);
-    return oldDelegate.progress != progress ||
-        waveChanged ||
+    return waveChanged ||
         gradientChanged ||
-        oldDelegate.opacity != opacity;
+        oldDelegate.opacity != opacity ||
+        oldDelegate.lightMode != lightMode;
   }
 
   bool _areWavesEqual(List<_WaveParams> a, List<_WaveParams> b) {
