@@ -4,7 +4,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../features/chat/chat_controller.dart';
 
-const String _defaultProxyUrl = 'https://api.sera.chat/api/openai-proxy';
+const String _defaultProxyUrlHost = 'https://api.sera.chat/api/openai-proxy';
+const String _defaultProxyUrlWeb = '/api/openai-proxy';
 
 const String _baseSystemPrompt =
   'Du är SERA – en säkerhetsmedveten felsökningsassistent för maskiner.'
@@ -128,7 +129,9 @@ class OpenAIClient {
     final envKey = dotenv.env['OPENAI_API_KEY'];
     final resolvedProxy = (s.proxyUrl?.isNotEmpty == true)
         ? s.proxyUrl!.trim()
-        : (envProxy.isNotEmpty ? envProxy : _defaultProxyUrl);
+        : (envProxy.isNotEmpty
+            ? envProxy
+            : (kIsWeb ? _defaultProxyUrlWeb : _defaultProxyUrlHost));
     return OpenAIClient(
       useProxy: s.proxyEnabled,
       proxyUrl: resolvedProxy,
