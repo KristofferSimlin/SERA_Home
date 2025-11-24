@@ -7,18 +7,25 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
+function setCors(res) {
+  Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+}
+
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
-    return res.status(200).set(corsHeaders).end();
+    setCors(res);
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).set(corsHeaders).json({ error: 'Only POST is allowed' });
+    setCors(res);
+    return res.status(405).json({ error: 'Only POST is allowed' });
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    return res.status(500).set(corsHeaders).json({ error: 'Missing OPENAI_API_KEY' });
+    setCors(res);
+    return res.status(500).json({ error: 'Missing OPENAI_API_KEY' });
   }
 
   try {
@@ -41,8 +48,10 @@ export default async function handler(req, res) {
       data = { raw: text };
     }
 
-    return res.status(upstream.status).set(corsHeaders).json(data);
+    setCors(res);
+    return res.status(upstream.status).json(data);
   } catch (err) {
-    return res.status(500).set(corsHeaders).json({ error: String(err) });
+    setCors(res);
+    return res.status(500).json({ error: String(err) });
   }
 }
