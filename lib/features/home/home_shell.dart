@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../chats/chat_models.dart';
@@ -298,6 +299,7 @@ class _LandingArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isWeb = kIsWeb;
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -313,13 +315,13 @@ class _LandingArea extends StatelessWidget {
             ),
           ),
         ),
-        const Positioned.fill(
+        Positioned.fill(
           child: FloatingLinesBackground(
             enabledWaves: ['top', 'middle', 'bottom'],
-            lineCount: [8, 12, 16],
-            lineDistance: [7, 5, 4],
-            animationSpeed: 0.16,
-            opacity: 0.8,
+            lineCount: isWeb ? [6, 10, 12] : [8, 12, 16],
+            lineDistance: isWeb ? [8.0, 6.0, 5.0] : [7.0, 5.0, 4.0],
+            animationSpeed: isWeb ? 0.13 : 0.16,
+            opacity: isWeb ? 0.7 : 0.8,
           ),
         ),
         Center(

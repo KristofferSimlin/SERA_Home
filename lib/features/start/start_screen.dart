@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'widgets/floating_lines_background.dart';
@@ -37,6 +38,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isWeb = kIsWeb;
     return Scaffold(
       body: AnimatedBuilder(
         animation: _fadeIn,
@@ -61,13 +63,13 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                 ),
               ),
             ),
-            const Positioned.fill(
+            Positioned.fill(
               child: FloatingLinesBackground(
                 enabledWaves: ['top', 'middle', 'bottom'],
-                lineCount: [10, 15, 20],
-                lineDistance: [8, 6, 4],
-                animationSpeed: 0.1375,
-                opacity: 0.85,
+                lineCount: isWeb ? [8, 12, 14] : [10, 15, 20],
+                lineDistance: isWeb ? [9.0, 7.0, 5.0] : [8.0, 6.0, 4.0],
+                animationSpeed: isWeb ? 0.12 : 0.1375,
+                opacity: isWeb ? 0.72 : 0.85,
               ),
             ),
             SafeArea(

@@ -309,7 +309,7 @@ class _FloatingLinesPainter extends CustomPainter {
     final amplitude = size.height * wave.amplitudeScale * (0.7 + normalizedIndex * 0.4);
     // Lower sample count on web to reduce CanvasKit work on large viewports.
     final steps = lightMode
-        ? math.max(20, (size.width / 36).round())
+        ? math.max(16, (size.width / 44).round())
         : math.max(40, (size.width / 12).round());
     final double phase = progress * math.pi * 2 * (0.5 + wave.speed) + wave.position.rotate;
     for (int step = 0; step <= steps; step++) {
