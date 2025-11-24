@@ -1,5 +1,6 @@
 // lib/features/chat/chat_controller.dart
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -369,6 +370,17 @@ class ChatController extends StateNotifier<ChatState> {
           await repo.renameSessionAuto(sessionId, title);
         }
       }
+    } catch (e, st) {
+      // Visa fel som assistent-meddelande så användaren ser vad som hände.
+      debugPrint('Chat error: $e\n$st');
+      final errText = e.toString();
+      final assistant = Message(
+        role: ChatRole.assistant,
+        text: 'Fel vid kontakt med modellen:\n$errText',
+      );
+      msgs = [...msgs, assistant];
+      state = state.copyWith(messages: msgs, hasSafetyRisk: false);
+      await repo.appendMessages(sessionId, [assistant.toDto()]);
     } finally {
       state = state.copyWith(isSending: false);
     }
