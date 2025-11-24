@@ -137,7 +137,12 @@ class SettingsState {
 
 class SettingsNotifier extends StateNotifier<SettingsState> {
   SettingsNotifier()
-      : super(const SettingsState(proxyEnabled: true, proxyUrl: null, directApiKey: null));
+      : super(SettingsState(
+          proxyEnabled: true,
+          // Default to same-origin proxy in web builds to avoid CORS/redirect issues.
+          proxyUrl: kIsWeb ? '/api/openai-proxy' : null,
+          directApiKey: null,
+        ));
 
   void setProxyEnabled(bool v) => state = state.copyWith(proxyEnabled: v);
   void setProxyUrl(String v) => state = state.copyWith(proxyUrl: v);
