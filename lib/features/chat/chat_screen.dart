@@ -1,4 +1,5 @@
 // lib/features/chat/chat_screen.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,6 +31,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _yearFocus = FocusNode();
 
   bool _lock = false;
+  bool _equipmentCollapsed = false;
 
   // Litet hjälp-API för att få en korrekt typad notifier
   ChatController _ctrl() => ref.read(chatControllerProvider(widget.sessionId).notifier);
@@ -172,7 +174,253 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     final cs = Theme.of(context).colorScheme;
     final isCompact = MediaQuery.sizeOf(context).width < 720;
+    final isWebMobile = kIsWeb && isCompact;
     final chat = _ctrl(); // typad notifier för enklare anrop nedan
+    final equipmentForm = Column(
+      children: [
+        if (isCompact) ...[
+          TextField(
+            focusNode: _brandFocus,
+            controller: _brandCtrl,
+            textInputAction: TextInputAction.next,
+            decoration: const InputDecoration(
+              labelText: 'Märke',
+              hintText: 'ex. Volvo, CAT, Wacker Neuson',
+            ),
+            onChanged: (_) => _applyEquipment(silent: true),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            focusNode: _modelFocus,
+            controller: _modelCtrl,
+            textInputAction: TextInputAction.next,
+            decoration: const InputDecoration(
+              labelText: 'Modell',
+              hintText: 'ex. EC250E, 320 GC',
+            ),
+            onChanged: (_) => _applyEquipment(silent: true),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 140),
+                child: TextField(
+                  focusNode: _yearFocus,
+                  controller: _yearCtrl,
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'Årsmodell',
+                    hintText: 'ex. 2019',
+                  ),
+                  onChanged: (_) => _applyEquipment(silent: true),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: DropdownButtonFormField<int>(
+                  value: state.expertise,
+                  decoration: const InputDecoration(
+                    labelText: 'Kunskapsnivå',
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 1, child: Text('1 – Nybörjare')),
+                    DropdownMenuItem(value: 2, child: Text('2 – Medel')),
+                    DropdownMenuItem(value: 3, child: Text('3 – Expert')),
+                  ],
+                  onChanged: (val) {
+                    chat.setExpertise(val);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          val == 1
+                              ? 'Nivå satt till Nybörjare'
+                              : val == 2
+                                  ? 'Nivå satt till Medel'
+                                  : val == 3
+                                      ? 'Nivå satt till Expert'
+                                      : 'Nivå rensad',
+                        ),
+                        duration: const Duration(milliseconds: 900),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ] else ...[
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  focusNode: _brandFocus,
+                  controller: _brandCtrl,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'Märke',
+                    hintText: 'ex. Volvo, CAT, Wacker Neuson',
+                  ),
+                  onChanged: (_) => _applyEquipment(silent: true),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  focusNode: _modelFocus,
+                  controller: _modelCtrl,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'Modell',
+                    hintText: 'ex. EC250E, 320 GC',
+                  ),
+                  onChanged: (_) => _applyEquipment(silent: true),
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 120,
+                child: TextField(
+                  focusNode: _yearFocus,
+                  controller: _yearCtrl,
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'Årsmodell',
+                    hintText: 'ex. 2019',
+                  ),
+                  onChanged: (_) => _applyEquipment(silent: true),
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 180,
+                child: DropdownButtonFormField<int>(
+                  value: state.expertise,
+                  decoration: const InputDecoration(
+                    labelText: 'Kunskapsnivå',
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 1, child: Text('1 – Nybörjare')),
+                    DropdownMenuItem(value: 2, child: Text('2 – Medel')),
+                    DropdownMenuItem(value: 3, child: Text('3 – Expert')),
+                  ],
+                  onChanged: (val) {
+                    chat.setExpertise(val);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          val == 1
+                              ? 'Nivå satt till Nybörjare'
+                              : val == 2
+                                  ? 'Nivå satt till Medel'
+                                  : val == 3
+                                      ? 'Nivå satt till Expert'
+                                      : 'Nivå rensad',
+                        ),
+                        duration: const Duration(milliseconds: 900),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+        const SizedBox(height: 10),
+        if (isCompact) ...[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.info_outline, size: 18, color: cs.secondary),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  _statusText(state),
+                  style: const TextStyle(fontSize: 12.5),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              TextButton.icon(
+                onPressed: _clearEquipment,
+                icon: const Icon(Icons.restart_alt, size: 18),
+                label: const Text('Byt'),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Switch(
+                    value: _lock,
+                    onChanged: (v) {
+                      setState(() => _lock = v);
+                      chat.setEquipmentLocked(v);
+                    },
+                  ),
+                  const Text('Lås'),
+                ],
+              ),
+              FilledButton.icon(
+                onPressed: () => _applyEquipment(),
+                icon: const Icon(Icons.save),
+                label: const Text('Spara'),
+              ),
+            ],
+          ),
+        ] else ...[
+          Row(
+            children: [
+              Icon(Icons.info_outline, size: 18, color: cs.secondary),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  _statusText(state),
+                  style: const TextStyle(fontSize: 12.5),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: _clearEquipment,
+                icon: const Icon(Icons.restart_alt, size: 18),
+                label: const Text('Byt'),
+              ),
+              const SizedBox(width: 8),
+              Switch(
+                value: _lock,
+                onChanged: (v) {
+                  setState(() => _lock = v);
+                  chat.setEquipmentLocked(v);
+                },
+              ),
+              const Text('Lås'),
+              const SizedBox(width: 8),
+              FilledButton.icon(
+                onPressed: () => _applyEquipment(),
+                icon: const Icon(Icons.save),
+                label: const Text('Spara'),
+              ),
+            ],
+          ),
+        ],
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              'debug → brand:${state.brand ?? "-"} | model:${state.model ?? "-"} | year:${state.year ?? "-"} | level:${state.expertise ?? "-"} | locked:${state.equipmentLocked}',
+              style: TextStyle(fontSize: 11, color: cs.onSurface.withOpacity(0.6)),
+            ),
+          ),
+        ),
+      ],
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -215,248 +463,37 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (isCompact) ...[
-                      TextField(
-                        focusNode: _brandFocus,
-                        controller: _brandCtrl,
-                        textInputAction: TextInputAction.next,
-                        decoration: const InputDecoration(
-                          labelText: 'Märke',
-                          hintText: 'ex. Volvo, CAT, Wacker Neuson',
-                        ),
-                        onChanged: (_) => _applyEquipment(silent: true),
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        focusNode: _modelFocus,
-                        controller: _modelCtrl,
-                        textInputAction: TextInputAction.next,
-                        decoration: const InputDecoration(
-                          labelText: 'Modell',
-                          hintText: 'ex. EC250E, 320 GC',
-                        ),
-                        onChanged: (_) => _applyEquipment(silent: true),
-                      ),
-                      const SizedBox(height: 10),
+                    if (isWebMobile)
                       Row(
                         children: [
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 140),
-                            child: TextField(
-                              focusNode: _yearFocus,
-                              controller: _yearCtrl,
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.next,
-                              decoration: const InputDecoration(
-                                labelText: 'Årsmodell',
-                                hintText: 'ex. 2019',
-                              ),
-                              onChanged: (_) => _applyEquipment(silent: true),
-                            ),
+                          const Text(
+                            'Utrustning',
+                            style: TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: DropdownButtonFormField<int>(
-                              value: state.expertise,
-                              decoration: const InputDecoration(
-                                labelText: 'Kunskapsnivå',
-                              ),
-                              items: const [
-                                DropdownMenuItem(value: 1, child: Text('1 – Nybörjare')),
-                                DropdownMenuItem(value: 2, child: Text('2 – Medel')),
-                                DropdownMenuItem(value: 3, child: Text('3 – Expert')),
-                              ],
-                              onChanged: (val) {
-                                chat.setExpertise(val);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      val == 1
-                                          ? 'Nivå satt till Nybörjare'
-                                          : val == 2
-                                              ? 'Nivå satt till Medel'
-                                              : val == 3
-                                                  ? 'Nivå satt till Expert'
-                                                  : 'Nivå rensad',
-                                    ),
-                                    duration: const Duration(milliseconds: 900),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ] else ...[
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              focusNode: _brandFocus,
-                              controller: _brandCtrl,
-                              textInputAction: TextInputAction.next,
-                              decoration: const InputDecoration(
-                                labelText: 'Märke',
-                                hintText: 'ex. Volvo, CAT, Wacker Neuson',
-                              ),
-                              onChanged: (_) => _applyEquipment(silent: true),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: TextField(
-                              focusNode: _modelFocus,
-                              controller: _modelCtrl,
-                              textInputAction: TextInputAction.next,
-                              decoration: const InputDecoration(
-                                labelText: 'Modell',
-                                hintText: 'ex. EC250E, 320 GC',
-                              ),
-                              onChanged: (_) => _applyEquipment(silent: true),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          SizedBox(
-                            width: 120,
-                            child: TextField(
-                              focusNode: _yearFocus,
-                              controller: _yearCtrl,
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.next,
-                              decoration: const InputDecoration(
-                                labelText: 'Årsmodell',
-                                hintText: 'ex. 2019',
-                              ),
-                              onChanged: (_) => _applyEquipment(silent: true),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          SizedBox(
-                            width: 180,
-                            child: DropdownButtonFormField<int>(
-                              value: state.expertise,
-                              decoration: const InputDecoration(
-                                labelText: 'Kunskapsnivå',
-                              ),
-                              items: const [
-                                DropdownMenuItem(value: 1, child: Text('1 – Nybörjare')),
-                                DropdownMenuItem(value: 2, child: Text('2 – Medel')),
-                                DropdownMenuItem(value: 3, child: Text('3 – Expert')),
-                              ],
-                              onChanged: (val) {
-                                chat.setExpertise(val);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      val == 1
-                                          ? 'Nivå satt till Nybörjare'
-                                          : val == 2
-                                              ? 'Nivå satt till Medel'
-                                              : val == 3
-                                                  ? 'Nivå satt till Expert'
-                                                  : 'Nivå rensad',
-                                    ),
-                                    duration: const Duration(milliseconds: 900),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                    const SizedBox(height: 10),
-                    if (isCompact) ...[
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(Icons.info_outline, size: 18, color: cs.secondary),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              _statusText(state),
-                              style: const TextStyle(fontSize: 12.5),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
+                          const Spacer(),
                           TextButton.icon(
-                            onPressed: _clearEquipment,
-                            icon: const Icon(Icons.restart_alt, size: 18),
-                            label: const Text('Byt'),
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Switch(
-                                value: _lock,
-                                onChanged: (v) {
-                                  setState(() => _lock = v);
-                                  chat.setEquipmentLocked(v);
-                                },
-                              ),
-                              const Text('Lås'),
-                            ],
-                          ),
-                          FilledButton.icon(
-                            onPressed: () => _applyEquipment(),
-                            icon: const Icon(Icons.save),
-                            label: const Text('Spara'),
-                          ),
-                        ],
-                      ),
-                    ] else ...[
-                      Row(
-                        children: [
-                          Icon(Icons.info_outline, size: 18, color: cs.secondary),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              _statusText(state),
-                              style: const TextStyle(fontSize: 12.5),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          TextButton.icon(
-                            onPressed: _clearEquipment,
-                            icon: const Icon(Icons.restart_alt, size: 18),
-                            label: const Text('Byt'),
-                          ),
-                          const SizedBox(width: 8),
-                          Switch(
-                            value: _lock,
-                            onChanged: (v) {
-                              setState(() => _lock = v);
-                              chat.setEquipmentLocked(v);
+                            onPressed: () {
+                              setState(() => _equipmentCollapsed = !_equipmentCollapsed);
                             },
-                          ),
-                          const Text('Lås'),
-                          const SizedBox(width: 8),
-                          FilledButton.icon(
-                            onPressed: () => _applyEquipment(),
-                            icon: const Icon(Icons.save),
-                            label: const Text('Spara'),
+                            icon: Icon(_equipmentCollapsed ? Icons.unfold_more : Icons.unfold_less),
+                            label: Text(_equipmentCollapsed ? 'Visa' : 'Göm'),
                           ),
                         ],
                       ),
-                    ],
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          'debug → brand:${state.brand ?? "-"} | model:${state.model ?? "-"} | year:${state.year ?? "-"} | level:${state.expertise ?? "-"} | locked:${state.equipmentLocked}',
-                          style: TextStyle(fontSize: 11, color: cs.onSurface.withOpacity(0.6)),
-                        ),
-                      ),
-                    ),
+                    if (isWebMobile) const SizedBox(height: 8),
+                    if (isWebMobile)
+                      AnimatedCrossFade(
+                        firstChild: const SizedBox.shrink(),
+                        secondChild: equipmentForm,
+                        crossFadeState:
+                            _equipmentCollapsed ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                        duration: const Duration(milliseconds: 220),
+                        sizeCurve: Curves.easeInOut,
+                      )
+                    else
+                      equipmentForm,
                   ],
                 ),
               ),
