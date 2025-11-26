@@ -16,16 +16,21 @@ class WebSearchClient {
     final res = await http.get(Uri.parse('$url?q=${Uri.encodeQueryComponent(query)}'));
     if (res.statusCode != 200) return null;
     final data = jsonDecode(res.body) as Map<String, dynamic>;
-    // förväntar { items: [{title, snippet, link}, ...] }
-    final items = (data['items'] as List?) ?? const [];
-    if (items.isEmpty) return null;
+    // Nya schemat: { summary, hits: [{title, snippet, link}] }
+    final summary = data['summary'];
+    if (summary is String && summary.trim().isNotEmpty) {
+      return summary.trim();
+    }
+
+    final hits = (data['hits'] as List?) ?? (data['items'] as List? ?? const []);
+    if (hits.isEmpty) return null;
     final b = StringBuffer();
-    for (final it in items.take(5)) {
+    for (final it in hits.take(5)) {
       final m = it as Map<String, dynamic>;
-      final title = m['title'] ?? '';
-      final snippet = m['snippet'] ?? '';
-      final link = m['link'] ?? '';
-      b.writeln('• $title — $snippet ($link)');
+      final title = (m['title'] ?? '').toString();
+      final snippet = (m['snippet'] ?? '').toString();
+      final link = (m['link'] ?? '').toString();
+      b.writeln('• $title — $snippet${link.isNotEmpty ? ' ($link)' : ''}');
     }
     return b.toString().trim();
   }
