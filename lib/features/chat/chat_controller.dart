@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/openai_client.dart';
+import '../../data/web_search_client.dart';
 import '../chats/chat_repository.dart';
 import '../chats/chat_models.dart';
 
@@ -182,6 +183,7 @@ class ChatController extends StateNotifier<ChatState> {
   final OpenAIClient client;
   final ChatRepository repo;
   SettingsState settings;
+  final WebSearchClient _webSearch = WebSearchClient();
 
   // ---- Persistensnycklar (per sessionId) ----
   String get _kBrand     => 'equip_${sessionId}_brand';
@@ -302,6 +304,28 @@ class ChatController extends StateNotifier<ChatState> {
         x.startsWith('byta utrustning');
   }
 
+  Future<String?> _fetchWebNotes(String userText) async {
+    final brand = state.brand?.trim();
+    final model = state.model?.trim();
+    final year = state.year?.trim();
+    final parts = <String>[];
+    if (brand?.isNotEmpty == true) parts.add(brand!);
+    if (model?.isNotEmpty == true) parts.add(model!);
+    if (year?.isNotEmpty == true) parts.add(year!);
+    final contextQuery = parts.join(' ');
+    final combined = [contextQuery, userText.trim()]
+        .where((s) => s.isNotEmpty)
+        .join(' ')
+        .trim();
+    if (combined.length < 4) return null;
+    try {
+      return await _webSearch.searchSummary(combined);
+    } catch (e, st) {
+      debugPrint('Web lookup error: $e\n$st');
+      return null;
+    }
+  }
+
   Future<void> send(String userText) async {
     // /byt: påminn att använda rutorna – ändra inget automatiskt
     if (_isChangeEquipmentCommand(userText)) {
@@ -337,6 +361,11 @@ class ChatController extends StateNotifier<ChatState> {
         .toList(growable: false);
 
     try {
+      String? webNotes;
+      if (settings.webLookupEnabled) {
+        webNotes = await _fetchWebNotes(userText);
+      }
+
       final fullText = await client.completeChat(
         history,
         userText,
@@ -344,6 +373,7 @@ class ChatController extends StateNotifier<ChatState> {
         brand: state.brand,
         model: state.model,
         year: state.year,
+        webNotes: webNotes,
       );
 
       var assistant = Message(role: ChatRole.assistant, text: '');
