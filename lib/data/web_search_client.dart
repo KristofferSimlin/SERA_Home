@@ -5,7 +5,10 @@ import 'package:http/http.dart' as http;
 class WebSearchClient {
   final String? proxySearchUrl; // t.ex. https://api.sera.chat/api/openai-search
 
-  WebSearchClient() : proxySearchUrl = dotenv.env['PROXY_SEARCH_URL'];
+  WebSearchClient()
+      : proxySearchUrl = (dotenv.env['PROXY_SEARCH_URL'] ?? '').trim().isNotEmpty
+            ? dotenv.env['PROXY_SEARCH_URL']!.trim()
+            : '/api/openai-search';
 
   Future<String?> searchSummary(String query) async {
     final url = proxySearchUrl;
