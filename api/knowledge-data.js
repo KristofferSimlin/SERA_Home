@@ -27,13 +27,14 @@ export const knowledge = [
     keywords: ['startar inte', 'relä', 'batteri'],
   },
   {
-  title: 'Brun ABC – mörk display/panel',
-  snippet: 'Displayen är mörk: 1) Huvudströmbrytare/batteri minst 17.3 V under last. 2) Kontrollera säkring för display/ICM och jordpunkt (rengör/drag åt). 3) Mät spänning vid panelens matning, ska vara batterispänning. 4) Inspektera kontaktdon och kabelstam för fukt/korrosion.',
-  link: 'https://example.com/manuals/brun-abc-display', // eller lämna tomt/ta bort om du vill
-  tags: ['brun', 'abc', 'display', 'el'],
-  years: [2017, 2018, 2019, 2020],
-  keywords: ['mörk', 'svart', 'display', 'instrument', 'säkring', 'batteri', 'jord'],
-}
-
-
+    title: 'Brun ABC – mörk display/panel',
+    snippet: 'Displayen är mörk: 1) Huvudströmbrytare/batteri: minst 22.7 V (≥11.35 V per batteri) under last. '
+        + '2) Kontrollera säkring för display/ICM och jordpunkt (rengör/drag åt). '
+        + '3) Mät spänning vid panelens matning, ska vara batterispänning. '
+        + '4) Inspektera kontaktdon och kabelstam för fukt/korrosion.',
+    link: '',
+    tags: ['brun', 'abc', 'display', 'el'],
+    years: [2017, 2018, 2019, 2020],
+    keywords: ['mörk', 'svart', 'display', 'panel', 'instrument', 'säkring', 'batteri', 'jord', 'volt'],
+  },
 ];
