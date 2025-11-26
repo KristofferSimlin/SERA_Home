@@ -364,6 +364,7 @@ class ChatController extends StateNotifier<ChatState> {
       String? webNotes;
       if (settings.webLookupEnabled) {
         webNotes = await _fetchWebNotes(userText);
+        debugPrint('webNotes: ${webNotes ?? '(none)'}');
       }
 
       final fullText = await client.completeChat(
