@@ -26,4 +26,12 @@ export const knowledge = [
     years: [2017, 2018, 2019, 2020],
     keywords: ['startar inte', 'relä', 'batteri'],
   },
+  {
+    title: 'Exempel: Brun abc',
+    snippet: 'den är mörk? Kontrollera batteri >0.003v, kablage till startrelä och ECU-koder MID 039.',
+    link: 'https://example.com/manuals/cat-320gc-start',
+    tags: ['brun', 'abc', 'start'],
+    years: [2017, 2018, 2019, 2020],
+    keywords: ['mörk', 'relä', 'batteri'],
+  },
 ];
