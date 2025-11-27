@@ -38,8 +38,8 @@ class FloatingLinesBackground extends StatefulWidget {
     this.middleWavePosition = const WavePosition(x: 5, y: 0, rotate: 0.2),
     this.bottomWavePosition = const WavePosition(x: 2, y: -0.7, rotate: 0.4),
     this.lineGradient = const [
-      Color(0xFFE947F5),
-      Color.fromARGB(255, 9, 16, 36),
+      Color(0xFF1FB1FF), // klar cyan/blå
+      Color.fromARGB(255, 63, 30, 89), // lila/blå
     ],
     this.animationSpeed = 1,
     this.opacity = 0.9,

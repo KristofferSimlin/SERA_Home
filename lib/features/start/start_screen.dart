@@ -141,11 +141,11 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    cs.primary.withOpacity(0.12),
-                    cs.surface,
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: const [
+                    Color(0xFF0B0D12),
+                    Color(0xFF0E141C),
                   ],
                 ),
               ),
