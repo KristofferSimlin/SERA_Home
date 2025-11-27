@@ -242,6 +242,11 @@ class _FloatingLinesPainter extends CustomPainter {
   final double opacity;
   final bool lightMode;
 
+  Color _withOpacity(Color color, double factor) {
+    final newAlpha = (color.a * 255 * factor).clamp(0, 255).round();
+    return color.withAlpha(newAlpha);
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     if (size.isEmpty) return;
@@ -260,8 +265,7 @@ class _FloatingLinesPainter extends CustomPainter {
       final centerY = size.height * (0.5 - wave.position.y.clamp(-1.5, 1.5) * 0.5);
       for (int i = 0; i < wave.lineCount; i++) {
         final t = wave.lineCount == 1 ? 0.0 : i / (wave.lineCount - 1);
-        final color =
-            _colorAt(t).withOpacity(opacity * (0.7 + 0.3 * (1 - t)));
+        final color = _withOpacity(_colorAt(t), opacity * (0.7 + 0.3 * (1 - t)));
         final paint = Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.1
@@ -276,7 +280,7 @@ class _FloatingLinesPainter extends CustomPainter {
         );
 
         glowPaint
-          ..color = color.withOpacity(color.opacity * 0.6)
+          ..color = _withOpacity(color, 0.6)
           ..strokeWidth = 1.8;
         canvas.drawPath(path, glowPaint);
         canvas.drawPath(path, paint);
@@ -289,7 +293,7 @@ class _FloatingLinesPainter extends CustomPainter {
       ..shader = RadialGradient(
         colors: [
           Colors.transparent,
-          Colors.black.withOpacity(vignetteAlpha),
+          _withOpacity(Colors.black, vignetteAlpha),
         ],
       ).createShader(rect);
     canvas.drawRect(rect, vignette);

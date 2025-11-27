@@ -16,7 +16,6 @@ class AppTheme {
         seedColor: electricBlue,
         primary: electricBlue,
         secondary: safetyOrange,
-        background: bgDark,
         surface: surfaceDark,
         brightness: Brightness.dark,
       ),

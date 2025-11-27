@@ -11,9 +11,13 @@ class SafetyBanner extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 12, 12, 6),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppTheme.safetyOrange.withOpacity(0.12),
+        color:
+            AppTheme.safetyOrange.withAlpha((AppTheme.safetyOrange.a * 255 * 0.12).round()),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.safetyOrange.withOpacity(0.6)),
+        border: Border.all(
+          color:
+              AppTheme.safetyOrange.withAlpha((AppTheme.safetyOrange.a * 255 * 0.6).round()),
+        ),
       ),
       child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,

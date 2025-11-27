@@ -138,7 +138,7 @@ class SettingsState {
 
 class SettingsNotifier extends StateNotifier<SettingsState> {
   SettingsNotifier()
-      : super(SettingsState(
+      : super(const SettingsState(
           proxyEnabled: true,
           // Default to same-origin proxy in web builds to avoid CORS/redirect issues.
           proxyUrl: kIsWeb ? '/api/openai-proxy' : null,

@@ -82,7 +82,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: cs.surfaceContainerHigh.withOpacity(0.25),
+                      color: cs.surfaceContainerHigh
+                          .withAlpha((cs.surfaceContainerHigh.a * 255 * 0.25).round()),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Text(

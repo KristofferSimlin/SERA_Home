@@ -85,6 +85,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               onNewChat: () {
                 _newChat();
               },
+              showCompactTitle: showCompactTitle,
             ),
           ),
         ],
@@ -296,13 +297,14 @@ class _NavButton extends StatelessWidget {
 }
 
 class _LandingArea extends StatelessWidget {
-  const _LandingArea({required this.onNewChat});
+  const _LandingArea({required this.onNewChat, required this.showCompactTitle});
   final VoidCallback onNewChat;
+  final bool showCompactTitle;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final isWeb = kIsWeb;
+    const isWeb = kIsWeb;
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -312,13 +314,13 @@ class _LandingArea extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                cs.surface.withOpacity(0.65),
-                cs.surface.withOpacity(0.85),
+                cs.surface.withAlpha((cs.surface.a * 255 * 0.65).round()),
+                cs.surface.withAlpha((cs.surface.a * 255 * 0.85).round()),
               ],
             ),
           ),
         ),
-        Positioned.fill(
+        const Positioned.fill(
           child: FloatingLinesBackground(
             enabledWaves: ['top', 'middle', 'bottom'],
             lineCount: isWeb ? [6, 10, 12] : [8, 12, 16],
@@ -348,7 +350,7 @@ class _LandingArea extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withAlpha((Colors.white.a * 255 * 0.08).round()),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
