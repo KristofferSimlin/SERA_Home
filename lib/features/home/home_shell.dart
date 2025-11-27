@@ -85,7 +85,6 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               onNewChat: () {
                 _newChat();
               },
-              showCompactTitle: showCompactTitle,
             ),
           ),
         ],
@@ -297,14 +296,18 @@ class _NavButton extends StatelessWidget {
 }
 
 class _LandingArea extends StatelessWidget {
-  const _LandingArea({required this.onNewChat, required this.showCompactTitle});
+  const _LandingArea({required this.onNewChat});
   final VoidCallback onNewChat;
-  final bool showCompactTitle;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     const isWeb = kIsWeb;
+    final size = MediaQuery.sizeOf(context);
+    final isCompact = size.width < 720;
+    final isHandheld =
+        defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android;
+    final showCompactTitle = isCompact || isHandheld;
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -322,9 +325,9 @@ class _LandingArea extends StatelessWidget {
         ),
         Positioned.fill(
           child: FloatingLinesBackground(
-            enabledWaves: ['top', 'middle', 'bottom'],
-            lineCount: isWeb ? [6, 10, 12] : [8, 12, 16],
-            lineDistance: isWeb ? [8.0, 6.0, 5.0] : [7.0, 5.0, 4.0],
+            enabledWaves: const ['top', 'middle', 'bottom'],
+            lineCount: isWeb ? const [6, 10, 12] : const [8, 12, 16],
+            lineDistance: isWeb ? const [8.0, 6.0, 5.0] : const [7.0, 5.0, 4.0],
             animationSpeed: isWeb ? 0.13 : 0.16,
             opacity: isWeb ? 0.7 : 0.8,
           ),
