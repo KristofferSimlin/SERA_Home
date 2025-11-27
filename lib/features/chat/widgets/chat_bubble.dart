@@ -18,8 +18,7 @@ class ChatBubble extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final bg = isUser
         ? colorScheme.primary
-        : colorScheme.surfaceContainerHighest
-            .withAlpha((colorScheme.surfaceContainerHighest.a * 255 * 0.4).round());
+        : colorScheme.surfaceContainerHighest.withOpacity(0.4);
     final fg = isUser
         ? colorScheme.onPrimary
         : colorScheme.onSurface;
@@ -55,7 +54,7 @@ class ChatBubble extends StatelessWidget {
                 Text(
                   ts,
                   style: TextStyle(
-                    color: fg.withAlpha((fg.a * 255 * 0.75).round()),
+                    color: fg.withOpacity(0.75),
                     fontSize: 11.5,
                   ),
                 ),

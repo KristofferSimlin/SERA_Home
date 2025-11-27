@@ -185,7 +185,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: cs.primary.withAlpha((cs.primary.a * 255 * 0.15).round()),
+                                color: cs.primary.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(
@@ -203,7 +203,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                           'Service & Equipment Repair Assistant',
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: cs.onSurface.withAlpha((cs.onSurface.a * 255 * 0.75).round()),
+                                color: cs.onSurface.withOpacity(0.75),
                               ),
                         ),
                         SizedBox(height: config.callToActionSpacing),

@@ -220,7 +220,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: DropdownButtonFormField<int>(
-                  initialValue: state.expertise,
+                  value: state.expertise,
                   decoration: const InputDecoration(
                     labelText: 'Kunskapsnivå',
                   ),
@@ -297,7 +297,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               SizedBox(
                 width: 180,
                 child: DropdownButtonFormField<int>(
-                  initialValue: state.expertise,
+                  value: state.expertise,
                   decoration: const InputDecoration(
                     labelText: 'Kunskapsnivå',
                   ),
@@ -417,7 +417,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           'debug → brand:${state.brand ?? "-"} | model:${state.model ?? "-"} | year:${state.year ?? "-"} | level:${state.expertise ?? "-"} | locked:${state.equipmentLocked}',
                           style: TextStyle(
                             fontSize: 11,
-                            color: cs.onSurface.withAlpha((cs.onSurface.a * 255 * 0.6).round()),
+                            color: cs.onSurface.withOpacity(0.6),
                           ),
                         ),
                       ),

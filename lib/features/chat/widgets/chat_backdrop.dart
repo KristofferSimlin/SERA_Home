@@ -61,7 +61,7 @@ class _ChatBackdropState extends State<ChatBackdrop>
     const baseBottom = Color(0xFF0E1116);
 
     Color scaled(Color c, double factor) =>
-        c.withAlpha((c.a * 255 * factor).clamp(0, 255).round());
+        c.withOpacity((c.opacity * factor).clamp(0.0, 1.0));
 
     final blue = scaled(cs.primary, 0.10 * clampedIntensity);
     final orange = scaled(cs.secondary, 0.08 * clampedIntensity);

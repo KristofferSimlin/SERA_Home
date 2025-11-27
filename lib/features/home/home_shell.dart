@@ -314,13 +314,13 @@ class _LandingArea extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                cs.surface.withAlpha((cs.surface.a * 255 * 0.65).round()),
-                cs.surface.withAlpha((cs.surface.a * 255 * 0.85).round()),
+                cs.surface.withOpacity(0.65),
+                cs.surface.withOpacity(0.85),
               ],
             ),
           ),
         ),
-        const Positioned.fill(
+        Positioned.fill(
           child: FloatingLinesBackground(
             enabledWaves: ['top', 'middle', 'bottom'],
             lineCount: isWeb ? [6, 10, 12] : [8, 12, 16],
@@ -350,7 +350,7 @@ class _LandingArea extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withAlpha((Colors.white.a * 255 * 0.08).round()),
+                        color: Colors.white.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(

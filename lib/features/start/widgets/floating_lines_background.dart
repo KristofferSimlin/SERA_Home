@@ -243,8 +243,8 @@ class _FloatingLinesPainter extends CustomPainter {
   final bool lightMode;
 
   Color _withOpacity(Color color, double factor) {
-    final newAlpha = (color.a * 255 * factor).clamp(0, 255).round();
-    return color.withAlpha(newAlpha);
+    final newOpacity = (color.opacity * factor).clamp(0.0, 1.0);
+    return color.withOpacity(newOpacity);
   }
 
   @override
