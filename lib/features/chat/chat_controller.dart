@@ -143,6 +143,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
           // Default to same-origin proxy in web builds to avoid CORS/redirect issues.
           proxyUrl: kIsWeb ? '/api/openai-proxy' : null,
           directApiKey: null,
+          webLookupEnabled: true,
         ));
 
   void setProxyEnabled(bool v) => state = state.copyWith(proxyEnabled: v);
