@@ -304,7 +304,9 @@ class _LandingArea extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     const isWeb = kIsWeb;
     final size = MediaQuery.sizeOf(context);
-    final showCompactTitle = size.shortestSide < 720;
+    final isHandheld =
+        defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android;
+    final showCompactTitle = isHandheld || size.width < 760 || size.shortestSide < 720;
     return Stack(
       fit: StackFit.expand,
       children: [
