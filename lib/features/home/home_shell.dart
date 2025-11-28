@@ -43,9 +43,6 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Widget build(BuildContext context) {
     // Responsiv layout: bred skärm -> fast sidofält, smal -> Drawer
     final isWide = MediaQuery.of(context).size.width >= 900;
-    final isCompact = MediaQuery.sizeOf(context).width < 720;
-    final isHandheld = defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android;
-    final showCompactTitle = isCompact || isHandheld;
     final sidebar = _Sidebar(
       onNewChat: () {
         _newChat();
@@ -303,10 +300,6 @@ class _LandingArea extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     const isWeb = kIsWeb;
-    final size = MediaQuery.sizeOf(context);
-    final isHandheld =
-        defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android;
-    final showCompactTitle = isHandheld || size.width < 760 || size.shortestSide < 720;
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -344,7 +337,7 @@ class _LandingArea extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      showCompactTitle ? 'SERA' : 'Välkommen till SERA',
+                      'SERA',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
                     ),
