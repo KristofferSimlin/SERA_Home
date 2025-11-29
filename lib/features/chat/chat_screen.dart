@@ -427,7 +427,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('SERA – Chatt  •  ${widget.sessionId}'),
+        title: const Text('SERA – Chatt'),
         actions: [
           IconButton(
             tooltip: 'Döp om chatt',

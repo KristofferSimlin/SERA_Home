@@ -61,6 +61,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               title: const Text('SERA'),
               actions: [
                 IconButton(
+                  tooltip: 'Profil',
+                  onPressed: () => Navigator.pushNamed(context, '/profile'),
+                  icon: const Icon(Icons.person),
+                ),
+                IconButton(
                   tooltip: 'Ny chatt',
                   onPressed: () {
                     _newChat();
@@ -86,15 +91,6 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           ),
         ],
       ),
-      floatingActionButton: isWide
-          ? null
-          : FloatingActionButton.extended(
-              onPressed: () {
-                _newChat();
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Ny chatt'),
-            ),
     );
   }
 }

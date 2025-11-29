@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'theme/app_theme.dart';
 import 'features/home/home_shell.dart';
 import 'features/settings/settings_screen.dart';
+import 'features/settings/profile_screen.dart';
 import 'features/chat/chat_screen.dart'; // ← lägg till
 import 'features/start/start_screen.dart';
 
@@ -30,6 +31,7 @@ class SeraApp extends StatelessWidget {
         '/start': (_) => const StartScreen(),
         '/': (_) => const HomeShell(),
         '/settings': (_) => const SettingsScreen(),
+        '/profile': (_) => const ProfileScreen(),
       },
 
       // NY: fångar /chat och ger ett stabilt sessionId (default om inget skickas)

@@ -120,6 +120,19 @@ class ChatRepository {
     if (s.isEmpty) return all;
     return all.where((e) => e.title.toLowerCase().contains(s)).toList();
   }
+
+  Future<void> clearAllLocalData() async {
+    final sp = await SharedPreferences.getInstance();
+    final keys = sp.getKeys();
+    final toRemove = <String>{
+      _kSessionsKey,
+      ...keys.where((k) => k.startsWith('sera.session.')),
+      ...keys.where((k) => k.startsWith('equip_')),
+    };
+    for (final k in toRemove) {
+      await sp.remove(k);
+    }
+  }
 }
 
 // ✅ Gemensam provider som alla filer importerar
