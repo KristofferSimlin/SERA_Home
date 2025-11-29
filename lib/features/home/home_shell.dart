@@ -43,6 +43,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Widget build(BuildContext context) {
     // Responsiv layout: bred skärm -> fast sidofält, smal -> Drawer
     final isWide = MediaQuery.of(context).size.width >= 900;
+    final showAppBar = !isWide || kIsWeb;
     final sidebar = _Sidebar(
       onNewChat: () {
         _newChat();
@@ -55,9 +56,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
     return Scaffold(
       drawer: isWide ? null : Drawer(child: SafeArea(child: sidebar)),
-      appBar: isWide
-          ? null
-          : AppBar(
+      appBar: showAppBar
+          ? AppBar(
+              automaticallyImplyLeading: !isWide,
               title: const Text('SERA'),
               actions: [
                 IconButton(
@@ -78,7 +79,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                   icon: const Icon(Icons.settings),
                 ),
               ],
-            ),
+            )
+          : null,
       body: Row(
         children: [
           if (isWide) SizedBox(width: 320, child: Material(color: Theme.of(context).colorScheme.surface, child: SafeArea(child: sidebar))),
