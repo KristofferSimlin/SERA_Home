@@ -8,6 +8,7 @@ environment:
 # Flutter config
 flutter:
   uses-material-design: true
+  generate: true
   assets:
     - .env
     # Lägg till dina assets här vid behov:
@@ -16,6 +17,8 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # UI / tema
   google_fonts: ^6.2.1
@@ -23,7 +26,6 @@ dependencies:
   # State & verktyg
   flutter_riverpod: ^2.5.1
   http: ^1.2.2
-  intl: ^0.19.0
   flutter_dotenv: ^5.1.0
   shared_preferences: ^2.2.3
 

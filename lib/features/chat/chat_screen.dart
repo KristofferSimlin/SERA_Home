@@ -2,6 +2,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sera/l10n/app_localizations.dart';
 
 import 'chat_controller.dart'; // <-- vanlig import, ingen show-filter
 import '../chats/chat_providers.dart' show sessionsProvider;
@@ -138,6 +139,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(chatControllerProvider(widget.sessionId));
+    final l = AppLocalizations.of(context)!;
 
     ref.listen<ChatState>(
       chatControllerProvider(widget.sessionId),
@@ -183,9 +185,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             focusNode: _brandFocus,
             controller: _brandCtrl,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Märke',
-              hintText: 'ex. Volvo, CAT, Wacker Neuson',
+            decoration: InputDecoration(
+              labelText: l.chatBrandLabel,
+              hintText: l.chatBrandHint,
             ),
             onChanged: (_) => _applyEquipment(silent: true),
           ),
@@ -194,9 +196,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             focusNode: _modelFocus,
             controller: _modelCtrl,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Modell',
-              hintText: 'ex. EC250E, 320 GC',
+            decoration: InputDecoration(
+              labelText: l.chatModelLabel,
+              hintText: l.chatModelHint,
             ),
             onChanged: (_) => _applyEquipment(silent: true),
           ),
@@ -210,9 +212,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   controller: _yearCtrl,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Årsmodell',
-                    hintText: 'ex. 2019',
+                  decoration: InputDecoration(
+                    labelText: l.chatYearLabel,
+                    hintText: l.chatYearHint,
                   ),
                   onChanged: (_) => _applyEquipment(silent: true),
                 ),
@@ -221,13 +223,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               Expanded(
                 child: DropdownButtonFormField<int>(
                   value: state.expertise,
-                  decoration: const InputDecoration(
-                    labelText: 'Kunskapsnivå',
+                  decoration: InputDecoration(
+                    labelText: l.chatExpertiseLabel,
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 1, child: Text('1 – Nybörjare')),
-                    DropdownMenuItem(value: 2, child: Text('2 – Medel')),
-                    DropdownMenuItem(value: 3, child: Text('3 – Expert')),
+                  items: [
+                    DropdownMenuItem(value: 1, child: Text(l.chatExpertise1)),
+                    DropdownMenuItem(value: 2, child: Text(l.chatExpertise2)),
+                    DropdownMenuItem(value: 3, child: Text(l.chatExpertise3)),
                   ],
                   onChanged: (val) {
                     chat.setExpertise(val);
@@ -258,9 +260,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   focusNode: _brandFocus,
                   controller: _brandCtrl,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Märke',
-                    hintText: 'ex. Volvo, CAT, Wacker Neuson',
+                  decoration: InputDecoration(
+                    labelText: l.chatBrandLabel,
+                    hintText: l.chatBrandHint,
                   ),
                   onChanged: (_) => _applyEquipment(silent: true),
                 ),
@@ -271,9 +273,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   focusNode: _modelFocus,
                   controller: _modelCtrl,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Modell',
-                    hintText: 'ex. EC250E, 320 GC',
+                  decoration: InputDecoration(
+                    labelText: l.chatModelLabel,
+                    hintText: l.chatModelHint,
                   ),
                   onChanged: (_) => _applyEquipment(silent: true),
                 ),
@@ -286,9 +288,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   controller: _yearCtrl,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Årsmodell',
-                    hintText: 'ex. 2019',
+                  decoration: InputDecoration(
+                    labelText: l.chatYearLabel,
+                    hintText: l.chatYearHint,
                   ),
                   onChanged: (_) => _applyEquipment(silent: true),
                 ),
@@ -298,13 +300,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 width: 180,
                 child: DropdownButtonFormField<int>(
                   value: state.expertise,
-                  decoration: const InputDecoration(
-                    labelText: 'Kunskapsnivå',
+                  decoration: InputDecoration(
+                    labelText: l.chatExpertiseLabel,
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 1, child: Text('1 – Nybörjare')),
-                    DropdownMenuItem(value: 2, child: Text('2 – Medel')),
-                    DropdownMenuItem(value: 3, child: Text('3 – Expert')),
+                  items: [
+                    DropdownMenuItem(value: 1, child: Text(l.chatExpertise1)),
+                    DropdownMenuItem(value: 2, child: Text(l.chatExpertise2)),
+                    DropdownMenuItem(value: 3, child: Text(l.chatExpertise3)),
                   ],
                   onChanged: (val) {
                     chat.setExpertise(val);
@@ -330,19 +332,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ],
         const SizedBox(height: 10),
         if (isCompact) ...[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(Icons.info_outline, size: 18, color: cs.secondary),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  _statusText(state),
-                  style: const TextStyle(fontSize: 12.5),
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.info_outline, size: 18, color: cs.secondary),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      _statusText(state, l),
+                      style: const TextStyle(fontSize: 12.5),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -352,7 +354,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               TextButton.icon(
                 onPressed: _clearEquipment,
                 icon: const Icon(Icons.restart_alt, size: 18),
-                label: const Text('Byt'),
+                label: Text(l.chatClear),
               ),
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -370,42 +372,42 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               FilledButton.icon(
                 onPressed: () => _applyEquipment(),
                 icon: const Icon(Icons.save),
-                label: const Text('Spara'),
+                label: Text(l.chatSave),
               ),
             ],
           ),
         ] else ...[
           Row(
-            children: [
-              Icon(Icons.info_outline, size: 18, color: cs.secondary),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  _statusText(state),
-                  style: const TextStyle(fontSize: 12.5),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              TextButton.icon(
-                onPressed: _clearEquipment,
-                icon: const Icon(Icons.restart_alt, size: 18),
-                label: const Text('Byt'),
-              ),
-              const SizedBox(width: 8),
-              Switch(
-                value: _lock,
-                onChanged: (v) {
-                  setState(() => _lock = v);
-                  chat.setEquipmentLocked(v);
-                },
-              ),
-              const Text('Lås'),
-              const SizedBox(width: 8),
-              FilledButton.icon(
-                onPressed: () => _applyEquipment(),
-                icon: const Icon(Icons.save),
-                label: const Text('Spara'),
-              ),
+                children: [
+                  Icon(Icons.info_outline, size: 18, color: cs.secondary),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      _statusText(state, l),
+                      style: const TextStyle(fontSize: 12.5),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+            TextButton.icon(
+              onPressed: _clearEquipment,
+              icon: const Icon(Icons.restart_alt, size: 18),
+              label: Text(l.chatClear),
+            ),
+            const SizedBox(width: 8),
+            Switch(
+              value: _lock,
+              onChanged: (v) {
+                setState(() => _lock = v);
+                chat.setEquipmentLocked(v);
+              },
+            ),
+            Text(l.chatLock),
+            const SizedBox(width: 8),
+            FilledButton.icon(
+              onPressed: () => _applyEquipment(),
+              icon: const Icon(Icons.save),
+              label: Text(l.chatSave),
+            ),
             ],
           ),
         ],
@@ -427,7 +429,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SERA – Chatt'),
+        title: Text(l.chatAppBarTitle),
         actions: [
           IconButton(
             tooltip: 'Döp om chatt',
@@ -527,13 +529,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ),
 
-          const SafeArea(
+          SafeArea(
             top: false,
             child: Padding(
-              padding: EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.only(bottom: 4),
               child: Text(
-                'Informationen är vägledande. Följ alltid tillverkarens instruktioner och lokala säkerhetsregler. Egen risk.',
-                style: TextStyle(color: Color.fromARGB(179, 241, 238, 238), fontSize: 12.5),
+                l.chatInfo,
+                style: const TextStyle(color: Color.fromARGB(179, 241, 238, 238), fontSize: 12.5),
               ),
             ),
           ),
@@ -546,22 +548,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 children: [
                   Expanded(
                     child: TextField(
-                      controller: _input,
-                      minLines: 1,
-                      maxLines: 5,
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: (_) => _send(),
-                      decoration: const InputDecoration(
-                        hintText: 'Skriv ett meddelande…',
-                      ),
+                    controller: _input,
+                    minLines: 1,
+                    maxLines: 5,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: (_) => _send(),
+                    decoration: InputDecoration(
+                      hintText: l.chatInputHint,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  FilledButton.icon(
-                    onPressed: state.isSending ? null : _send,
-                    icon: const Icon(Icons.send),
-                    label: const Text('Skicka'),
-                  ),
+                ),
+                const SizedBox(width: 8),
+                FilledButton.icon(
+                  onPressed: state.isSending ? null : _send,
+                  icon: const Icon(Icons.send),
+                  label: Text(l.chatSend),
+                ),
                 ],
               ),
             ),
@@ -587,25 +589,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     }
   }
 
-  String _statusText(ChatState st) {
+  String _statusText(ChatState st, AppLocalizations l) {
     final b = st.brand?.trim() ?? '';
     final m = st.model?.trim() ?? '';
     final y = st.year?.trim() ?? '';
-    String lvl;
+    String lvl = '';
     if (st.expertise == 1) {
-      lvl = ' • Nivå: Nybörjare';
+      lvl = l.chatStatusLevel(l.chatExpertise1);
     } else if (st.expertise == 2) {
-      lvl = ' • Nivå: Medel';
+      lvl = l.chatStatusLevel(l.chatExpertise2);
     } else if (st.expertise == 3) {
-      lvl = ' • Nivå: Expert';
-    } else {
-      lvl = '';
+      lvl = l.chatStatusLevel(l.chatExpertise3);
     }
     if (b.isEmpty && m.isEmpty && y.isEmpty) {
-      return 'Ingen utrustning vald ännu.$lvl';
+      return '${l.chatStatusNone}${lvl.isNotEmpty ? ' $lvl' : ''}';
     }
     final core = [b, m].where((e) => e.isNotEmpty).join(' ');
     final withYear = y.isEmpty ? core : '$core ($y)';
-    return 'Vald: ${withYear.isEmpty ? '—' : withYear}${st.equipmentLocked ? ' • Låst' : ''}$lvl';
+    final locked = st.equipmentLocked ? l.chatStatusLocked : '';
+    final base = withYear.isEmpty ? '—' : withYear;
+    return '${l.chatStatusTitle(base)}$locked${lvl.isNotEmpty ? ' $lvl' : ''}';
   }
 }

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sera/l10n/app_localizations.dart';
 
 import '../chat/chat_controller.dart';
-import '../chats/chat_repository.dart';
-import '../chats/chat_providers.dart' show sessionsProvider;
 
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -36,10 +35,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
     final cs = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inställningar'),
+        title: Text(l.settingsTitle),
       ),
       body: ListView(
         padding: const EdgeInsets.all(12),
@@ -51,12 +51,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Anslutning', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  Text(l.settingsConnection, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('Proxy-läge (rekommenderas)'),
-                    subtitle: const Text('Döljer API-nyckel och kan lägga till webbsök /search'),
+                    title: Text(l.settingsProxyToggle),
+                    subtitle: Text(l.settingsProxySubtitle),
                     value: settings.proxyEnabled,
                     onChanged: (v) => ref.read(settingsProvider.notifier).setProxyEnabled(v),
                   ),
@@ -64,10 +64,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   TextField(
                     controller: _proxyCtrl,
                     onChanged: (v) => ref.read(settingsProvider.notifier).setProxyUrl(v.trim()),
-                    decoration: const InputDecoration(
-                      labelText: 'PROXY_URL',
-                      hintText: 'https://api.sera.chat/api/openai-proxy',
-                      helperText: 'Ange ENDAST URL:en (inte "PROXY_URL=" framför).',
+                    decoration: InputDecoration(
+                      labelText: l.settingsProxyUrlLabel,
+                      hintText: l.settingsProxyUrlHint,
+                      helperText: l.settingsProxyUrlHelper,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -75,10 +75,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     controller: _keyCtrl,
                     onChanged: (v) => ref.read(settingsProvider.notifier).setDirectKey(v.trim()),
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'OPENAI_API_KEY (direktläge)',
-                      hintText: 'sk-********',
-                      helperText: 'Använd bara för lokal test. Lägg aldrig nyckeln i produktion.',
+                    decoration: InputDecoration(
+                      labelText: l.settingsDirectKeyLabel,
+                      hintText: l.settingsDirectKeyHint,
+                      helperText: l.settingsDirectKeyHelper,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -88,9 +88,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       color: cs.surfaceContainerHigh.withOpacity(0.25),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
-                      'Tips: Kör proxy-läge i produktion. Direktläge exponerar nyckeln i klienten.',
-                      style: TextStyle(fontSize: 12.5),
+                    child: Text(
+                      l.settingsProxyTip,
+                      style: const TextStyle(fontSize: 12.5),
                     ),
                   ),
                 ],
@@ -105,38 +105,59 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Webbsök (beta)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  Text(l.settingsWebSearchTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('Aktivera webbsök via proxy /search'),
-                    subtitle: const Text('Kräver PROXY_SEARCH_URL i .env och route /search i proxyn'),
+                    title: Text(l.settingsWebSearchToggle),
+                    subtitle: Text(l.settingsWebSearchSubtitle),
                     value: settings.webLookupEnabled,
                     onChanged: (v) => ref.read(settingsProvider.notifier).setWebLookup(v),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'När detta är på försöker SERA hämta relevanta källor (manualer, forum, tekniska sidor) '
-                    'för ditt märke/modell/årsmodell och väver in fynden i svaret.',
-                    style: TextStyle(fontSize: 12.5),
+                  Text(
+                    l.settingsWebSearchInfo,
+                    style: const TextStyle(fontSize: 12.5),
                   ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(Icons.language),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          value: settings.localeCode,
+                          decoration: InputDecoration(labelText: l.settingsLanguageLabel),
+                          items: const [
+                            DropdownMenuItem(value: 'sv', child: Text('Svenska')),
+                            DropdownMenuItem(value: 'en', child: Text('English')),
+                          ],
+                          onChanged: (val) {
+                            if (val != null) {
+                              ref.read(settingsProvider.notifier).setLocale(val);
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
                 ],
               ),
             ),
           ),
 
-          // Info
-          const Card(
+          Card(
             child: Padding(
-              padding: EdgeInsets.all(14),
+              padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Säkerhet', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  SizedBox(height: 8),
+                  Text(l.settingsSafetyTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
                   Text(
-                    'Informationen är vägledande. Följ alltid tillverkarens instruktioner och lokala säkerhetsregler. Egen risk.',
-                    style: TextStyle(fontSize: 12.5),
+                    l.chatInfo,
+                    style: const TextStyle(fontSize: 12.5),
                   ),
                 ],
               ),

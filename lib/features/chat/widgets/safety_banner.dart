@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sera/l10n/app_localizations.dart';
 import '../../../../theme/app_theme.dart';
 
 class SafetyBanner extends StatelessWidget {
@@ -6,6 +7,7 @@ class SafetyBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(12, 12, 12, 6),
@@ -17,15 +19,14 @@ class SafetyBanner extends StatelessWidget {
           color: AppTheme.safetyOrange.withOpacity(0.6),
         ),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('⚠️ ', style: TextStyle(fontSize: 18)),
+          const Text('⚠️ ', style: TextStyle(fontSize: 18)),
           Expanded(
             child: Text(
-              'Säkerhetsfilter: Koppla från ström, avlasta tryck, ventilera vid bränslearbete. '
-              'Använd skyddsutrustning. Följ alltid tillverkarens instruktioner.',
-              style: TextStyle(fontSize: 13.5, height: 1.35),
+              l.chatSafetyBanner,
+              style: const TextStyle(fontSize: 13.5, height: 1.35),
             ),
           ),
         ],

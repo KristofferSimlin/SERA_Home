@@ -113,12 +113,14 @@ class SettingsState {
   final String? proxyUrl; // t.ex. https://api.sera.chat/api/openai-proxy
   final String? directApiKey;
   final bool webLookupEnabled;
+  final String localeCode;
 
   const SettingsState({
     required this.proxyEnabled,
     this.proxyUrl,
     this.directApiKey,
     this.webLookupEnabled = false,
+    this.localeCode = 'sv',
   });
 
   SettingsState copyWith({
@@ -126,12 +128,14 @@ class SettingsState {
     String? proxyUrl,
     String? directApiKey,
     bool? webLookupEnabled,
+    String? localeCode,
   }) {
     return SettingsState(
       proxyEnabled: proxyEnabled ?? this.proxyEnabled,
       proxyUrl: proxyUrl ?? this.proxyUrl,
       directApiKey: directApiKey ?? this.directApiKey,
       webLookupEnabled: webLookupEnabled ?? this.webLookupEnabled,
+      localeCode: localeCode ?? this.localeCode,
     );
   }
 }
@@ -144,12 +148,14 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
           proxyUrl: kIsWeb ? '/api/openai-proxy' : null,
           directApiKey: null,
           webLookupEnabled: true,
+          localeCode: 'sv',
         ));
 
   void setProxyEnabled(bool v) => state = state.copyWith(proxyEnabled: v);
   void setProxyUrl(String v) => state = state.copyWith(proxyUrl: v);
   void setDirectKey(String v) => state = state.copyWith(directApiKey: v);
   void setWebLookup(bool v) => state = state.copyWith(webLookupEnabled: v);
+  void setLocale(String code) => state = state.copyWith(localeCode: code);
 }
 
 final settingsProvider =

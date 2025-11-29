@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sera/l10n/app_localizations.dart';
 
 import 'widgets/floating_lines_background.dart';
 
@@ -126,6 +127,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final config = _resolveConfig(context);
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       body: AnimatedBuilder(
         animation: _fadeIn,
@@ -174,55 +176,55 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'SERA',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 6,
-                                  ),
-                            ),
-                            const SizedBox(width: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: cs.primary.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Text(
-                                'BETA',
-                                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                      letterSpacing: 2,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: config.titleSpacing),
-                        Text(
-                          'Service & Equipment Repair Assistant',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: cs.onSurface.withOpacity(0.75),
-                              ),
-                        ),
-                        SizedBox(height: config.callToActionSpacing),
-                        SizedBox(
-                          width: config.fullWidthButton ? double.infinity : null,
-                          child: FilledButton.icon(
-                            onPressed: _enterApp,
-                            icon: const Icon(Icons.play_arrow_rounded),
-                            label: const Text('Kom igång'),
+                      'SERA',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 6,
                           ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          'Version 1.0 • För tekniker och supportteam',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: cs.onSurfaceVariant,
-                              ),
-                        ),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: cs.primary.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        l.beta,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              letterSpacing: 2,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: config.titleSpacing),
+                Text(
+                  l.startSubtitle,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: cs.onSurface.withOpacity(0.75),
+                      ),
+                ),
+                SizedBox(height: config.callToActionSpacing),
+                SizedBox(
+                  width: config.fullWidthButton ? double.infinity : null,
+                  child: FilledButton.icon(
+                    onPressed: _enterApp,
+                    icon: const Icon(Icons.play_arrow_rounded),
+                    label: Text(l.startCta),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  l.startVersion,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                ),
                       ],
                     ),
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sera/l10n/app_localizations.dart';
 
 import '../chats/chat_providers.dart' show sessionsProvider;
 import '../chats/chat_repository.dart';
@@ -10,9 +11,10 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profil'),
+        title: Text(l.profileTitle),
       ),
       body: ListView(
         padding: const EdgeInsets.all(12),
@@ -23,17 +25,16 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Profil & data', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  Text(l.profileDataTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Rensa lokalt sparad data (sessioner, meddelanden, utrustning). '
-                    'Krav från App Store: möjliggör radering av lagrad användardata.',
-                    style: TextStyle(fontSize: 12.5),
+                  Text(
+                    l.profileDataInfo,
+                    style: const TextStyle(fontSize: 12.5),
                   ),
                   const SizedBox(height: 12),
                   FilledButton.icon(
                     icon: const Icon(Icons.delete_forever),
-                    label: const Text('Radera lagrad data'),
+                    label: Text(l.profileDelete),
                     style: FilledButton.styleFrom(
                       backgroundColor: cs.error,
                       foregroundColor: cs.onError,
@@ -42,18 +43,16 @@ class ProfileScreen extends ConsumerWidget {
                       final confirmed = await showDialog<bool>(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          title: const Text('Radera all lagrad data?'),
-                          content: const Text(
-                            'Detta raderar lokala sessioner, meddelanden och utrustningsval. Åtgärden går inte att ångra.',
-                          ),
+                          title: Text(l.profileDeleteConfirmTitle),
+                          content: Text(l.profileDeleteConfirmBody),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(ctx).pop(false),
-                              child: const Text('Avbryt'),
+                              child: Text(l.profileDeleteCancel),
                             ),
                             FilledButton(
                               onPressed: () => Navigator.of(ctx).pop(true),
-                              child: const Text('Radera'),
+                              child: Text(l.profileDeleteConfirm),
                             ),
                           ],
                         ),
@@ -63,7 +62,7 @@ class ProfileScreen extends ConsumerWidget {
                         if (!context.mounted) return;
                         ref.invalidate(sessionsProvider);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('All lokal data raderad')),
+                          SnackBar(content: Text(l.profileDeleteDone)),
                         );
                       }
                     },
@@ -77,15 +76,23 @@ class ProfileScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('Kommer snart', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  SizedBox(height: 8),
+                children: [
+                  Text(l.profileComingSoonTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
                   Text(
-                    'Här lägger vi till inloggning, snabbval av utrustning och andra profilinställningar.',
-                    style: TextStyle(fontSize: 12.5),
+                    l.profileComingSoonBody,
+                    style: const TextStyle(fontSize: 12.5),
                   ),
                 ],
               ),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.privacy_tip_outlined),
+              title: Text(l.profilePrivacy),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.pushNamed(context, '/privacy'),
             ),
           ),
         ],

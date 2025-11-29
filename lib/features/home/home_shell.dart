@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sera/l10n/app_localizations.dart';
 import '../chats/chat_models.dart';
 import '../chats/chat_providers.dart' show sessionsProvider;
 import '../chats/chat_repository.dart';
@@ -44,6 +45,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     // Responsiv layout: bred skärm -> fast sidofält, smal -> Drawer
     final isWide = MediaQuery.of(context).size.width >= 900;
     final showAppBar = !isWide || kIsWeb;
+    final l = AppLocalizations.of(context)!;
     final sidebar = _Sidebar(
       onNewChat: () {
         _newChat();
@@ -63,16 +65,16 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               title: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('SERA'),
+                  Text(l.homeAppBarTitle),
                   if (isWide) ...[
                     const SizedBox(width: 16),
                     IconButton(
-                      tooltip: 'Academy',
+                      tooltip: l.homeAcademy,
                       onPressed: () {},
                       icon: const Icon(Icons.school),
                     ),
                     IconButton(
-                      tooltip: 'Forum',
+                      tooltip: l.homeForum,
                       onPressed: () {},
                       icon: const Icon(Icons.forum),
                     ),
@@ -81,19 +83,19 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               ),
               actions: [
                 IconButton(
-                  tooltip: 'Profil',
+                  tooltip: l.homeProfile,
                   onPressed: () => Navigator.pushNamed(context, '/profile'),
                   icon: const Icon(Icons.person),
                 ),
                 IconButton(
-                  tooltip: 'Ny chatt',
+                  tooltip: l.homeNewChat,
                   onPressed: () {
                     _newChat();
                   },
                   icon: const Icon(Icons.add_comment),
                 ),
                 IconButton(
-                  tooltip: 'Inställningar',
+                  tooltip: l.homeSettings,
                   onPressed: () => Navigator.pushNamed(context, '/settings'),
                   icon: const Icon(Icons.settings),
                 ),
@@ -132,17 +134,18 @@ class _Sidebar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sessions = ref.watch(sessionsProvider);
+    final l = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
           if (showNavLinks) ...[
-            const Row(
+            Row(
               children: [
-                _NavButton(label: 'Academy', subtitle: 'Coming soon', icon: Icons.school),
-                SizedBox(width: 8),
-                _NavButton(label: 'Forum', subtitle: 'Coming soon', icon: Icons.forum),
+                _NavButton(label: l.homeAcademy, subtitle: l.comingSoon, icon: Icons.school),
+                const SizedBox(width: 8),
+                _NavButton(label: l.homeForum, subtitle: l.comingSoon, icon: Icons.forum),
               ],
             ),
             const SizedBox(height: 12),
@@ -154,12 +157,12 @@ class _Sidebar extends ConsumerWidget {
                 child: FilledButton.icon(
                   onPressed: onNewChat,
                   icon: const Icon(Icons.add),
-                  label: const Text('Ny chatt'),
+                  label: Text(l.homeNewChat),
                 ),
               ),
               const SizedBox(width: 8),
               IconButton(
-                tooltip: 'Inställningar',
+                tooltip: l.homeSettings,
                 onPressed: () => Navigator.pushNamed(context, '/settings'),
                 icon: const Icon(Icons.settings),
               )
@@ -170,9 +173,9 @@ class _Sidebar extends ConsumerWidget {
             controller: searchCtrl,
             textInputAction: TextInputAction.search,
             onSubmitted: (_) => FocusScope.of(context).unfocus(),
-            decoration: const InputDecoration(
-              hintText: 'Sök i chattar…',
-              prefixIcon: Icon(Icons.search),
+            decoration: InputDecoration(
+              hintText: l.homeSearchHint,
+              prefixIcon: const Icon(Icons.search),
             ),
           ),
           const SizedBox(height: 10),
@@ -184,8 +187,8 @@ class _Sidebar extends ConsumerWidget {
             child: sessions.when(
               data: (list) {
                 if (list.isEmpty) {
-                  return const Center(
-                    child: Text('Inga chattar ännu'),
+                  return Center(
+                    child: Text(l.homeNoChats),
                   );
                 }
                 return ListView.separated(
@@ -203,12 +206,12 @@ class _Sidebar extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            tooltip: 'Byt namn',
+                            tooltip: l.homeRename,
                             icon: const Icon(Icons.drive_file_rename_outline),
                             onPressed: () => _renameSession(context, ref, s),
                           ),
                           IconButton(
-                            tooltip: 'Radera',
+                            tooltip: l.homeDelete,
                             icon: const Icon(Icons.delete_outline),
                             onPressed: () async {
                               await ref.read(chatRepoProvider).deleteSession(s.id);
@@ -235,26 +238,27 @@ class _Sidebar extends ConsumerWidget {
     WidgetRef ref,
     ChatSessionMeta session,
   ) async {
+    final l = AppLocalizations.of(context)!;
     final controller = TextEditingController(text: session.title);
     final newTitle = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Döp om chatt'),
+        title: Text(l.homeRenameDialogTitle),
         content: TextField(
           controller: controller,
           autofocus: true,
           maxLength: 48,
-          decoration: const InputDecoration(hintText: 'Ange nytt namn'),
+          decoration: InputDecoration(hintText: l.homeRenameDialogHint),
           onSubmitted: (value) => Navigator.of(ctx).pop(value),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Avbryt'),
+            child: Text(l.homeRenameCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(controller.text),
-            child: const Text('Spara'),
+            child: Text(l.homeRenameSave),
           ),
         ],
       ),
