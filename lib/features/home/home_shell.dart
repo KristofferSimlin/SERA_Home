@@ -52,6 +52,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
         _openChat(id);
       },
       searchCtrl: _search,
+      showNavLinks: !isWide,
     );
 
     return Scaffold(
@@ -59,7 +60,25 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       appBar: showAppBar
           ? AppBar(
               automaticallyImplyLeading: !isWide,
-              title: const Text('SERA'),
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('SERA'),
+                  if (isWide) ...[
+                    const SizedBox(width: 16),
+                    IconButton(
+                      tooltip: 'Academy',
+                      onPressed: () {},
+                      icon: const Icon(Icons.school),
+                    ),
+                    IconButton(
+                      tooltip: 'Forum',
+                      onPressed: () {},
+                      icon: const Icon(Icons.forum),
+                    ),
+                  ],
+                ],
+              ),
               actions: [
                 IconButton(
                   tooltip: 'Profil',
@@ -102,11 +121,13 @@ class _Sidebar extends ConsumerWidget {
     required this.onNewChat,
     required this.onOpenChat,
     required this.searchCtrl,
+    required this.showNavLinks,
   });
 
   final VoidCallback onNewChat;
   final void Function(String id) onOpenChat;
   final TextEditingController searchCtrl;
+  final bool showNavLinks;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -116,14 +137,16 @@ class _Sidebar extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          const Row(
-            children: [
-              _NavButton(label: 'Academy', subtitle: 'Coming soon', icon: Icons.school),
-              SizedBox(width: 8),
-              _NavButton(label: 'Forum', subtitle: 'Coming soon', icon: Icons.forum),
-            ],
-          ),
-          const SizedBox(height: 12),
+          if (showNavLinks) ...[
+            const Row(
+              children: [
+                _NavButton(label: 'Academy', subtitle: 'Coming soon', icon: Icons.school),
+                SizedBox(width: 8),
+                _NavButton(label: 'Forum', subtitle: 'Coming soon', icon: Icons.forum),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
           // Topp: Ny chatt + Sök
           Row(
             children: [
