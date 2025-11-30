@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-# Pin a stable Flutter version to avoid SDK mismatch in CI
-FLUTTER_VERSION="3.24.4"
+# Use latest stable Flutter (aligns with intl 0.20.x)
+FLUTTER_VERSION="stable"
 git clone https://github.com/flutter/flutter.git --branch "$FLUTTER_VERSION" --depth 1
 export PATH="$PATH:$(pwd)/flutter/bin"
 
