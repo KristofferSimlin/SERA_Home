@@ -104,7 +104,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           : null,
       body: Row(
         children: [
-          if (isWide) SizedBox(width: 320, child: Material(color: Theme.of(context).colorScheme.surface, child: SafeArea(child: sidebar))),
+          if (isWide)
+            SizedBox(
+                width: 320,
+                child: Material(
+                    color: Theme.of(context).colorScheme.surface,
+                    child: SafeArea(child: sidebar))),
           Expanded(
             child: _LandingArea(
               onNewChat: () {
@@ -143,9 +148,15 @@ class _Sidebar extends ConsumerWidget {
           if (showNavLinks) ...[
             Row(
               children: [
-                _NavButton(label: l.homeAcademy, subtitle: l.comingSoon, icon: Icons.school),
+                _NavButton(
+                    label: l.homeAcademy,
+                    subtitle: l.comingSoon,
+                    icon: Icons.school),
                 const SizedBox(width: 8),
-                _NavButton(label: l.homeForum, subtitle: l.comingSoon, icon: Icons.forum),
+                _NavButton(
+                    label: l.homeForum,
+                    subtitle: l.comingSoon,
+                    icon: Icons.forum),
               ],
             ),
             const SizedBox(height: 12),
@@ -199,7 +210,8 @@ class _Sidebar extends ConsumerWidget {
                     return ListTile(
                       dense: true,
                       leading: const Icon(Icons.chat_bubble_outline),
-                      title: Text(s.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      title: Text(s.title,
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
                       subtitle: Text('${s.updatedAt}'),
                       onTap: () => onOpenChat(s.id),
                       trailing: Row(
@@ -214,7 +226,9 @@ class _Sidebar extends ConsumerWidget {
                             tooltip: l.homeDelete,
                             icon: const Icon(Icons.delete_outline),
                             onPressed: () async {
-                              await ref.read(chatRepoProvider).deleteSession(s.id);
+                              await ref
+                                  .read(chatRepoProvider)
+                                  .deleteSession(s.id);
                               ref.invalidate(sessionsProvider);
                             },
                           ),
@@ -304,7 +318,8 @@ class _NavButton extends StatelessWidget {
           children: [
             Text(
               label,
-              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+              style: theme.textTheme.titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w600),
             ),
             Text(
               subtitle,
@@ -325,101 +340,116 @@ class _LandingArea extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     const isWeb = kIsWeb;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                cs.surface.withOpacity(0.65),
-                cs.surface.withOpacity(0.85),
-              ],
-            ),
-          ),
-        ),
-        Positioned.fill(
-          child: FloatingLinesBackground(
-            enabledWaves: const ['top', 'middle', 'bottom'],
-            // Färre linjer och långsammare animering på web för bättre prestanda
-            lineCount: isWeb ? const [4, 6, 8] : const [8, 12, 16],
-            lineDistance: isWeb ? const [10.0, 8.0, 6.0] : const [7.0, 5.0, 4.0],
-            animationSpeed: isWeb ? 0.08 : 0.16,
-            opacity: isWeb ? 0.55 : 0.8,
-          ),
-        ),
-        Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 920),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Stor rubrik
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'SERA',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(width: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        'BETA',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              letterSpacing: 2,
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Service & Equipment Repair Assistant',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white70),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Förslag ("prompt suggestions")
-                  const Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      _SuggestionChip('Felsökning – motor startar inte'),
-                      _SuggestionChip('Läs felkod & nästa steg'),
-                      _SuggestionChip('Underhåll – checklista'),
-                      _SuggestionChip('Säkerhetsråd – hydraulik'),
-                    ],
-                  ),
-                  const SizedBox(height: 28),
-
-                  FilledButton.icon(
-                    onPressed: onNewChat,
-                    icon: const Icon(Icons.add_comment),
-                    label: const Text('Starta ny chatt'),
-                  ),
-
-                  const SizedBox(height: 32),
-                  const _Disclaimer(),
+    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+    return TickerMode(
+      enabled: isCurrentRoute,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  cs.surface.withOpacity(0.65),
+                  cs.surface.withOpacity(0.85),
                 ],
               ),
             ),
           ),
-        ),
-      ],
+          Positioned.fill(
+            child: FloatingLinesBackground(
+              enabledWaves: const ['top', 'middle', 'bottom'],
+              // Färre linjer och långsammare animering på web för bättre prestanda
+              lineCount: isWeb ? const [4, 6, 8] : const [8, 12, 16],
+              lineDistance:
+                  isWeb ? const [10.0, 8.0, 6.0] : const [7.0, 5.0, 4.0],
+              animationSpeed: isWeb ? 0.08 : 0.16,
+              opacity: isWeb ? 0.55 : 0.8,
+            ),
+          ),
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 920),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Stor rubrik
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'SERA',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .textTheme
+                              .displaySmall
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            'BETA',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                                  letterSpacing: 2,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Service & Equipment Repair Assistant',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(color: Colors.white70),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Förslag ("prompt suggestions")
+                    const Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        _SuggestionChip('Felsökning – motor startar inte'),
+                        _SuggestionChip('Läs felkod & nästa steg'),
+                        _SuggestionChip('Underhåll – checklista'),
+                        _SuggestionChip('Säkerhetsråd – hydraulik'),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+
+                    FilledButton.icon(
+                      onPressed: onNewChat,
+                      icon: const Icon(Icons.add_comment),
+                      label: const Text('Starta ny chatt'),
+                    ),
+
+                    const SizedBox(height: 32),
+                    const _Disclaimer(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -433,7 +463,8 @@ class _SuggestionChip extends StatelessWidget {
     return InputChip(
       label: Text(text),
       onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Tips valt: $text — tryck Ny chatt och klistra in')),
+        SnackBar(
+            content: Text('Tips valt: $text — tryck Ny chatt och klistra in')),
       ),
     );
   }
