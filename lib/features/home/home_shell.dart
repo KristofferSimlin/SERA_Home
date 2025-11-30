@@ -343,10 +343,11 @@ class _LandingArea extends StatelessWidget {
         Positioned.fill(
           child: FloatingLinesBackground(
             enabledWaves: const ['top', 'middle', 'bottom'],
-            lineCount: isWeb ? const [6, 10, 12] : const [8, 12, 16],
-            lineDistance: isWeb ? const [8.0, 6.0, 5.0] : const [7.0, 5.0, 4.0],
-            animationSpeed: isWeb ? 0.13 : 0.16,
-            opacity: isWeb ? 0.7 : 0.8,
+            // Färre linjer och långsammare animering på web för bättre prestanda
+            lineCount: isWeb ? const [4, 6, 8] : const [8, 12, 16],
+            lineDistance: isWeb ? const [10.0, 8.0, 6.0] : const [7.0, 5.0, 4.0],
+            animationSpeed: isWeb ? 0.08 : 0.16,
+            opacity: isWeb ? 0.55 : 0.8,
           ),
         ),
         Center(
