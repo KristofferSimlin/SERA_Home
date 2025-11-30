@@ -54,6 +54,7 @@
   "profileDeleteCancel": "Cancel",
   "profileDeleteConfirm": "Delete",
   "profileDeleteDone": "All local data deleted",
+  "error": "Error",
   "profileComingSoonTitle": "Coming soon",
   "profileComingSoonBody": "Here we will add login, quick equipment presets and other profile settings.",
   "profilePrivacy": "Privacy Policy",

@@ -404,6 +404,12 @@ abstract class AppLocalizations {
   /// **'All local data deleted'**
   String get profileDeleteDone;
 
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
   /// No description provided for @profileComingSoonTitle.
   ///
   /// In en, this message translates to:

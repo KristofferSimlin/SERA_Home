@@ -170,6 +170,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileDeleteDone => 'All local data deleted';
 
   @override
+  String get error => 'Error';
+
+  @override
   String get profileComingSoonTitle => 'Coming soon';
 
   @override

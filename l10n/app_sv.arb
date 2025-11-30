@@ -54,6 +54,7 @@
   "profileDeleteCancel": "Avbryt",
   "profileDeleteConfirm": "Radera",
   "profileDeleteDone": "All lokal data raderad",
+  "error": "Fel",
   "profileComingSoonTitle": "Kommer snart",
   "profileComingSoonBody": "Här lägger vi till inloggning, snabbval av utrustning och andra profilinställningar.",
   "profilePrivacy": "Privacy Policy",

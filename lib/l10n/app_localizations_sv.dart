@@ -170,6 +170,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get profileDeleteDone => 'All lokal data raderad';
 
   @override
+  String get error => 'Fel';
+
+  @override
   String get profileComingSoonTitle => 'Kommer snart';
 
   @override

@@ -58,12 +58,19 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                       );
                       if (confirmed == true) {
-                        await ref.read(chatRepoProvider).clearAllLocalData();
-                        if (!context.mounted) return;
-                        ref.invalidate(sessionsProvider);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l.profileDeleteDone)),
-                        );
+                        try {
+                          await ref.read(chatRepoProvider).clearAllLocalData();
+                          if (!context.mounted) return;
+                          ref.invalidate(sessionsProvider);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(l.profileDeleteDone)),
+                          );
+                        } catch (e) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('${l.error}: $e')),
+                          );
+                        }
                       }
                     },
                   ),
