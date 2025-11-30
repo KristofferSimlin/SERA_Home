@@ -457,8 +457,15 @@ class _Disclaimer extends StatelessWidget {
   }
 }
 
-class _FeatureCards extends StatelessWidget {
+class _FeatureCards extends StatefulWidget {
   const _FeatureCards();
+
+  @override
+  State<_FeatureCards> createState() => _FeatureCardsState();
+}
+
+class _FeatureCardsState extends State<_FeatureCards> {
+  int? _mobileExpanded;
 
   @override
   Widget build(BuildContext context) {
@@ -505,9 +512,11 @@ class _FeatureCards extends StatelessWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         const spacing = 12.0;
+        final isMobile = width < 720;
+        // Behåll minst 2 kolumner även på mobil (om bredden tillåter)
         final columns = width >= 880
             ? 4
-            : width >= 640
+            : width >= 400
                 ? 2
                 : 1;
         final itemWidth =
@@ -518,12 +527,23 @@ class _FeatureCards extends StatelessWidget {
           child: Wrap(
             spacing: spacing,
             runSpacing: 16,
-            children: cards
-                .map((card) => SizedBox(
-                      width: itemWidth,
-                      child: _HoverCard(data: card),
-                    ))
-                .toList(),
+            children: [
+              for (var i = 0; i < cards.length; i++)
+                SizedBox(
+                  width: itemWidth,
+                  child: _HoverCard(
+                    data: cards[i],
+                    expandedOverride: isMobile ? _mobileExpanded == i : null,
+                    onTap: isMobile
+                        ? () {
+                            setState(() {
+                              _mobileExpanded = _mobileExpanded == i ? null : i;
+                            });
+                          }
+                        : null,
+                  ),
+                ),
+            ],
           ),
         );
       },
@@ -532,9 +552,15 @@ class _FeatureCards extends StatelessWidget {
 }
 
 class _HoverCard extends StatefulWidget {
-  const _HoverCard({required this.data});
+  const _HoverCard({
+    required this.data,
+    this.expandedOverride,
+    this.onTap,
+  });
 
   final _CardData data;
+  final bool? expandedOverride;
+  final VoidCallback? onTap;
 
   @override
   State<_HoverCard> createState() => _HoverCardState();
@@ -553,34 +579,43 @@ class _HoverCardState extends State<_HoverCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final expanded = widget.expandedOverride ?? _expanded;
     final bgColor = Colors.white
-        .withOpacity(_expanded ? 0.12 : 0.08); // subtle glow on hover
+        .withOpacity(expanded ? 0.12 : 0.08); // subtle glow on hover
 
     return MouseRegion(
       onEnter: (e) {
-        if (e.kind == PointerDeviceKind.mouse) {
+        if (e.kind == PointerDeviceKind.mouse &&
+            widget.expandedOverride == null) {
           _setHover(true);
         }
       },
       onExit: (e) {
-        if (e.kind == PointerDeviceKind.mouse) {
+        if (e.kind == PointerDeviceKind.mouse &&
+            widget.expandedOverride == null) {
           _setHover(false);
         }
       },
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => _setHover(!_expanded), // tap support on touch devices
+        onTap: () {
+          if (widget.onTap != null) {
+            widget.onTap!();
+          } else {
+            _setHover(!expanded); // tap support on touch devices
+          }
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeInOut,
-          padding: EdgeInsets.all(_expanded ? 18 : 16),
+          padding: EdgeInsets.all(expanded ? 18 : 16),
           decoration: BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: Colors.white.withOpacity(_expanded ? 0.28 : 0.16),
+              color: Colors.white.withOpacity(expanded ? 0.28 : 0.16),
             ),
-            boxShadow: _expanded
+            boxShadow: expanded
                 ? [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.18),
@@ -609,7 +644,7 @@ class _HoverCardState extends State<_HoverCard> {
               TweenAnimationBuilder<double>(
                 duration: const Duration(milliseconds: 250),
                 curve: Curves.easeInOut,
-                tween: Tween<double>(begin: 0, end: _expanded ? 1 : 0),
+                tween: Tween<double>(begin: 0, end: expanded ? 1 : 0),
                 child: Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: Column(
