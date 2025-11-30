@@ -84,6 +84,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sidebarTipsTitle4 => 'Safety advice – hydraulics';
 
   @override
+  String get homeHeroDescription =>
+      'SERA is your AI assistant for heavy equipment—from troubleshooting to installation. Soon complemented by SERA Academy and a community forum where you can learn, share experience, and get help from peers.';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override

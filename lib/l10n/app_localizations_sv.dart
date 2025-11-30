@@ -84,6 +84,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get sidebarTipsTitle4 => 'Säkerhetsråd – hydraulik';
 
   @override
+  String get homeHeroDescription =>
+      'SERA är din AI-assistent för entreprenadmaskiner – från felsökning till installation. Snart kompletterad med SERA Academy och ett community-forum där du kan lära, dela erfarenheter och få stöd av andra i branschen.';
+
+  @override
   String get settingsTitle => 'Inställningar';
 
   @override

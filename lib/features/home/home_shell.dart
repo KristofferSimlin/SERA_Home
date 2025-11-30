@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sera/l10n/app_localizations.dart';
@@ -339,6 +340,7 @@ class _LandingArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
     const isWeb = kIsWeb;
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
     return TickerMode(
@@ -412,27 +414,15 @@ class _LandingArea extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Service & Equipment Repair Assistant',
+                      l.startSubtitle,
                       textAlign: TextAlign.center,
                       style: Theme.of(context)
                           .textTheme
                           .titleMedium
                           ?.copyWith(color: Colors.white70),
                     ),
-                    const SizedBox(height: 24),
-
-                    // Förslag ("prompt suggestions")
-                    const Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        _SuggestionChip('Felsökning – motor startar inte'),
-                        _SuggestionChip('Läs felkod & nästa steg'),
-                        _SuggestionChip('Underhåll – checklista'),
-                        _SuggestionChip('Säkerhetsråd – hydraulik'),
-                      ],
-                    ),
+                    const SizedBox(height: 20),
+                    const _FeatureCards(),
                     const SizedBox(height: 28),
 
                     FilledButton.icon(
@@ -454,22 +444,6 @@ class _LandingArea extends StatelessWidget {
   }
 }
 
-class _SuggestionChip extends StatelessWidget {
-  const _SuggestionChip(this.text);
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return InputChip(
-      label: Text(text),
-      onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Tips valt: $text — tryck Ny chatt och klistra in')),
-      ),
-    );
-  }
-}
-
 class _Disclaimer extends StatelessWidget {
   const _Disclaimer();
 
@@ -481,4 +455,212 @@ class _Disclaimer extends StatelessWidget {
       style: TextStyle(fontSize: 12.5, color: Colors.white70, height: 1.35),
     );
   }
+}
+
+class _FeatureCards extends StatelessWidget {
+  const _FeatureCards();
+
+  @override
+  Widget build(BuildContext context) {
+    const cards = [
+      _CardData(
+        title: 'Felsökning',
+        badge: 'FELFÖRSÖKNING',
+        description:
+            'SERA hjälper dig att snabbt identifiera fel i entreprenadmaskiner med AI-drivna analyser.\n'
+            'Förklara symtom, få förslag på orsaker och steg-för-steg-lösningar.\n'
+            'Perfekt för både fälttekniker och mekaniker som behöver snabba svar.\n'
+            'Alltid tillgängligt och uppdaterat.',
+      ),
+      _CardData(
+        title: 'Underhåll',
+        badge: 'UNDERHÅLL',
+        description:
+            'Få tydliga instruktioner för service, inspektion och planerat underhåll.\n'
+            'SERA guidar dig genom rätt intervaller, rekommenderade åtgärder och vanliga problem.\n'
+            'Mindre gissande, mer struktur.\n'
+            'Hjälper dig hålla maskinerna driftsäkra längre.',
+      ),
+      _CardData(
+        title: 'Utbildning',
+        badge: 'UTBILDNING',
+        description:
+            'SERA Academy erbjuder guider, utbildningar och lättförståeligt material.\n'
+            'Lär dig funktioner, system, installationer och säkerhetsrutiner.\n'
+            'Perfekt för nya tekniker eller den som vill utveckla sina färdigheter.\n'
+            'Allt samlat i ett enkelt, digitalt format.',
+      ),
+      _CardData(
+        title: 'Community',
+        badge: 'COMMUNITY',
+        description:
+            'Ett forum där tekniker, förare och entusiaster kan dela kunskap och erfarenheter.\n'
+            'Ställ frågor, diskutera lösningar och hjälp andra i branschen.\n'
+            'Bygger en stark gemenskap runt SERA och entreprenadmaskiner.\n'
+            'En plats att lära, inspireras och växa tillsammans.',
+      ),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        const spacing = 12.0;
+        final columns = width >= 880
+            ? 4
+            : width >= 640
+                ? 2
+                : 1;
+        final itemWidth = columns == 1
+            ? width
+            : (width - spacing * (columns - 1)) / columns;
+
+        return Align(
+          alignment: Alignment.center,
+          child: Wrap(
+            spacing: spacing,
+            runSpacing: 16,
+            children: cards
+                .map((card) => SizedBox(
+                      width: itemWidth,
+                      child: _HoverCard(data: card),
+                    ))
+                .toList(),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _HoverCard extends StatefulWidget {
+  const _HoverCard({required this.data});
+
+  final _CardData data;
+
+  @override
+  State<_HoverCard> createState() => _HoverCardState();
+}
+
+class _HoverCardState extends State<_HoverCard> {
+  bool _expanded = false;
+
+  void _setHover(bool value) {
+    if (_expanded == value) return;
+    setState(() {
+      _expanded = value;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bgColor =
+        Colors.white.withOpacity(_expanded ? 0.12 : 0.08); // subtle glow on hover
+
+    return MouseRegion(
+      onEnter: (e) {
+        if (e.kind == PointerDeviceKind.mouse) {
+          _setHover(true);
+        }
+      },
+      onExit: (e) {
+        if (e.kind == PointerDeviceKind.mouse) {
+          _setHover(false);
+        }
+      },
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _setHover(!_expanded), // tap support on touch devices
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          padding: EdgeInsets.all(_expanded ? 18 : 16),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Colors.white.withOpacity(_expanded ? 0.28 : 0.16),
+            ),
+            boxShadow: _expanded
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.18),
+                      blurRadius: 18,
+                      offset: const Offset(0, 10),
+                    ),
+                  ]
+                : const [],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Center(
+                  child: Text(
+                    widget.data.title,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                tween: Tween<double>(begin: 0, end: _expanded ? 1 : 0),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.data.badge,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          letterSpacing: 1.6,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        widget.data.description,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white70,
+                          height: 1.48,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                builder: (context, value, child) {
+                  return ClipRect(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      heightFactor: value,
+                      child: Opacity(opacity: value, child: child),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CardData {
+  const _CardData({
+    required this.title,
+    required this.badge,
+    required this.description,
+  });
+
+  final String title;
+  final String badge;
+  final String description;
 }

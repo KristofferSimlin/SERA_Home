@@ -248,6 +248,12 @@ abstract class AppLocalizations {
   /// **'Safety advice – hydraulics'**
   String get sidebarTipsTitle4;
 
+  /// No description provided for @homeHeroDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'SERA is your AI assistant for heavy equipment—from troubleshooting to installation. Soon complemented by SERA Academy and a community forum where you can learn, share experience, and get help from peers.'**
+  String get homeHeroDescription;
+
   /// No description provided for @settingsTitle.
   ///
   /// In en, this message translates to:
