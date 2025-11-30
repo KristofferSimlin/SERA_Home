@@ -465,7 +465,7 @@ class _FeatureCards extends StatelessWidget {
     const cards = [
       _CardData(
         title: 'Felsökning',
-        badge: 'FELFÖRSÖKNING',
+        badge: 'FELSÖKNING',
         description:
             'SERA hjälper dig att snabbt identifiera fel i entreprenadmaskiner med AI-drivna analyser.\n'
             'Förklara symtom, få förslag på orsaker och steg-för-steg-lösningar.\n'
@@ -510,9 +510,8 @@ class _FeatureCards extends StatelessWidget {
             : width >= 640
                 ? 2
                 : 1;
-        final itemWidth = columns == 1
-            ? width
-            : (width - spacing * (columns - 1)) / columns;
+        final itemWidth =
+            columns == 1 ? width : (width - spacing * (columns - 1)) / columns;
 
         return Align(
           alignment: Alignment.center,
@@ -554,8 +553,8 @@ class _HoverCardState extends State<_HoverCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bgColor =
-        Colors.white.withOpacity(_expanded ? 0.12 : 0.08); // subtle glow on hover
+    final bgColor = Colors.white
+        .withOpacity(_expanded ? 0.12 : 0.08); // subtle glow on hover
 
     return MouseRegion(
       onEnter: (e) {
