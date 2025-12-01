@@ -75,7 +75,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get homeCardTroubleshootingTitle => 'Felsökning';
 
   @override
-  String get homeCardTroubleshootingBadge => 'FELFÖRSÖKNING';
+  String get homeCardTroubleshootingBadge => 'FELSÖKNING';
 
   @override
   String get homeCardTroubleshootingBody =>
