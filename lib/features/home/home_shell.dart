@@ -498,14 +498,17 @@ class _FeatureCardsState extends State<_FeatureCards> {
         final width = constraints.maxWidth;
         const spacing = 12.0;
         final isMobile = width < 720;
-        // Behåll minst 2 kolumner även på mobil (om bredden tillåter)
+        // Försök hålla 2 kolumner även på mobil; fall back till 1 på extremt smalt
         final columns = width >= 880
             ? 4
-            : width >= 400
+            : width >= 620
                 ? 2
-                : 1;
+                : width >= 320
+                    ? 2
+                    : 1;
         final itemWidth =
             columns == 1 ? width : (width - spacing * (columns - 1)) / columns;
+        final compactText = width < 420;
 
         return Align(
           alignment: Alignment.center,
@@ -518,6 +521,7 @@ class _FeatureCardsState extends State<_FeatureCards> {
                   width: itemWidth,
                   child: _HoverCard(
                     data: cards[i],
+                    compactText: compactText,
                     expandedOverride: isMobile ? _mobileExpanded == i : null,
                     onTap: isMobile
                         ? () {
@@ -539,11 +543,13 @@ class _FeatureCardsState extends State<_FeatureCards> {
 class _HoverCard extends StatefulWidget {
   const _HoverCard({
     required this.data,
+    required this.compactText,
     this.expandedOverride,
     this.onTap,
   });
 
   final _CardData data;
+  final bool compactText;
   final bool? expandedOverride;
   final VoidCallback? onTap;
 
@@ -619,7 +625,10 @@ class _HoverCardState extends State<_HoverCard> {
                   child: Text(
                     widget.data.title,
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.titleMedium?.copyWith(
+                    style: (widget.compactText
+                            ? theme.textTheme.titleSmall
+                            : theme.textTheme.titleMedium)
+                        ?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
@@ -646,7 +655,10 @@ class _HoverCardState extends State<_HoverCard> {
                       const SizedBox(height: 6),
                       Text(
                         widget.data.description,
-                        style: theme.textTheme.bodyMedium?.copyWith(
+                        style: (widget.compactText
+                                ? theme.textTheme.bodySmall
+                                : theme.textTheme.bodyMedium)
+                            ?.copyWith(
                           color: Colors.white70,
                           height: 1.48,
                         ),
