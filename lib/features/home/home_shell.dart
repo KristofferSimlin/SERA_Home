@@ -470,6 +470,7 @@ class _FeatureCardsState extends State<_FeatureCards> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+    final viewportWidth = MediaQuery.sizeOf(context).width;
     final cards = [
       _CardData(
         title: l.homeCardTroubleshootingTitle,
@@ -496,16 +497,14 @@ class _FeatureCardsState extends State<_FeatureCards> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        const spacing = 12.0;
+        const spacing = 10.0;
         final isMobile = width < 720;
-        // Försök hålla 2 kolumner även på mobil; fall back till 1 på extremt smalt
-        final columns = width >= 880
+        // Försök hålla 2 kolumner även på mobil; fall back till 1 först vid riktigt smal viewport
+        final columns = viewportWidth >= 880
             ? 4
-            : width >= 620
+            : viewportWidth >= 320
                 ? 2
-                : width >= 320
-                    ? 2
-                    : 1;
+                : 1;
         final itemWidth =
             columns == 1 ? width : (width - spacing * (columns - 1)) / columns;
         final compactText = width < 420;
