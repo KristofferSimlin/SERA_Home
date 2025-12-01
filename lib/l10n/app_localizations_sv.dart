@@ -72,6 +72,46 @@ class AppLocalizationsSv extends AppLocalizations {
   String get homeRenameSave => 'Spara';
 
   @override
+  String get homeCardTroubleshootingTitle => 'Felsökning';
+
+  @override
+  String get homeCardTroubleshootingBadge => 'FELFÖRSÖKNING';
+
+  @override
+  String get homeCardTroubleshootingBody =>
+      'SERA hjälper dig att snabbt identifiera fel i entreprenadmaskiner med AI-drivna analyser.\nFörklara symtom, få förslag på orsaker och steg-för-steg-lösningar.\nPerfekt för både fälttekniker och mekaniker som behöver snabba svar.\nAlltid tillgängligt och uppdaterat.';
+
+  @override
+  String get homeCardMaintenanceTitle => 'Underhåll';
+
+  @override
+  String get homeCardMaintenanceBadge => 'UNDERHÅLL';
+
+  @override
+  String get homeCardMaintenanceBody =>
+      'Få tydliga instruktioner för service, inspektion och planerat underhåll.\nSERA guidar dig genom rätt intervaller, rekommenderade åtgärder och vanliga problem.\nMindre gissande, mer struktur.\nHjälper dig hålla maskinerna driftsäkra längre.';
+
+  @override
+  String get homeCardTrainingTitle => 'Utbildning';
+
+  @override
+  String get homeCardTrainingBadge => 'UTBILDNING';
+
+  @override
+  String get homeCardTrainingBody =>
+      'SERA Academy erbjuder guider, utbildningar och lättförståeligt material.\nLär dig funktioner, system, installationer och säkerhetsrutiner.\nPerfekt för nya tekniker eller den som vill utveckla sina färdigheter.\nAllt samlat i ett enkelt, digitalt format.';
+
+  @override
+  String get homeCardCommunityTitle => 'Community';
+
+  @override
+  String get homeCardCommunityBadge => 'COMMUNITY';
+
+  @override
+  String get homeCardCommunityBody =>
+      'Ett forum där tekniker, förare och entusiaster kan dela kunskap och erfarenheter.\nStäll frågor, diskutera lösningar och hjälp andra i branschen.\nBygger en stark gemenskap runt SERA och entreprenadmaskiner.\nEn plats att lära, inspireras och växa tillsammans.';
+
+  @override
   String get sidebarTipsTitle1 => 'Felsökning – motor startar inte';
 
   @override

@@ -224,6 +224,78 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get homeRenameSave;
 
+  /// No description provided for @homeCardTroubleshootingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Troubleshooting'**
+  String get homeCardTroubleshootingTitle;
+
+  /// No description provided for @homeCardTroubleshootingBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'TROUBLESHOOTING'**
+  String get homeCardTroubleshootingBadge;
+
+  /// No description provided for @homeCardTroubleshootingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'SERA helps you quickly identify faults in heavy equipment with AI-powered analysis.\nDescribe symptoms, get suggested causes and step-by-step fixes.\nPerfect for field techs and mechanics who need answers fast.\nAlways available and up to date.'**
+  String get homeCardTroubleshootingBody;
+
+  /// No description provided for @homeCardMaintenanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance'**
+  String get homeCardMaintenanceTitle;
+
+  /// No description provided for @homeCardMaintenanceBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'MAINTENANCE'**
+  String get homeCardMaintenanceBadge;
+
+  /// No description provided for @homeCardMaintenanceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear instructions for service, inspections and planned maintenance.\nSERA guides you through the right intervals, recommended actions and common issues.\nLess guesswork, more structure.\nHelps you keep machines reliable longer.'**
+  String get homeCardMaintenanceBody;
+
+  /// No description provided for @homeCardTrainingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Training'**
+  String get homeCardTrainingTitle;
+
+  /// No description provided for @homeCardTrainingBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'TRAINING'**
+  String get homeCardTrainingBadge;
+
+  /// No description provided for @homeCardTrainingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'SERA Academy offers guides, training and easy-to-read material.\nLearn functions, systems, installations and safety procedures.\nPerfect for new technicians or anyone leveling up skills.\nEverything collected in one simple digital format.'**
+  String get homeCardTrainingBody;
+
+  /// No description provided for @homeCardCommunityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get homeCardCommunityTitle;
+
+  /// No description provided for @homeCardCommunityBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'COMMUNITY'**
+  String get homeCardCommunityBadge;
+
+  /// No description provided for @homeCardCommunityBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A forum where technicians, operators and enthusiasts share knowledge and experience.\nAsk questions, discuss fixes and help others in the industry.\nBuilds a strong community around SERA and heavy equipment.\nA place to learn, get inspired and grow together.'**
+  String get homeCardCommunityBody;
+
   /// No description provided for @sidebarTipsTitle1.
   ///
   /// In en, this message translates to:

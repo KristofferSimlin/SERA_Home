@@ -428,7 +428,7 @@ class _LandingArea extends StatelessWidget {
                     FilledButton.icon(
                       onPressed: onNewChat,
                       icon: const Icon(Icons.add_comment),
-                      label: const Text('Starta ny chatt'),
+                      label: Text(l.homeNewChat),
                     ),
 
                     const SizedBox(height: 32),
@@ -469,42 +469,27 @@ class _FeatureCardsState extends State<_FeatureCards> {
 
   @override
   Widget build(BuildContext context) {
-    const cards = [
+    final l = AppLocalizations.of(context)!;
+    final cards = [
       _CardData(
-        title: 'Felsökning',
-        badge: 'FELSÖKNING',
-        description:
-            'SERA hjälper dig att snabbt identifiera fel i entreprenadmaskiner med AI-drivna analyser.\n'
-            'Förklara symtom, få förslag på orsaker och steg-för-steg-lösningar.\n'
-            'Perfekt för både fälttekniker och mekaniker som behöver snabba svar.\n'
-            'Alltid tillgängligt och uppdaterat.',
+        title: l.homeCardTroubleshootingTitle,
+        badge: l.homeCardTroubleshootingBadge,
+        description: l.homeCardTroubleshootingBody,
       ),
       _CardData(
-        title: 'Underhåll',
-        badge: 'UNDERHÅLL',
-        description:
-            'Få tydliga instruktioner för service, inspektion och planerat underhåll.\n'
-            'SERA guidar dig genom rätt intervaller, rekommenderade åtgärder och vanliga problem.\n'
-            'Mindre gissande, mer struktur.\n'
-            'Hjälper dig hålla maskinerna driftsäkra längre.',
+        title: l.homeCardMaintenanceTitle,
+        badge: l.homeCardMaintenanceBadge,
+        description: l.homeCardMaintenanceBody,
       ),
       _CardData(
-        title: 'Utbildning',
-        badge: 'UTBILDNING',
-        description:
-            'SERA Academy erbjuder guider, utbildningar och lättförståeligt material.\n'
-            'Lär dig funktioner, system, installationer och säkerhetsrutiner.\n'
-            'Perfekt för nya tekniker eller den som vill utveckla sina färdigheter.\n'
-            'Allt samlat i ett enkelt, digitalt format.',
+        title: l.homeCardTrainingTitle,
+        badge: l.homeCardTrainingBadge,
+        description: l.homeCardTrainingBody,
       ),
       _CardData(
-        title: 'Community',
-        badge: 'COMMUNITY',
-        description:
-            'Ett forum där tekniker, förare och entusiaster kan dela kunskap och erfarenheter.\n'
-            'Ställ frågor, diskutera lösningar och hjälp andra i branschen.\n'
-            'Bygger en stark gemenskap runt SERA och entreprenadmaskiner.\n'
-            'En plats att lära, inspireras och växa tillsammans.',
+        title: l.homeCardCommunityTitle,
+        badge: l.homeCardCommunityBadge,
+        description: l.homeCardCommunityBody,
       ),
     ];
 

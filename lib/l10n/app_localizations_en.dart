@@ -72,6 +72,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeRenameSave => 'Save';
 
   @override
+  String get homeCardTroubleshootingTitle => 'Troubleshooting';
+
+  @override
+  String get homeCardTroubleshootingBadge => 'TROUBLESHOOTING';
+
+  @override
+  String get homeCardTroubleshootingBody =>
+      'SERA helps you quickly identify faults in heavy equipment with AI-powered analysis.\nDescribe symptoms, get suggested causes and step-by-step fixes.\nPerfect for field techs and mechanics who need answers fast.\nAlways available and up to date.';
+
+  @override
+  String get homeCardMaintenanceTitle => 'Maintenance';
+
+  @override
+  String get homeCardMaintenanceBadge => 'MAINTENANCE';
+
+  @override
+  String get homeCardMaintenanceBody =>
+      'Clear instructions for service, inspections and planned maintenance.\nSERA guides you through the right intervals, recommended actions and common issues.\nLess guesswork, more structure.\nHelps you keep machines reliable longer.';
+
+  @override
+  String get homeCardTrainingTitle => 'Training';
+
+  @override
+  String get homeCardTrainingBadge => 'TRAINING';
+
+  @override
+  String get homeCardTrainingBody =>
+      'SERA Academy offers guides, training and easy-to-read material.\nLearn functions, systems, installations and safety procedures.\nPerfect for new technicians or anyone leveling up skills.\nEverything collected in one simple digital format.';
+
+  @override
+  String get homeCardCommunityTitle => 'Community';
+
+  @override
+  String get homeCardCommunityBadge => 'COMMUNITY';
+
+  @override
+  String get homeCardCommunityBody =>
+      'A forum where technicians, operators and enthusiasts share knowledge and experience.\nAsk questions, discuss fixes and help others in the industry.\nBuilds a strong community around SERA and heavy equipment.\nA place to learn, get inspired and grow together.';
+
+  @override
   String get sidebarTipsTitle1 => 'Troubleshooting – engine will not start';
 
   @override
