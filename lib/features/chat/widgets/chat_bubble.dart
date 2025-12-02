@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:intl/intl.dart';
 
 class ChatBubble extends StatelessWidget {
@@ -15,6 +16,7 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isTableLike = _looksLikeTable(text);
     final colorScheme = Theme.of(context).colorScheme;
     final bg = isUser
         ? colorScheme.primary
@@ -47,7 +49,14 @@ class ChatBubble extends StatelessWidget {
             children: [
               SelectableText(
                 text.trim().isEmpty ? ' ' : text,
-                style: TextStyle(color: fg, height: 1.35, fontSize: 15.0),
+                style: TextStyle(
+                  color: fg,
+                  height: 1.35,
+                  fontSize: isTableLike ? 14.5 : 15.0,
+                  fontFamily: isTableLike ? 'monospace' : null,
+                  fontFeatures:
+                      isTableLike ? const [] : const [FontFeature.tabularFigures()],
+                ),
               ),
               if (ts != null) ...[
                 const SizedBox(height: 6),
@@ -64,5 +73,14 @@ class ChatBubble extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool _looksLikeTable(String text) {
+    if (text.contains('```')) return true;
+    final lines = text.split('\n').map((l) => l.trim()).toList();
+    final hasPipes = lines.any((l) => l.startsWith('|') && l.contains('|'));
+    final hasSeparator =
+        lines.any((l) => l.startsWith('|') && l.contains('---'));
+    return hasPipes && hasSeparator;
   }
 }
