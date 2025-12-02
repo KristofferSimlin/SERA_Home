@@ -21,19 +21,19 @@ class ChatBubble extends StatelessWidget {
     final bg = isUser
         ? colorScheme.primary
         : colorScheme.surfaceContainerHighest.withOpacity(0.4);
-    final fg = isUser
-        ? colorScheme.onPrimary
-        : colorScheme.onSurface;
+    final fg = isUser ? colorScheme.onPrimary : colorScheme.onSurface;
 
     final align = isUser ? Alignment.centerRight : Alignment.centerLeft;
     final radius = BorderRadius.only(
       topLeft: const Radius.circular(14),
       topRight: const Radius.circular(14),
       bottomLeft: isUser ? const Radius.circular(14) : const Radius.circular(4),
-      bottomRight: isUser ? const Radius.circular(4) : const Radius.circular(14),
+      bottomRight:
+          isUser ? const Radius.circular(4) : const Radius.circular(14),
     );
 
     final ts = time != null ? DateFormat('HH:mm').format(time!) : null;
+    final tableParts = _extractTableBlock(text);
 
     return Align(
       alignment: align,
@@ -47,30 +47,15 @@ class ChatBubble extends StatelessWidget {
             crossAxisAlignment:
                 isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
-              if (isTableLike)
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SelectableText(
-                    text.trim().isEmpty ? ' ' : text,
-                    style: TextStyle(
-                      color: fg,
-                      height: 1.25,
-                      fontSize: 14.5,
-                      fontFamily: 'monospace',
-                      fontFeatures: const [],
-                    ),
-                  ),
-                )
-              else
-                SelectableText(
-                  text.trim().isEmpty ? ' ' : text,
-                  style: TextStyle(
-                    color: fg,
-                    height: 1.35,
-                    fontSize: 15.0,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
+              if (tableParts == null)
+                _plainText(text, fg, isTableLike)
+              else ...[
+                if (tableParts.before.isNotEmpty)
+                  _plainText(tableParts.before, fg, false),
+                _tableView(tableParts.tableLines, fg),
+                if (tableParts.after.isNotEmpty)
+                  _plainText(tableParts.after, fg, false),
+              ],
               if (ts != null) ...[
                 const SizedBox(height: 6),
                 Text(
@@ -96,4 +81,115 @@ class ChatBubble extends StatelessWidget {
         lines.any((l) => l.startsWith('|') && l.contains('---'));
     return hasPipes && hasSeparator;
   }
+
+  Widget _plainText(String value, Color fg, bool isTableLike) {
+    return SelectableText(
+      value.trim().isEmpty ? ' ' : value,
+      style: TextStyle(
+        color: fg,
+        height: isTableLike ? 1.25 : 1.35,
+        fontSize: isTableLike ? 14.5 : 15.0,
+        fontFamily: isTableLike ? 'monospace' : null,
+        fontFeatures:
+            isTableLike ? const [] : const [FontFeature.tabularFigures()],
+      ),
+    );
+  }
+
+  Widget _tableView(List<String> tableLines, Color fg) {
+    final rows = _parseTable(tableLines);
+    if (rows.isEmpty) {
+      return _plainText(tableLines.join('\n'), fg, true);
+    }
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.hardEdge,
+      child: Table(
+        defaultColumnWidth: const IntrinsicColumnWidth(),
+        border: TableBorder.symmetric(
+          inside: BorderSide(color: fg.withOpacity(0.25), width: 0.6),
+          outside: BorderSide(color: fg.withOpacity(0.35), width: 0.8),
+        ),
+        defaultVerticalAlignment: TableCellVerticalAlignment.top,
+        children: [
+          for (final row in rows)
+            TableRow(
+              decoration: const BoxDecoration(),
+              children: [
+                for (final cell in row)
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                    child: SelectableText(
+                      cell,
+                      style: TextStyle(
+                        color: fg,
+                        height: 1.3,
+                        fontSize: 14.5,
+                        fontFamily: 'monospace',
+                        fontFeatures: const [],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  List<List<String>> _parseTable(List<String> lines) {
+    final cleaned = <List<String>>[];
+    for (final raw in lines) {
+      var line = raw.trim();
+      if (line.isEmpty) continue;
+      if (line.startsWith('|')) line = line.substring(1);
+      if (line.endsWith('|')) line = line.substring(0, line.length - 1);
+      final cells = line.split('|').map((c) => c.trim()).toList();
+      // Skip separator rows like --- or :---:
+      final isSeparator =
+          cells.every((c) => RegExp(r'^:?-{2,}:?$').hasMatch(c));
+      if (isSeparator) continue;
+      cleaned.add(cells);
+    }
+    if (cleaned.isEmpty) return [];
+    // Normalize column count
+    final cols =
+        cleaned.map((r) => r.length).fold<int>(0, (a, b) => b > a ? b : a);
+    return cleaned
+        .map((r) => [
+              ...r,
+              ...List.filled(cols - r.length, ''),
+            ])
+        .toList();
+  }
+
+  _TableParts? _extractTableBlock(String text) {
+    final lines = text.split('\n');
+    int start = -1;
+    int end = -1;
+    for (var i = 0; i < lines.length; i++) {
+      final l = lines[i].trim();
+      if (l.startsWith('|') && l.contains('|')) {
+        if (start == -1) start = i;
+        end = i;
+      } else {
+        if (start != -1 && end != -1) break;
+      }
+    }
+    if (start == -1 || end == -1 || start == end) return null;
+    // Expand end to include following separator row if present
+    final before = lines.sublist(0, start).join('\n').trim();
+    final tableLines = lines.sublist(start, end + 1);
+    final after = lines.sublist(end + 1).join('\n').trim();
+    return _TableParts(before: before, tableLines: tableLines, after: after);
+  }
+}
+
+class _TableParts {
+  _TableParts(
+      {required this.before, required this.tableLines, required this.after});
+  final String before;
+  final List<String> tableLines;
+  final String after;
 }
