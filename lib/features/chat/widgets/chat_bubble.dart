@@ -47,17 +47,30 @@ class ChatBubble extends StatelessWidget {
             crossAxisAlignment:
                 isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
-              SelectableText(
-                text.trim().isEmpty ? ' ' : text,
-                style: TextStyle(
-                  color: fg,
-                  height: 1.35,
-                  fontSize: isTableLike ? 14.5 : 15.0,
-                  fontFamily: isTableLike ? 'monospace' : null,
-                  fontFeatures:
-                      isTableLike ? const [] : const [FontFeature.tabularFigures()],
+              if (isTableLike)
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SelectableText(
+                    text.trim().isEmpty ? ' ' : text,
+                    style: TextStyle(
+                      color: fg,
+                      height: 1.25,
+                      fontSize: 14.5,
+                      fontFamily: 'monospace',
+                      fontFeatures: const [],
+                    ),
+                  ),
+                )
+              else
+                SelectableText(
+                  text.trim().isEmpty ? ' ' : text,
+                  style: TextStyle(
+                    color: fg,
+                    height: 1.35,
+                    fontSize: 15.0,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
                 ),
-              ),
               if (ts != null) ...[
                 const SizedBox(height: 6),
                 Text(
