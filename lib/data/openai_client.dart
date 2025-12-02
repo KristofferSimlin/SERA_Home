@@ -24,6 +24,7 @@ STRUKTUR:
 1) Kort introduktion (2–3 meningar, nybörjare).
 2) Säkerhet först: punktlista med varför (LOTO, avstängning, tryckavlastning, stöd/stöttor/lyftpunkter, parkeringsläge, PPE).
 3) Översiktlig felsökningsstrategi: 5–7 punkter (enkla kontroller → visuellt → mätningar → demontering).
+3b) Vanliga felbilder (kortlista 4–8 rader): Symptom → sannolik orsak → snabbtest/mätning → tolkning → åtgärd. Anpassa efter systemområdet, håll det kompakt.
 4) Tabell: Symptom | Trolig orsak | Kontroll/test (steg-för-steg) | Verktyg/mätinstrument | Normalt värde/förväntat resultat | Åtgärd/reparation. Inkludera grundkontroller (bränslenivå, huvudströmbrytare, nödstopp, oljor, läckage, säkringar/reläer, kontakter).
 5) Steg-för-steg-flöde med om/annars-hänvisning och kort “varför”.
 6) (Valfritt) Minilexikon för termer (matarpump, givare, jordpunkt, CAN-bus m.m.).
@@ -40,7 +41,8 @@ STRUKTUR:
 1) Kort introduktion (2–3 meningar, mekaniker med viss erfarenhet).
 2) Säkerhet: kort lista (LOTO, tryckavlastning, lyft/säkring, PPE).
 3) Översiktlig strategi (4–6 punkter): snabba uppenbara orsaker → visuell kontroll → systematiska mätningar (spänning/tryck/flöde/motstånd) → diagnos/felkoder → ev. demontering/byte.
-4) Tabell: Symptom | Trolig orsak | Kontroll/test | Verktyg/mätinstrument | Gränsvärden/normalvärden | Rekommenderad åtgärd. Ta med bas, men lägg mer vikt vid mätpunkter, givare, kontakter, reläer, ventiler, tryckbegränsning/pilottryck/interna läckage.
+3b) Vanliga felbilder (kort lista 4–8 rader): Symptom → sannolik orsak → test/mätpunkt → tolkning → åtgärd. Anpassa efter systemområdet, håll det kompakt.
+4) Tabell: Symptom | Trolig orsak | Kontroll/test | Verktyg/mätinstrument | Gränsvärden/normalvärden | Rekommenderad åtgärd. Lägg mer vikt vid mätpunkter, givare, kontakter, reläer, ventiler, tryckbegränsning/pilottryck/interna läckage.
 5) Steg-för-steg-flöde med om → gå till steg X. Referera till mätvärden.
 6) Vanliga felbilder & fällor (jordpunkter, kabelbrott i böj, interna läckage, etc.).
 SPRÅK: Teknisk svenska, kompaktare än nivå 1.
@@ -55,6 +57,7 @@ STRUKTUR:
 1) Kort introduktion (1–2 meningar, direkt på sak).
 2) Säkerhet (3–5 punkter): trycksatta system, högspänning, lagrad energi, lyft/infästning.
 3) Felsökningsstrategi för expert: systematisk uteslutning, mätning under last, felkod/logg-analys, kända svagheter.
+3b) Vanliga felbilder (kort lista 4–8 rader, avancerat): Symptom → rotorsak/felbild → test/mätpunkt → gränsvärde/tolkning → åtgärd. Anpassa efter systemområdet.
 4) Avancerad tabell: Symptom | Trolig rotorsak/felbild | Diagnostiskt test (mätpunkter) | Mätvärden/gränsvärden | Tolkning | Rekommenderad åtgärd. Fokusera på spänningsfall under start, ECU-matning/jord, tryck vid testportar, pilottryck, interna bypass, CAN/kommunikation.
 5) Steg-för-steg flöde (kort): om/annars-logik med mättrösklar.
 6) Kända svagheter & typiska rotorsaker (kabelstammar, givare som drar buss, ventiler som kärvar, firmware-buggar).

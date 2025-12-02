@@ -10,10 +10,15 @@ class WebSearchClient {
             ? dotenv.env['PROXY_SEARCH_URL']!.trim()
             : '/api/openai-search';
 
-  Future<String?> searchSummary(String query) async {
+  Future<String?> searchSummary(String query,
+      {String? brand, String? model}) async {
     final url = proxySearchUrl;
     if (url == null || url.isEmpty) return null;
-    final res = await http.get(Uri.parse('$url?q=${Uri.encodeQueryComponent(query)}'));
+    final params = <String, String>{'q': query};
+    if (brand != null && brand.isNotEmpty) params['brand'] = brand;
+    if (model != null && model.isNotEmpty) params['model'] = model;
+    final uri = Uri.parse(url).replace(queryParameters: params);
+    final res = await http.get(uri);
     if (res.statusCode != 200) return null;
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     // Nya schemat: { summary, hits: [{title, snippet, link}] }

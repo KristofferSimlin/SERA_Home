@@ -326,7 +326,11 @@ class ChatController extends StateNotifier<ChatState> {
         .trim();
     if (combined.length < 4) return null;
     try {
-      return await _webSearch.searchSummary(combined);
+      return await _webSearch.searchSummary(
+        combined,
+        brand: brand,
+        model: model,
+      );
     } catch (e, st) {
       debugPrint('Web lookup error: $e\n$st');
       return null;
