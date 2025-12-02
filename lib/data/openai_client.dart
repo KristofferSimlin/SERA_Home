@@ -27,7 +27,7 @@ STRUKTUR:
 2) Säkerhet först: punktlista med varför (LOTO, avstängning, tryckavlastning, stöd/stöttor/lyftpunkter, parkeringsläge, PPE).
 3) Översiktlig felsökningsstrategi: 5–7 punkter (enkla kontroller → visuellt → mätningar → demontering).
 3b) Vanliga felbilder (kortlista 4–8 rader): Symptom → sannolik orsak → snabbtest/mätning → tolkning → åtgärd. Anpassa efter systemområdet, håll det kompakt.
-4) Tabell (8–12 rader, hela meningar): Symptom | Trolig orsak | Kontroll/test (steg-för-steg) | Verktyg/mätinstrument | Normalt värde/förväntat resultat | Åtgärd/reparation. Var generös med orden per cell (2–3 meningar där det behövs). Tillåt 1–3 troliga orsaker per symptom genom att lägga flera rader med samma Symptom men olika orsaker/tester. Inkludera grundkontroller (bränslenivå, huvudströmbrytare, nödstopp, oljor, läckage, säkringar/reläer, kontakter).
+4) Tabell (minst 8–10 symptomrader, hela meningar): Symptom | Trolig orsak | Kontroll/test (steg-för-steg) | Verktyg/mätinstrument | Normalt värde/förväntat resultat | Åtgärd/reparation. Var generös med orden per cell (2–3 meningar där det behövs). Tillåt 1–3 troliga orsaker per symptom genom att lägga flera rader med samma Symptom men olika orsaker/tester. Inkludera grundkontroller (bränslenivå, huvudströmbrytare, nödstopp, oljor, läckage, säkringar/reläer, kontakter).
 5) Steg-för-steg-flöde med om/annars-hänvisning och kort “varför”.
 6) (Valfritt) Minilexikon för termer (matarpump, givare, jordpunkt, CAN-bus m.m.).
 7) Vanliga misstag & tips (t.ex. byta delar innan mätning, inte mäta under last).
@@ -44,7 +44,7 @@ STRUKTUR:
 2) Säkerhet: kort lista (LOTO, tryckavlastning, lyft/säkring, PPE).
 3) Översiktlig strategi (4–6 punkter): snabba uppenbara orsaker → visuell kontroll → systematiska mätningar (spänning/tryck/flöde/motstånd) → diagnos/felkoder → ev. demontering/byte.
 3b) Vanliga felbilder (kort lista 4–8 rader): Symptom → sannolik orsak → test/mätpunkt → tolkning → åtgärd. Anpassa efter systemområdet, håll det kompakt.
-4) Tabell (8–12 rader, hela meningar): Symptom | Trolig orsak | Kontroll/test | Verktyg/mätinstrument | Gränsvärden/normalvärden | Rekommenderad åtgärd. Var generös med ord per cell (2–3 meningar vid behov). Tillåt 1–3 troliga orsaker per symptom genom att repetera Symptom-raden med olika orsaker/tester. Lägg mer vikt vid mätpunkter, givare, kontakter, reläer, ventiler, tryckbegränsning/pilottryck/interna läckage.
+4) Tabell (minst 8–10 symptomrader, hela meningar): Symptom | Trolig orsak | Kontroll/test | Verktyg/mätinstrument | Gränsvärden/normalvärden | Rekommenderad åtgärd. Var generös med ord per cell (2–3 meningar vid behov). Tillåt 1–3 troliga orsaker per symptom genom att repetera Symptom-raden med olika orsaker/tester. Lägg mer vikt vid mätpunkter, givare, kontakter, reläer, ventiler, tryckbegränsning/pilottryck/interna läckage.
 5) Steg-för-steg-flöde med om → gå till steg X. Referera till mätvärden.
 6) Vanliga felbilder & fällor (jordpunkter, kabelbrott i böj, interna läckage, etc.).
 SPRÅK: Teknisk svenska, kompaktare än nivå 1.
@@ -60,7 +60,7 @@ STRUKTUR:
 2) Säkerhet (3–5 punkter): trycksatta system, högspänning, lagrad energi, lyft/infästning.
 3) Felsökningsstrategi för expert: systematisk uteslutning, mätning under last, felkod/logg-analys, kända svagheter.
 3b) Vanliga felbilder (kort lista 4–8 rader, avancerat): Symptom → rotorsak/felbild → test/mätpunkt → gränsvärde/tolkning → åtgärd. Anpassa efter systemområdet.
-4) Avancerad tabell (8–12 rader, hela meningar): Symptom | Trolig rotorsak/felbild | Diagnostiskt test (mätpunkter) | Mätvärden/gränsvärden | Tolkning | Rekommenderad åtgärd. Var generös med ord per cell och fokusera på spänningsfall under start, ECU-matning/jord, tryck vid testportar, pilottryck, interna bypass, CAN/kommunikation. Tillåt 1–3 rotorsaker per symptom genom att använda flera rader med samma Symptom men olika orsaker/tester.
+4) Avancerad tabell (minst 8–10 symptomrader, hela meningar): Symptom | Trolig rotorsak/felbild | Diagnostiskt test (mätpunkter) | Mätvärden/gränsvärden | Tolkning | Rekommenderad åtgärd. Var generös med ord per cell och fokusera på spänningsfall under start, ECU-matning/jord, tryck vid testportar, pilottryck, interna bypass, CAN/kommunikation. Tillåt 1–3 rotorsaker per symptom genom att använda flera rader med samma Symptom men olika orsaker/tester.
 5) Steg-för-steg flöde (kort): om/annars-logik med mättrösklar.
 6) Kända svagheter & typiska rotorsaker (kabelstammar, givare som drar buss, ventiler som kärvar, firmware-buggar).
 SPRÅK: Kort, teknisk svenska för proffs. Fackspråk OK.
