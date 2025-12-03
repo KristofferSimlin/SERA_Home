@@ -61,68 +61,153 @@ class PersonalPricingScreen extends StatelessWidget {
                 constraints: const BoxConstraints(maxWidth: 720),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        l.personalPricingTitle,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.w700),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          cs.primary.withOpacity(0.5),
+                          cs.secondary.withOpacity(0.5),
+                        ],
                       ),
-                      const SizedBox(height: 12),
-                      Text(
-                        l.personalPricingBody,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: cs.onSurface.withOpacity(0.85),
-                              height: 1.35,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    padding: const EdgeInsets.all(2.2),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0E121A).withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 84,
+                            height: 84,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0xFF6EE7FF),
+                                  Color(0xFF8A6DFF),
+                                  Color(0xFF55F273),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                             ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        l.personalPricingTrial,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: cs.onSurface.withOpacity(0.9),
-                              height: 1.4,
+                            child: const Icon(Icons.person,
+                                size: 42, color: Colors.white),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            l.personalPricingTitle,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            l.personalPricingBody,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: cs.onSurface.withOpacity(0.85),
+                                  height: 1.4,
+                                ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            l.personalPricingTrial,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: cs.onSurface.withOpacity(0.95),
+                                  height: 1.4,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                          const SizedBox(height: 14),
+                          _GradientButton(
+                            label: l.personalPricingSubscribe,
+                            onPressed: () => _openUrl(
+                              context,
+                              'https://apps.apple.com/', // TODO: replace with real IAP link
                             ),
+                          ),
+                          const SizedBox(height: 14),
+                          OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                  color: cs.onSurface.withOpacity(0.5),
+                                  width: 1),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 18, vertical: 12),
+                            ),
+                            onPressed: () => _openApp(context),
+                            icon: const Icon(Icons.check_circle_outline),
+                            label: Text(l.personalPricingOpenApp),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
-                      FilledButton.icon(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: cs.primary.withOpacity(0.9),
-                          side: BorderSide(
-                              color: cs.onPrimary.withOpacity(0.45), width: 1),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 12),
-                        ),
-                        onPressed: () => _openUrl(
-                          context,
-                          'https://apps.apple.com/', // TODO: replace with real IAP link
-                        ),
-                        icon: const Icon(Icons.subscriptions),
-                        label: Text(l.personalPricingSubscribe),
-                      ),
-                      const SizedBox(height: 16),
-                      OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                              color: cs.onSurface.withOpacity(0.5), width: 1),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 12),
-                        ),
-                        onPressed: () => _openApp(context),
-                        icon: const Icon(Icons.check_circle_outline),
-                        label: Text(l.personalPricingOpenApp),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _GradientButton extends StatelessWidget {
+  const _GradientButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF6EE7FF),
+            Color(0xFF8A6DFF),
+            Color(0xFF55F273),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        child: TextButton(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            foregroundColor: Colors.white,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          onPressed: onPressed,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ),
       ),
     );
   }
