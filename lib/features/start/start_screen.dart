@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sera/l10n/app_localizations.dart';
 
 import 'widgets/floating_lines_background.dart';
@@ -124,6 +125,21 @@ class _StartScreenState extends State<StartScreen>
     Navigator.of(context).pushReplacementNamed('/');
   }
 
+  Future<void> _handlePersonalAccess() async {
+    final prefs = await SharedPreferences.getInstance();
+    final hasAccess = prefs.getBool('personal_access') ?? false;
+    if (hasAccess) {
+      _enterApp();
+    } else {
+      if (!mounted) return;
+      Navigator.of(context).pushNamed('/personal-pricing');
+    }
+  }
+
+  void _handleBusinessLogin() {
+    Navigator.of(context).pushNamed('/business-login');
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
@@ -224,14 +240,45 @@ class _StartScreenState extends State<StartScreen>
                                 ),
                           ),
                           SizedBox(height: config.callToActionSpacing),
-                          SizedBox(
-                            width:
-                                config.fullWidthButton ? double.infinity : null,
-                            child: FilledButton.icon(
-                              onPressed: _enterApp,
-                              icon: const Icon(Icons.play_arrow_rounded),
-                              label: Text(l.startCta),
-                            ),
+                          Column(
+                            children: [
+                              SizedBox(
+                                width: config.fullWidthButton
+                                    ? double.infinity
+                                    : null,
+                                child: FilledButton.icon(
+                                  onPressed: _handleBusinessLogin,
+                                  icon: const Icon(Icons.business_center),
+                                  label: Text(l.startLoginBusiness),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                width: config.fullWidthButton
+                                    ? double.infinity
+                                    : null,
+                                child: FilledButton.icon(
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor:
+                                        cs.primary.withOpacity(0.85),
+                                  ),
+                                  onPressed: _handlePersonalAccess,
+                                  icon: const Icon(Icons.person),
+                                  label: Text(l.startLoginPersonal),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                width: config.fullWidthButton
+                                    ? double.infinity
+                                    : null,
+                                child: OutlinedButton.icon(
+                                  onPressed: _enterApp,
+                                  icon: const Icon(Icons.play_arrow_rounded),
+                                  label: Text(l.startCta),
+                                ),
+                              ),
+                            ],
                           ),
                           const Spacer(),
                           Text(

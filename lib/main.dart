@@ -11,6 +11,8 @@ import 'features/settings/profile_screen.dart';
 import 'features/settings/privacy_policy_screen.dart';
 import 'features/chat/chat_screen.dart'; // ← lägg till
 import 'features/start/start_screen.dart';
+import 'features/start/business_login_screen.dart';
+import 'features/start/personal_pricing_screen.dart';
 import 'features/chat/chat_controller.dart';
 import 'package:sera/l10n/app_localizations.dart';
 
@@ -46,6 +48,8 @@ class SeraApp extends ConsumerWidget {
         '/settings': (_) => const SettingsScreen(),
         '/profile': (_) => const ProfileScreen(),
         '/privacy': (_) => const PrivacyPolicyScreen(),
+        '/business-login': (_) => const BusinessLoginScreen(),
+        '/personal-pricing': (_) => const PersonalPricingScreen(),
       },
 
       // NY: fångar /chat och ger ett stabilt sessionId (default om inget skickas)
