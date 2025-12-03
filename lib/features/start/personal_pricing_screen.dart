@@ -142,19 +142,75 @@ class PersonalPricingScreen extends StatelessWidget {
                               'https://apps.apple.com/', // TODO: replace with real IAP link
                             ),
                           ),
-                          const SizedBox(height: 14),
-                          OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                  color: cs.onSurface.withOpacity(0.5),
-                                  width: 1),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 18, vertical: 12),
-                            ),
-                            onPressed: () => _openApp(context),
-                            icon: const Icon(Icons.check_circle_outline),
-                            label: Text(l.personalPricingOpenApp),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 12,
+                            runSpacing: 4,
+                            children: [
+                              TextButton(
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(0, 0),
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                onPressed: () =>
+                                    Navigator.of(context).pushNamed('/privacy'),
+                                child: Text(
+                                  l.privacyTitle,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: cs.onSurface.withOpacity(0.75),
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                ),
+                              ),
+                              TextButton(
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(0, 0),
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                onPressed: () => Navigator.of(context)
+                                    .pushNamed('/subscription-terms'),
+                                child: Text(
+                                  l.subscriptionTitle,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: cs.onSurface.withOpacity(0.75),
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                ),
+                              ),
+                              TextButton(
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(0, 0),
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                onPressed: () =>
+                                    Navigator.of(context).pushNamed('/terms'),
+                                child: Text(
+                                  l.termsTitle,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: cs.onSurface.withOpacity(0.75),
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                ),
+                              ),
+                            ],
                           ),
+                          const SizedBox(height: 12),
                         ],
                       ),
                     ),

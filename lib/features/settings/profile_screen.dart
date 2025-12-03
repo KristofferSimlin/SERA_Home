@@ -102,6 +102,22 @@ class ProfileScreen extends ConsumerWidget {
               onTap: () => Navigator.pushNamed(context, '/privacy'),
             ),
           ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.description_outlined),
+              title: Text(l.termsTitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.pushNamed(context, '/terms'),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.subscriptions_outlined),
+              title: Text(l.subscriptionTitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.pushNamed(context, '/subscription-terms'),
+            ),
+          ),
         ],
       ),
     );
