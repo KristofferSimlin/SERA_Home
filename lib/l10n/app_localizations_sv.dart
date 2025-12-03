@@ -40,6 +40,19 @@ class AppLocalizationsSv extends AppLocalizations {
   String get businessLoginButton => 'Fortsätt till inloggning';
 
   @override
+  String get businessLoginUsername => 'Användarnamn';
+
+  @override
+  String get businessLoginPassword => 'Lösenord';
+
+  @override
+  String get businessLoginSubmit => 'Logga in';
+
+  @override
+  String get businessLoginFooter =>
+      'Saknar du konto? Kontakta er administratör.';
+
+  @override
   String get personalPricingTitle => 'Privat åtkomst';
 
   @override

@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sera/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'widgets/floating_lines_background.dart';
+
 class PersonalPricingScreen extends StatelessWidget {
   const PersonalPricingScreen({super.key});
 
@@ -30,48 +32,103 @@ class PersonalPricingScreen extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(l.startLoginPersonal)),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l.personalPricingTitle,
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.w700),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF0B0D12), Color(0xFF0E141C)],
+              ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              l.personalPricingBody,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: cs.onSurface.withOpacity(0.8),
-                    height: 1.35,
+          ),
+          const Positioned.fill(
+            child: FloatingLinesBackground(
+              enabledWaves: ['top', 'middle', 'bottom'],
+              lineCount: [10, 14, 18],
+              lineDistance: [9.0, 7.0, 5.0],
+              animationSpeed: 0.12,
+              opacity: 0.7,
+            ),
+          ),
+          SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        l.personalPricingTitle,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        l.personalPricingBody,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: cs.onSurface.withOpacity(0.85),
+                              height: 1.35,
+                            ),
+                      ),
+                      const SizedBox(height: 24),
+                      FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: cs.primary.withOpacity(0.9),
+                          side: BorderSide(
+                              color: cs.onPrimary.withOpacity(0.45), width: 1),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 12),
+                        ),
+                        onPressed: () => _openUrl(
+                          context,
+                          'https://apps.apple.com/', // TODO: replace with real link
+                        ),
+                        icon: const Icon(Icons.apple),
+                        label: Text(l.personalPricingStoreIos),
+                      ),
+                      const SizedBox(height: 12),
+                      FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: cs.secondary.withOpacity(0.9),
+                          side: BorderSide(
+                              color: cs.onSecondary.withOpacity(0.4), width: 1),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 12),
+                        ),
+                        onPressed: () => _openUrl(
+                          context,
+                          'https://play.google.com/', // TODO: replace with real link
+                        ),
+                        icon: const Icon(Icons.android),
+                        label: Text(l.personalPricingStoreAndroid),
+                      ),
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                              color: cs.onSurface.withOpacity(0.5), width: 1),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 12),
+                        ),
+                        onPressed: () => _openApp(context),
+                        icon: const Icon(Icons.check_circle_outline),
+                        label: Text(l.personalPricingOpenApp),
+                      ),
+                    ],
                   ),
+                ),
+              ),
             ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: () => _openUrl(context,
-                  'https://apps.apple.com/'), // TODO: replace with real link
-              icon: const Icon(Icons.apple),
-              label: Text(l.personalPricingStoreIos),
-            ),
-            const SizedBox(height: 12),
-            FilledButton.icon(
-              onPressed: () => _openUrl(context,
-                  'https://play.google.com/'), // TODO: replace with real link
-              icon: const Icon(Icons.android),
-              label: Text(l.personalPricingStoreAndroid),
-            ),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: () => _openApp(context),
-              icon: const Icon(Icons.check_circle_outline),
-              label: Text(l.personalPricingOpenApp),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

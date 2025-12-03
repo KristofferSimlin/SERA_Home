@@ -126,13 +126,19 @@ class _StartScreenState extends State<StartScreen>
   }
 
   Future<void> _handlePersonalAccess() async {
-    final prefs = await SharedPreferences.getInstance();
-    final hasAccess = prefs.getBool('personal_access') ?? false;
-    if (hasAccess) {
-      _enterApp();
-    } else {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final hasAccess = prefs.getBool('personal_access') ?? false;
       if (!mounted) return;
-      Navigator.of(context).pushNamed('/personal-pricing');
+      if (hasAccess) {
+        _enterApp();
+      } else {
+        Navigator.of(context).pushNamed('/personal-pricing');
+      }
+    } catch (e) {
+      if (!mounted) return;
+      // Handle error gracefully, e.g., show a snackbar or fallback to default behavior
+      _enterApp();
     }
   }
 

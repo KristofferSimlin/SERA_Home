@@ -155,8 +155,32 @@ abstract class AppLocalizations {
   /// No description provided for @businessLoginButton.
   ///
   /// In en, this message translates to:
-  /// **'Continue to login'**
+  /// **'Continue to log in'**
   String get businessLoginButton;
+
+  /// No description provided for @businessLoginUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get businessLoginUsername;
+
+  /// No description provided for @businessLoginPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get businessLoginPassword;
+
+  /// No description provided for @businessLoginSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get businessLoginSubmit;
+
+  /// No description provided for @businessLoginFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Don’t have an account? Contact your admin.'**
+  String get businessLoginFooter;
 
   /// No description provided for @personalPricingTitle.
   ///
@@ -167,7 +191,7 @@ abstract class AppLocalizations {
   /// No description provided for @personalPricingBody.
   ///
   /// In en, this message translates to:
-  /// **'Personal users subscribe via App Store or Google Play. If you already logged in on this device, you’ll go straight into the app.'**
+  /// **'Personal users subscribe via App Store or Google Play. If you have already logged in on this device, you\'ll go straight into the app.'**
   String get personalPricingBody;
 
   /// No description provided for @personalPricingStoreIos.

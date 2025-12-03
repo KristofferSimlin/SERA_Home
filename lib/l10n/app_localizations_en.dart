@@ -37,14 +37,27 @@ class AppLocalizationsEn extends AppLocalizations {
       'Licenses are purchased separately. Use your company login link or SSO. If you need help, contact your administrator.';
 
   @override
-  String get businessLoginButton => 'Continue to login';
+  String get businessLoginButton => 'Continue to log in';
+
+  @override
+  String get businessLoginUsername => 'Username';
+
+  @override
+  String get businessLoginPassword => 'Password';
+
+  @override
+  String get businessLoginSubmit => 'Sign in';
+
+  @override
+  String get businessLoginFooter =>
+      'Don’t have an account? Contact your admin.';
 
   @override
   String get personalPricingTitle => 'Personal access';
 
   @override
   String get personalPricingBody =>
-      'Personal users subscribe via App Store or Google Play. If you already logged in on this device, you’ll go straight into the app.';
+      'Personal users subscribe via App Store or Google Play. If you have already logged in on this device, you\'ll go straight into the app.';
 
   @override
   String get personalPricingStoreIos => 'Buy via App Store';
