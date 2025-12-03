@@ -194,17 +194,17 @@ abstract class AppLocalizations {
   /// **'Personal users subscribe via App Store or Google Play. If you have already logged in on this device, you\'ll go straight into the app.'**
   String get personalPricingBody;
 
-  /// No description provided for @personalPricingStoreIos.
+  /// No description provided for @personalPricingTrial.
   ///
   /// In en, this message translates to:
-  /// **'Buy via App Store'**
-  String get personalPricingStoreIos;
+  /// **'7-day free trial, then 29/month.'**
+  String get personalPricingTrial;
 
-  /// No description provided for @personalPricingStoreAndroid.
+  /// No description provided for @personalPricingSubscribe.
   ///
   /// In en, this message translates to:
-  /// **'Buy via Google Play'**
-  String get personalPricingStoreAndroid;
+  /// **'Start 7 days free – 29/month'**
+  String get personalPricingSubscribe;
 
   /// No description provided for @personalPricingOpenApp.
   ///

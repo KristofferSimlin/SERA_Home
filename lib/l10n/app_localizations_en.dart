@@ -60,10 +60,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Personal users subscribe via App Store or Google Play. If you have already logged in on this device, you\'ll go straight into the app.';
 
   @override
-  String get personalPricingStoreIos => 'Buy via App Store';
+  String get personalPricingTrial => '7-day free trial, then 29/month.';
 
   @override
-  String get personalPricingStoreAndroid => 'Buy via Google Play';
+  String get personalPricingSubscribe => 'Start 7 days free – 29/month';
 
   @override
   String get personalPricingOpenApp => 'I’ve already purchased – open the app';

@@ -15,8 +15,8 @@
   "businessLoginFooter": "Saknar du konto? Kontakta er administratör.",
   "personalPricingTitle": "Privat åtkomst",
   "personalPricingBody": "Privata användare tecknar via App Store eller Google Play. Om du redan har loggat in på den här enheten kommer du direkt in i appen.",
-  "personalPricingStoreIos": "Köp via App Store",
-  "personalPricingStoreAndroid": "Köp via Google Play",
+  "personalPricingTrial": "7 dagars gratis test, därefter 29 kr/månad.",
+  "personalPricingSubscribe": "Starta 7 dagar gratis – 29 kr/mån",
   "personalPricingOpenApp": "Jag har redan köpt – öppna appen",
   "startVersion": "Version 1.0 • För tekniker och supportteam",
 

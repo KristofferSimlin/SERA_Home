@@ -25,6 +25,7 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
+    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
     return Scaffold(
       appBar: AppBar(title: Text(l.startLoginBusiness)),
       body: Stack(
@@ -39,15 +40,16 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
               ),
             ),
           ),
-          const Positioned.fill(
-            child: FloatingLinesBackground(
-              enabledWaves: ['top', 'middle', 'bottom'],
-              lineCount: [10, 14, 18],
-              lineDistance: [9.0, 7.0, 5.0],
-              animationSpeed: 0.12,
-              opacity: 0.7,
+          if (isCurrentRoute)
+            const Positioned.fill(
+              child: FloatingLinesBackground(
+                enabledWaves: ['middle'],
+                lineCount: [6, 8],
+                lineDistance: [10.0, 8.0],
+                animationSpeed: 0.08,
+                opacity: 0.6,
+              ),
             ),
-          ),
           SafeArea(
             child: Center(
               child: ConstrainedBox(

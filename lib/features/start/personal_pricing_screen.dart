@@ -30,6 +30,7 @@ class PersonalPricingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
+    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
     return Scaffold(
       appBar: AppBar(title: Text(l.startLoginPersonal)),
       body: Stack(
@@ -44,15 +45,16 @@ class PersonalPricingScreen extends StatelessWidget {
               ),
             ),
           ),
-          const Positioned.fill(
-            child: FloatingLinesBackground(
-              enabledWaves: ['top', 'middle', 'bottom'],
-              lineCount: [10, 14, 18],
-              lineDistance: [9.0, 7.0, 5.0],
-              animationSpeed: 0.12,
-              opacity: 0.7,
+          if (isCurrentRoute)
+            const Positioned.fill(
+              child: FloatingLinesBackground(
+                enabledWaves: ['middle'],
+                lineCount: [6, 8],
+                lineDistance: [10.0, 8.0],
+                animationSpeed: 0.08,
+                opacity: 0.6,
+              ),
             ),
-          ),
           SafeArea(
             child: Center(
               child: ConstrainedBox(
@@ -78,7 +80,15 @@ class PersonalPricingScreen extends StatelessWidget {
                               height: 1.35,
                             ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
+                      Text(
+                        l.personalPricingTrial,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: cs.onSurface.withOpacity(0.9),
+                              height: 1.4,
+                            ),
+                      ),
+                      const SizedBox(height: 12),
                       FilledButton.icon(
                         style: FilledButton.styleFrom(
                           backgroundColor: cs.primary.withOpacity(0.9),
@@ -89,26 +99,10 @@ class PersonalPricingScreen extends StatelessWidget {
                         ),
                         onPressed: () => _openUrl(
                           context,
-                          'https://apps.apple.com/', // TODO: replace with real link
+                          'https://apps.apple.com/', // TODO: replace with real IAP link
                         ),
-                        icon: const Icon(Icons.apple),
-                        label: Text(l.personalPricingStoreIos),
-                      ),
-                      const SizedBox(height: 12),
-                      FilledButton.icon(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: cs.secondary.withOpacity(0.9),
-                          side: BorderSide(
-                              color: cs.onSecondary.withOpacity(0.4), width: 1),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 12),
-                        ),
-                        onPressed: () => _openUrl(
-                          context,
-                          'https://play.google.com/', // TODO: replace with real link
-                        ),
-                        icon: const Icon(Icons.android),
-                        label: Text(l.personalPricingStoreAndroid),
+                        icon: const Icon(Icons.subscriptions),
+                        label: Text(l.personalPricingSubscribe),
                       ),
                       const SizedBox(height: 16),
                       OutlinedButton.icon(

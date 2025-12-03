@@ -60,10 +60,11 @@ class AppLocalizationsSv extends AppLocalizations {
       'Privata användare tecknar via App Store eller Google Play. Om du redan har loggat in på den här enheten kommer du direkt in i appen.';
 
   @override
-  String get personalPricingStoreIos => 'Köp via App Store';
+  String get personalPricingTrial =>
+      '7 dagars gratis test, därefter 29 kr/månad.';
 
   @override
-  String get personalPricingStoreAndroid => 'Köp via Google Play';
+  String get personalPricingSubscribe => 'Starta 7 dagar gratis – 29 kr/mån';
 
   @override
   String get personalPricingOpenApp => 'Jag har redan köpt – öppna appen';
