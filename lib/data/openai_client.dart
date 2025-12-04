@@ -217,7 +217,7 @@ class OpenAIClient {
             ...history.map((e) => {'role': e.$1 ? 'user' : 'assistant', 'content': e.$2}),
             {'role': 'user', 'content': newUserMessage},
           ],
-          'model': 'gpt-4o-mini',
+          'model': 'gpt-4o',
           'temperature': 0.2,
         }),
       );
@@ -239,7 +239,7 @@ class OpenAIClient {
           'Authorization': 'Bearer $directKey',
         },
         body: jsonEncode({
-          'model': 'gpt-4o-mini',
+          'model': 'gpt-4o',
           'messages': [
             {'role': 'system', 'content': systemPrompt},
             ...history.map((e) => {'role': e.$1 ? 'user' : 'assistant', 'content': e.$2}),
