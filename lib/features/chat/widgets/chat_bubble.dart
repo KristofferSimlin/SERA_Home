@@ -317,7 +317,9 @@ class _ChatBubbleState extends State<ChatBubble> {
   String _prettify(String input) {
     var s = input;
     // Bullets: replace leading "- " with "• "
-    s = s.replaceAllMapped(RegExp(r'(?m)^\s*-\s+'), (m) => '• ');
+    // Replace leading "- " (line-start) with bullet; avoid inline flags for web
+    s = s.replaceAllMapped(
+        RegExp(r'(^|\n)\s*-\s+'), (m) => '${m.group(1) ?? ''}• ');
     // Bold markers **text** or __text__ → text
     s = s.replaceAll(RegExp(r'\*\*'), '');
     s = s.replaceAll(RegExp(r'__'), '');
