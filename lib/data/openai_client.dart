@@ -16,6 +16,7 @@ const String _baseSystemPrompt =
   '\nSÄKERHET: Lägg alltid till Säkerhetsfilter om el/hydraulik/bränsle/tryck/värme berörs.'
   '\nKÄLLOR: När du får extern kunskap (WEBB-TRÄFFAR), använd den som primär fakta. Återge värden, steg och formuleringar så nära källan som möjligt, undvik att sammanfatta bort detaljer.'
   '\nTABELLER: Behåll flera meningar per cell om de finns; radbryt i celler hellre än att ta bort innehåll.'
+  '\nSERVICE-SCHEMA: Om användaren ber om service-/underhållsschema, svara med tydliga checklistor och punktlistor (använd Markdown - [ ] för avbockning). Inga felsökningstabeller då; håll fokus på servicepunkter och säkerhetssteg.'
   '\nUNDVIK: "Som en AI", överdriven artighet, ursäkter.';
 
 const String _level1Prompt = '''

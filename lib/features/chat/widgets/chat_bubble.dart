@@ -63,14 +63,14 @@ class _ChatBubbleState extends State<ChatBubble> {
                 ...segments
                     .map((s) => s.checklist != null
                         ? _checklistView(s.checklist!, fg)
-                        : _plainText(s.text ?? '', fg, isTableLike))
+                        : _plainText(context, s.text ?? '', fg, isTableLike))
                     .toList()
               else ...[
                 if (tableParts.before.isNotEmpty)
-                  _plainText(tableParts.before, fg, false),
-                _tableView(tableParts.tableLines, fg),
+                  _plainText(context, tableParts.before, fg, false),
+                _tableView(context, tableParts.tableLines, fg),
                 if (tableParts.after.isNotEmpty)
-                  _plainText(tableParts.after, fg, false),
+                  _plainText(context, tableParts.after, fg, false),
               ],
               if (ts != null) ...[
                 const SizedBox(height: 6),
@@ -98,24 +98,71 @@ class _ChatBubbleState extends State<ChatBubble> {
     return hasPipes && hasSeparator;
   }
 
-  Widget _plainText(String value, Color fg, bool isTableLike) {
-    return SelectableText(
-      value.trim().isEmpty ? ' ' : value,
-      style: TextStyle(
-        color: fg,
-        height: isTableLike ? 1.25 : 1.35,
-        fontSize: isTableLike ? 14.5 : 15.0,
-        fontFamily: isTableLike ? 'monospace' : null,
-        fontFeatures:
-            isTableLike ? const [] : const [FontFeature.tabularFigures()],
-      ),
+  Widget _plainText(
+      BuildContext context, String value, Color fg, bool isTableLike) {
+    final theme = Theme.of(context);
+    final lines = value.split('\n');
+    final children = <Widget>[];
+    final headingRegex = RegExp(r'^\\s*(#{1,6})\\s*(.+)$');
+
+    for (final raw in lines) {
+      final line = raw.trimRight();
+      if (line.isEmpty) continue;
+      final m = headingRegex.firstMatch(line);
+      if (m != null) {
+        final level = m.group(1)!.length;
+        final text = m.group(2)!.trim();
+        TextStyle base;
+        if (level <= 2) {
+          base = theme.textTheme.titleLarge ??
+              const TextStyle(fontSize: 20, fontWeight: FontWeight.w700);
+        } else if (level == 3) {
+          base = theme.textTheme.titleMedium ??
+              const TextStyle(fontSize: 18, fontWeight: FontWeight.w700);
+        } else {
+          base = theme.textTheme.titleSmall ??
+              const TextStyle(fontSize: 16, fontWeight: FontWeight.w700);
+        }
+        children.add(Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: SelectableText(
+            text,
+            style: base.copyWith(color: fg),
+          ),
+        ));
+      } else {
+        final pretty = _prettify(line);
+        children.add(SelectableText(
+          pretty.trim().isEmpty ? ' ' : pretty,
+          style: TextStyle(
+            color: fg,
+            height: isTableLike ? 1.25 : 1.35,
+            fontSize: isTableLike ? 14.5 : 15.0,
+            fontFamily: isTableLike ? 'monospace' : null,
+            fontFeatures:
+                isTableLike ? const [] : const [FontFeature.tabularFigures()],
+          ),
+        ));
+      }
+    }
+
+    if (children.isEmpty) {
+      children.add(SelectableText(
+        ' ',
+        style: TextStyle(color: fg, height: 1.35),
+      ));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
     );
   }
 
-  Widget _tableView(List<String> tableLines, Color fg) {
+  Widget _tableView(BuildContext context, List<String> tableLines, Color fg) {
     final rows = _parseTable(tableLines);
     if (rows.isEmpty) {
-      return _plainText(tableLines.join('\n'), fg, true);
+      return _plainText(context, tableLines.join('\n'), fg, true);
     }
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -265,6 +312,18 @@ class _ChatBubbleState extends State<ChatBubble> {
           ),
       ],
     );
+  }
+
+  String _prettify(String input) {
+    var s = input;
+    // Bullets: replace leading "- " with "• "
+    s = s.replaceAllMapped(RegExp(r'(?m)^\\s*-\\s+'), (m) => '• ');
+    // Bold markers **text** or __text__ → text
+    s = s.replaceAll(RegExp(r'\\*\\*'), '');
+    s = s.replaceAll(RegExp(r'__'), '');
+    // Strip lone backticks used for inline code
+    s = s.replaceAll('`', '');
+    return s;
   }
 }
 
