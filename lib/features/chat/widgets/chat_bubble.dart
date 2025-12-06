@@ -103,7 +103,7 @@ class _ChatBubbleState extends State<ChatBubble> {
     final theme = Theme.of(context);
     final lines = value.split('\n');
     final children = <Widget>[];
-    final headingRegex = RegExp(r'^\\s*(#{1,6})\\s*(.+)$');
+    final headingRegex = RegExp(r'^\s*(#{1,6})\s*(.+)$');
 
     for (final raw in lines) {
       final line = raw.trimRight();
@@ -250,7 +250,7 @@ class _ChatBubbleState extends State<ChatBubble> {
     final segments = <_Segment>[];
     List<_ChecklistItem>? currentChecklist;
     final buffer = StringBuffer();
-    final regex = RegExp(r'^\\s*[-*]\\s*\\[( |x|X)\\]\\s*(.+)$');
+    final regex = RegExp(r'^\s*[-*]\s*\[( |x|X)\]\s*(.+)$');
 
     void flushText() {
       final t = buffer.toString().trimRight();
@@ -317,9 +317,9 @@ class _ChatBubbleState extends State<ChatBubble> {
   String _prettify(String input) {
     var s = input;
     // Bullets: replace leading "- " with "• "
-    s = s.replaceAllMapped(RegExp(r'(?m)^\\s*-\\s+'), (m) => '• ');
+    s = s.replaceAllMapped(RegExp(r'(?m)^\s*-\s+'), (m) => '• ');
     // Bold markers **text** or __text__ → text
-    s = s.replaceAll(RegExp(r'\\*\\*'), '');
+    s = s.replaceAll(RegExp(r'\*\*'), '');
     s = s.replaceAll(RegExp(r'__'), '');
     // Strip lone backticks used for inline code
     s = s.replaceAll('`', '');
