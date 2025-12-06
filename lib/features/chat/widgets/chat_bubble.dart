@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
 
-class ChatBubble extends StatelessWidget {
+class ChatBubble extends StatefulWidget {
   const ChatBubble({
     super.key,
     required this.isUser,
@@ -15,25 +15,36 @@ class ChatBubble extends StatelessWidget {
   final DateTime? time;
 
   @override
+  State<ChatBubble> createState() => _ChatBubbleState();
+}
+
+class _ChatBubbleState extends State<ChatBubble> {
+  final Map<int, bool> _checks = {};
+
+  @override
   Widget build(BuildContext context) {
+    final text = widget.text;
     final isTableLike = _looksLikeTable(text);
     final colorScheme = Theme.of(context).colorScheme;
-    final bg = isUser
+    final bg = widget.isUser
         ? colorScheme.primary
         : colorScheme.surfaceContainerHighest.withOpacity(0.4);
-    final fg = isUser ? colorScheme.onPrimary : colorScheme.onSurface;
+    final fg = widget.isUser ? colorScheme.onPrimary : colorScheme.onSurface;
 
-    final align = isUser ? Alignment.centerRight : Alignment.centerLeft;
+    final align = widget.isUser ? Alignment.centerRight : Alignment.centerLeft;
     final radius = BorderRadius.only(
       topLeft: const Radius.circular(14),
       topRight: const Radius.circular(14),
-      bottomLeft: isUser ? const Radius.circular(14) : const Radius.circular(4),
+      bottomLeft:
+          widget.isUser ? const Radius.circular(14) : const Radius.circular(4),
       bottomRight:
-          isUser ? const Radius.circular(4) : const Radius.circular(14),
+          widget.isUser ? const Radius.circular(4) : const Radius.circular(14),
     );
 
-    final ts = time != null ? DateFormat('HH:mm').format(time!) : null;
+    final ts =
+        widget.time != null ? DateFormat('HH:mm').format(widget.time!) : null;
     final tableParts = _extractTableBlock(text);
+    final segments = _parseSegments(text);
 
     return Align(
       alignment: align,
@@ -44,11 +55,16 @@ class ChatBubble extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(color: bg, borderRadius: radius),
           child: Column(
-            crossAxisAlignment:
-                isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            crossAxisAlignment: widget.isUser
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
             children: [
               if (tableParts == null)
-                _plainText(text, fg, isTableLike)
+                ...segments
+                    .map((s) => s.checklist != null
+                        ? _checklistView(s.checklist!, fg)
+                        : _plainText(s.text ?? '', fg, isTableLike))
+                    .toList()
               else ...[
                 if (tableParts.before.isNotEmpty)
                   _plainText(tableParts.before, fg, false),
@@ -146,14 +162,12 @@ class ChatBubble extends StatelessWidget {
       if (line.startsWith('|')) line = line.substring(1);
       if (line.endsWith('|')) line = line.substring(0, line.length - 1);
       final cells = line.split('|').map((c) => c.trim()).toList();
-      // Skip separator rows like --- or :---:
       final isSeparator =
           cells.every((c) => RegExp(r'^:?-{2,}:?$').hasMatch(c));
       if (isSeparator) continue;
       cleaned.add(cells);
     }
     if (cleaned.isEmpty) return [];
-    // Normalize column count
     final cols =
         cleaned.map((r) => r.length).fold<int>(0, (a, b) => b > a ? b : a);
     return cleaned
@@ -178,11 +192,79 @@ class ChatBubble extends StatelessWidget {
       }
     }
     if (start == -1 || end == -1 || start == end) return null;
-    // Expand end to include following separator row if present
     final before = lines.sublist(0, start).join('\n').trim();
     final tableLines = lines.sublist(start, end + 1);
     final after = lines.sublist(end + 1).join('\n').trim();
     return _TableParts(before: before, tableLines: tableLines, after: after);
+  }
+
+  List<_Segment> _parseSegments(String text) {
+    final lines = text.split('\n');
+    final segments = <_Segment>[];
+    List<_ChecklistItem>? currentChecklist;
+    final buffer = StringBuffer();
+    final regex = RegExp(r'^\\s*[-*]\\s*\\[( |x|X)\\]\\s*(.+)$');
+
+    void flushText() {
+      final t = buffer.toString().trimRight();
+      if (t.isNotEmpty) segments.add(_Segment.text(t));
+      buffer.clear();
+    }
+
+    void flushChecklist() {
+      if (currentChecklist != null && currentChecklist!.isNotEmpty) {
+        segments.add(_Segment.checklist(currentChecklist!));
+      }
+      currentChecklist = null;
+    }
+
+    for (final line in lines) {
+      final m = regex.firstMatch(line);
+      if (m != null) {
+        if (buffer.isNotEmpty) flushText();
+        currentChecklist ??= [];
+        final checked = m.group(1)!.toLowerCase() == 'x';
+        final label = m.group(2)!.trim();
+        currentChecklist!.add(_ChecklistItem(label, checked));
+      } else {
+        if (currentChecklist != null) {
+          flushChecklist();
+        }
+        buffer.writeln(line);
+      }
+    }
+    if (currentChecklist != null) {
+      flushChecklist();
+    }
+    if (buffer.isNotEmpty) {
+      flushText();
+    }
+    return segments;
+  }
+
+  Widget _checklistView(List<_ChecklistItem> items, Color fg) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 0; i < items.length; i++)
+          CheckboxListTile(
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+            visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+            controlAffinity: ListTileControlAffinity.leading,
+            value: _checks[i] ?? items[i].checked,
+            onChanged: (v) {
+              setState(() {
+                _checks[i] = v ?? false;
+              });
+            },
+            title: Text(
+              items[i].label,
+              style: TextStyle(color: fg, height: 1.3),
+            ),
+          ),
+      ],
+    );
   }
 }
 
@@ -192,4 +274,17 @@ class _TableParts {
   final String before;
   final List<String> tableLines;
   final String after;
+}
+
+class _Segment {
+  const _Segment.text(this.text) : checklist = null;
+  const _Segment.checklist(this.checklist) : text = null;
+  final String? text;
+  final List<_ChecklistItem>? checklist;
+}
+
+class _ChecklistItem {
+  _ChecklistItem(this.label, this.checked);
+  final String label;
+  bool checked;
 }
