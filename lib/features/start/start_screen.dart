@@ -202,6 +202,11 @@ class _StartScreenState extends State<StartScreen>
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              Image.asset(
+                                'sera_logo/SERA5.png',
+                                height: 150,
+                              ),
+                              const SizedBox(width: 1),
                               Text(
                                 'SERA',
                                 textAlign: TextAlign.center,

@@ -383,6 +383,11 @@ class _LandingArea extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        Image.asset(
+                          'sera_logo/SERA5.png',
+                          height: 130,
+                        ),
+                        const SizedBox(width: 0.5),
                         Text(
                           'SERA',
                           textAlign: TextAlign.center,
@@ -391,7 +396,7 @@ class _LandingArea extends StatelessWidget {
                               .displaySmall
                               ?.copyWith(fontWeight: FontWeight.w700),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),

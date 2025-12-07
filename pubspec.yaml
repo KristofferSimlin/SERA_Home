@@ -11,6 +11,7 @@ flutter:
   generate: true
   assets:
     - .env
+    - sera_logo/
     # Lägg till dina assets här vid behov:
     # - assets/images/
 
