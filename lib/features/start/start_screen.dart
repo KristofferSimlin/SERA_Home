@@ -151,6 +151,18 @@ class _StartScreenState extends State<StartScreen>
     final cs = Theme.of(context).colorScheme;
     final config = _resolveConfig(context);
     final l = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isSmallPhone = screenWidth < 380;
+    final logoSize = isSmallPhone ? 120.0 : 150.0;
+    final logoSpacing = isSmallPhone ? 6.0 : 12.0;
+    final betaPadH = isSmallPhone ? 10.0 : 12.0;
+    final betaPadV = isSmallPhone ? 4.0 : 6.0;
+    final betaLetterSpacing = isSmallPhone ? 1.5 : 2.0;
+    final titleLetterSpacing = isSmallPhone ? 4.0 : 6.0;
+    final titleStyle = (isSmallPhone
+            ? Theme.of(context).textTheme.displayMedium
+            : Theme.of(context).textTheme.displayLarge)
+        ?.copyWith(fontWeight: FontWeight.bold, letterSpacing: titleLetterSpacing);
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
     return Scaffold(
       body: TickerMode(
@@ -202,41 +214,35 @@ class _StartScreenState extends State<StartScreen>
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Image.asset(
-                                'sera_logo/SERA5.png',
-                                height: 150,
-                              ),
-                              const SizedBox(width: 1),
-                              Text(
-                                'SERA',
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .displayLarge
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 6,
-                                    ),
-                              ),
-                              const SizedBox(width: 12),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: cs.primary.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(999),
+                        Image.asset(
+                          'sera_logo/SERA5.png',
+                          height: logoSize,
+                        ),
+                        SizedBox(width: logoSpacing),
+                        Text(
+                          'SERA',
+                          textAlign: TextAlign.center,
+                          style: titleStyle,
+                        ),
+                        SizedBox(width: logoSpacing),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: betaPadH, vertical: betaPadV),
+                          decoration: BoxDecoration(
+                            color: cs.primary.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            l.beta,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                                  letterSpacing: betaLetterSpacing,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                child: Text(
-                                  l.beta,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelLarge
-                                      ?.copyWith(
-                                        letterSpacing: 2,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                ),
-                              ),
+                          ),
+                        ),
                             ],
                           ),
                           SizedBox(height: config.titleSpacing),
