@@ -385,7 +385,7 @@ class _LandingArea extends StatelessWidget {
                       children: [
                         Image.asset(
                           'sera_logo/SERA5.png',
-                          height: 130,
+                          height: 70,
                           semanticLabel: 'SERA logo',
                         ),
                         const SizedBox(width: 8),

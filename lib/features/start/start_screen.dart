@@ -153,7 +153,7 @@ class _StartScreenState extends State<StartScreen>
     final l = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isSmallPhone = screenWidth < 380;
-    final logoSize = isSmallPhone ? 120.0 : 150.0;
+    final logoSize = isSmallPhone ? 90.0 : 100.0;
     final logoSpacing = isSmallPhone ? 6.0 : 12.0;
     final betaPadH = isSmallPhone ? 10.0 : 12.0;
     final betaPadV = isSmallPhone ? 4.0 : 6.0;
@@ -220,7 +220,7 @@ class _StartScreenState extends State<StartScreen>
                                   height: logoSize,
                                   semanticLabel: 'SERA logo',
                                 ),
-                                const SizedBox(height: 6),
+                                const SizedBox(height: 90),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -313,7 +313,7 @@ class _StartScreenState extends State<StartScreen>
                                   label: Text(l.startLoginBusiness),
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 10),
                               SizedBox(
                                 width: config.fullWidthButton
                                     ? double.infinity
