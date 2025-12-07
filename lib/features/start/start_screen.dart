@@ -220,7 +220,7 @@ class _StartScreenState extends State<StartScreen>
                                   height: logoSize,
                                   semanticLabel: 'SERA logo',
                                 ),
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 6),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
