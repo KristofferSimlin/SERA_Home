@@ -211,40 +211,84 @@ class _StartScreenState extends State<StartScreen>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Spacer(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                        Image.asset(
-                          'sera_logo/SERA5.png',
-                          height: logoSize,
-                        ),
-                        SizedBox(width: logoSpacing),
-                        Text(
-                          'SERA',
-                          textAlign: TextAlign.center,
-                          style: titleStyle,
-                        ),
-                        SizedBox(width: logoSpacing),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: betaPadH, vertical: betaPadV),
-                          decoration: BoxDecoration(
-                            color: cs.primary.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            l.beta,
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelLarge
-                                ?.copyWith(
-                                  letterSpacing: betaLetterSpacing,
-                                  fontWeight: FontWeight.w600,
+                          if (isSmallPhone)
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  'sera_logo/SERA5.png',
+                                  height: logoSize,
+                                  semanticLabel: 'SERA logo',
                                 ),
-                          ),
-                        ),
-                            ],
-                          ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'SERA',
+                                      textAlign: TextAlign.center,
+                                      style: titleStyle,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: betaPadH,
+                                          vertical: betaPadV),
+                                      decoration: BoxDecoration(
+                                        color: cs.primary.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(999),
+                                      ),
+                                      child: Text(
+                                        l.beta,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelLarge
+                                            ?.copyWith(
+                                              letterSpacing: betaLetterSpacing,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          else
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'sera_logo/SERA5.png',
+                                  height: logoSize,
+                                  semanticLabel: 'SERA logo',
+                                ),
+                                SizedBox(width: logoSpacing),
+                                Text(
+                                  'SERA',
+                                  textAlign: TextAlign.center,
+                                  style: titleStyle,
+                                ),
+                                SizedBox(width: logoSpacing),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: betaPadH, vertical: betaPadV),
+                                  decoration: BoxDecoration(
+                                    color: cs.primary.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    l.beta,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelLarge
+                                        ?.copyWith(
+                                          letterSpacing: betaLetterSpacing,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           SizedBox(height: config.titleSpacing),
                           Text(
                             l.startSubtitle,
