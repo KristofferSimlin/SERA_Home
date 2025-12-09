@@ -66,13 +66,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     super.dispose();
   }
 
-  void _applyEquipment({bool silent = false}) {
+  void _applyEquipment({bool silent = false, bool collapse = false}) {
     _ctrl().updateEquipment(
       brand: _brandCtrl.text.trim().isEmpty ? null : _brandCtrl.text.trim(),
       model: _modelCtrl.text.trim().isEmpty ? null : _modelCtrl.text.trim(),
       year:  _yearCtrl.text.trim().isEmpty  ? null : _yearCtrl.text.trim(),
       lock: _lock,
     );
+    if (collapse && _equipmentCollapsed == false) {
+      setState(() {
+        _equipmentCollapsed = true;
+      });
+    }
     if (!silent) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Utrustning uppdaterad')));
@@ -177,6 +182,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final cs = Theme.of(context).colorScheme;
     final isCompact = MediaQuery.sizeOf(context).width < 720;
     final isWebMobile = kIsWeb && isCompact;
+    final equipmentSummary = [
+      state.brand?.trim(),
+      state.model?.trim(),
+      state.year?.trim(),
+    ].where((e) => e != null && e!.isNotEmpty).map((e) => e!).join(' • ');
+    final hasEquipmentSummary = equipmentSummary.isNotEmpty;
+    final equipmentSummaryText = hasEquipmentSummary ? equipmentSummary : 'Inget valt';
     final chat = _ctrl(); // typad notifier för enklare anrop nedan
     final equipmentForm = Column(
       children: [
@@ -370,7 +382,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ],
               ),
               FilledButton.icon(
-                onPressed: () => _applyEquipment(),
+                onPressed: () => _applyEquipment(collapse: isWebMobile),
                 icon: const Icon(Icons.save),
                 label: Text(l.chatSave),
               ),
@@ -404,7 +416,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Text(l.chatLock),
             const SizedBox(width: 8),
             FilledButton.icon(
-              onPressed: () => _applyEquipment(),
+              onPressed: () => _applyEquipment(collapse: isWebMobile),
               icon: const Icon(Icons.save),
               label: Text(l.chatSave),
             ),
@@ -477,13 +489,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             'Utrustning',
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
+                          if (_equipmentCollapsed && hasEquipmentSummary) ...[
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                equipmentSummaryText,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black54,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                           const Spacer(),
                           TextButton.icon(
                             onPressed: () {
                               setState(() => _equipmentCollapsed = !_equipmentCollapsed);
                             },
                             icon: Icon(_equipmentCollapsed ? Icons.unfold_more : Icons.unfold_less),
-                            label: Text(_equipmentCollapsed ? 'Visa' : 'Göm'),
+                            label: Text(_equipmentCollapsed ? 'Ändra' : 'Göm'),
                           ),
                         ],
                       ),
