@@ -485,23 +485,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     if (isWebMobile)
                       Row(
                         children: [
-                          const Text(
-                            'Utrustning',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          if (_equipmentCollapsed && hasEquipmentSummary) ...[
-                            const SizedBox(width: 8),
-                            Flexible(
-                              child: Text(
-                                equipmentSummaryText,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black54,
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                          Flexible(
+                            child: Text(
+                              _equipmentCollapsed ? equipmentSummaryText : 'Utrustning',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: _equipmentCollapsed ? Colors.white70 : null,
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ],
+                          ),
                           const Spacer(),
                           TextButton.icon(
                             onPressed: () {
