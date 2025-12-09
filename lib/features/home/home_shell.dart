@@ -384,7 +384,7 @@ class _LandingArea extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'sera_logo/SERA5.png',
+                          'sera_logo/SERA6.png',
                           height: 70,
                           semanticLabel: 'SERA logo',
                         ),

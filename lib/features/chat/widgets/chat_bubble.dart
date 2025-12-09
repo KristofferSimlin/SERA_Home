@@ -19,7 +19,7 @@ class ChatBubble extends StatefulWidget {
 }
 
 class _ChatBubbleState extends State<ChatBubble> {
-  final Map<int, bool> _checks = {};
+  final Map<String, bool> _checks = {};
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,7 @@ class _ChatBubbleState extends State<ChatBubble> {
               if (tableParts == null)
                 ...segments
                     .map((s) => s.checklist != null
-                        ? _checklistView(s.checklist!, fg)
+                        ? _checklistView(s.checklist!, fg, s.id ?? '')
                         : _plainText(context, s.text ?? '', fg, isTableLike))
                     .toList()
               else ...[
@@ -249,6 +249,8 @@ class _ChatBubbleState extends State<ChatBubble> {
     final lines = text.split('\n');
     final segments = <_Segment>[];
     List<_ChecklistItem>? currentChecklist;
+    int? currentChecklistLine;
+    var checklistGroup = 0;
     final buffer = StringBuffer();
     final regex = RegExp(r'^\s*[-*]\s*\[( |x|X)\]\s*(.+)$');
 
@@ -260,16 +262,21 @@ class _ChatBubbleState extends State<ChatBubble> {
 
     void flushChecklist() {
       if (currentChecklist != null && currentChecklist!.isNotEmpty) {
-        segments.add(_Segment.checklist(currentChecklist!));
+        final id = 'c$checklistGroup-${currentChecklistLine ?? 0}';
+        segments.add(_Segment.checklist(id: id, checklist: currentChecklist!));
+        checklistGroup++;
       }
       currentChecklist = null;
+      currentChecklistLine = null;
     }
 
-    for (final line in lines) {
+    for (var idx = 0; idx < lines.length; idx++) {
+      final line = lines[idx];
       final m = regex.firstMatch(line);
       if (m != null) {
         if (buffer.isNotEmpty) flushText();
         currentChecklist ??= [];
+        currentChecklistLine ??= idx;
         final checked = m.group(1)!.toLowerCase() == 'x';
         final label = m.group(2)!.trim();
         currentChecklist!.add(_ChecklistItem(label, checked));
@@ -289,7 +296,8 @@ class _ChatBubbleState extends State<ChatBubble> {
     return segments;
   }
 
-  Widget _checklistView(List<_ChecklistItem> items, Color fg) {
+  Widget _checklistView(
+      List<_ChecklistItem> items, Color fg, String segmentId) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -299,10 +307,11 @@ class _ChatBubbleState extends State<ChatBubble> {
             contentPadding: EdgeInsets.zero,
             visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
             controlAffinity: ListTileControlAffinity.leading,
-            value: _checks[i] ?? items[i].checked,
+            value:
+                _checks['$segmentId-$i'] ?? items[i].checked,
             onChanged: (v) {
               setState(() {
-                _checks[i] = v ?? false;
+                _checks['$segmentId-$i'] = v ?? false;
               });
             },
             title: Text(
@@ -338,10 +347,16 @@ class _TableParts {
 }
 
 class _Segment {
-  const _Segment.text(this.text) : checklist = null;
-  const _Segment.checklist(this.checklist) : text = null;
+  const _Segment.text(this.text)
+      : checklist = null,
+        id = null;
+  const _Segment.checklist({
+    required this.id,
+    required this.checklist,
+  }) : text = null;
   final String? text;
   final List<_ChecklistItem>? checklist;
+  final String? id;
 }
 
 class _ChecklistItem {
