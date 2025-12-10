@@ -165,6 +165,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       },
     );
 
+    ref.listen<ChatState>(
+      chatControllerProvider(widget.sessionId),
+      (prev, next) {
+        final hadRisk = prev?.hasSafetyRisk ?? false;
+        if (!hadRisk && next.hasSafetyRisk) {
+          setState(() => _showSafetyBanner = true);
+        }
+      },
+    );
+
     // Synka fält ↔ state (skriv inte över när fältet är fokuserat)
     if (!_brandFocus.hasFocus && _brandCtrl.text != (state.brand ?? '')) {
       _brandCtrl.text = state.brand ?? '';

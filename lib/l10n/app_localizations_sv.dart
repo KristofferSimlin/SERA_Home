@@ -375,7 +375,7 @@ class AppLocalizationsSv extends AppLocalizations {
       'Säkerhetsfilter: Koppla från ström, avlasta tryck, ventilera vid bränslearbete. Använd skyddsutrustning. Följ alltid tillverkarens instruktioner.';
 
   @override
-  String get chatSafetyHide => 'Göm säkerhetsfilter';
+  String get chatSafetyHide => 'Dölj säkerhetsfilter';
 
   @override
   String get chatSafetyShow => 'Visa säkerhetsfilter';
