@@ -3,7 +3,9 @@ import 'package:sera/l10n/app_localizations.dart';
 import '../../../../theme/app_theme.dart';
 
 class SafetyBanner extends StatelessWidget {
-  const SafetyBanner({super.key});
+  const SafetyBanner({super.key, this.onClose});
+
+  final VoidCallback? onClose;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +31,15 @@ class SafetyBanner extends StatelessWidget {
               style: const TextStyle(fontSize: 13.5, height: 1.35),
             ),
           ),
+          if (onClose != null)
+            IconButton(
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+              tooltip: l.chatSafetyHide,
+              onPressed: onClose,
+              icon: const Icon(Icons.close, size: 18),
+            ),
         ],
       ),
     );

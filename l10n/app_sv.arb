@@ -117,5 +117,7 @@
   "chatInfo": "Informationen är vägledande. Följ alltid tillverkarens instruktioner och lokala säkerhetsregler. Egen risk.",
   "chatInputHint": "Skriv ett meddelande…",
   "chatSend": "Skicka",
-  "chatSafetyBanner": "Säkerhetsfilter: Koppla från ström, avlasta tryck, ventilera vid bränslearbete. Använd skyddsutrustning. Följ alltid tillverkarens instruktioner."
+  "chatSafetyBanner": "Säkerhetsfilter: Koppla från ström, avlasta tryck, ventilera vid bränslearbete. Använd skyddsutrustning. Följ alltid tillverkarens instruktioner.",
+  "chatSafetyHide": "Göm säkerhetsfilter",
+  "chatSafetyShow": "Visa säkerhetsfilter"
 }

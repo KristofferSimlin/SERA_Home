@@ -33,6 +33,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   bool _lock = false;
   bool _equipmentCollapsed = false;
+  bool _showSafetyBanner = true;
 
   // Litet hjälp-API för att få en korrekt typad notifier
   ChatController _ctrl() => ref.read(chatControllerProvider(widget.sessionId).notifier);
@@ -523,10 +524,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ),
 
-          if (state.hasSafetyRisk)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              child: SafetyBanner(),
+          if (state.hasSafetyRisk && _showSafetyBanner)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: SafetyBanner(
+                onClose: () => setState(() => _showSafetyBanner = false),
+              ),
+            )
+          else if (state.hasSafetyRisk && !_showSafetyBanner)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () => setState(() => _showSafetyBanner = true),
+                  icon: const Icon(Icons.shield_outlined, size: 18),
+                  label: Text(l.chatSafetyShow),
+                ),
+              ),
             ),
 
           const SizedBox(height: 6),

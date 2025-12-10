@@ -775,6 +775,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Safety filter: Disconnect power, relieve pressure, ventilate when handling fuel. Use PPE. Always follow manufacturer instructions.'**
   String get chatSafetyBanner;
+
+  /// No description provided for @chatSafetyHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide safety notice'**
+  String get chatSafetyHide;
+
+  /// No description provided for @chatSafetyShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show safety notice'**
+  String get chatSafetyShow;
 }
 
 class _AppLocalizationsDelegate

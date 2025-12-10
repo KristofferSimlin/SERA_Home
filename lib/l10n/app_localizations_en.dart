@@ -372,4 +372,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get chatSafetyBanner =>
       'Safety filter: Disconnect power, relieve pressure, ventilate when handling fuel. Use PPE. Always follow manufacturer instructions.';
+
+  @override
+  String get chatSafetyHide => 'Hide safety notice';
+
+  @override
+  String get chatSafetyShow => 'Show safety notice';
 }

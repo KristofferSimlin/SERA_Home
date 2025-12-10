@@ -111,5 +111,7 @@
   "chatInfo": "Information is guidance only. Follow manufacturer instructions and local safety rules. Use at your own risk.",
   "chatInputHint": "Type a message…",
   "chatSend": "Send",
-  "chatSafetyBanner": "Safety filter: Disconnect power, relieve pressure, ventilate when handling fuel. Use PPE. Always follow manufacturer instructions."
+  "chatSafetyBanner": "Safety filter: Disconnect power, relieve pressure, ventilate when handling fuel. Use PPE. Always follow manufacturer instructions.",
+  "chatSafetyHide": "Hide safety notice",
+  "chatSafetyShow": "Show safety notice"
 }

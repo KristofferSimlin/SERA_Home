@@ -21,7 +21,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get startSubtitle => 'Service & Equipment Repair Assistant';
 
   @override
-  String get startCta => 'Kom in';
+  String get startCta => 'Logga in - test';
 
   @override
   String get startLoginBusiness => 'Logga in - företag';
@@ -373,4 +373,10 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get chatSafetyBanner =>
       'Säkerhetsfilter: Koppla från ström, avlasta tryck, ventilera vid bränslearbete. Använd skyddsutrustning. Följ alltid tillverkarens instruktioner.';
+
+  @override
+  String get chatSafetyHide => 'Göm säkerhetsfilter';
+
+  @override
+  String get chatSafetyShow => 'Visa säkerhetsfilter';
 }
