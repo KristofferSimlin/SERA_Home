@@ -379,4 +379,14 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get chatSafetyShow => 'Visa säkerhetsfilter';
+
+  @override
+  String get chatThinkingPreparing => 'Tänker …';
+
+  @override
+  String get chatThinkingGathering =>
+      'Samlar information från kunskapsbiblioteket …';
+
+  @override
+  String get chatThinkingComposing => 'Lägger ihop ett svar …';
 }

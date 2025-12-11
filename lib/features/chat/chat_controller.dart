@@ -44,6 +44,7 @@ class ChatState {
   final List<Message> messages;
   final bool isSending;
   final bool hasSafetyRisk;
+  final String? thinkingCode; // 'thinking' | 'gathering' | 'composing'
 
   // Meta
   final int? expertise; // 1/2/3
@@ -60,6 +61,7 @@ class ChatState {
     required this.messages,
     required this.isSending,
     required this.hasSafetyRisk,
+    required this.thinkingCode,
     required this.expertise,
     required this.brand,
     required this.model,
@@ -73,6 +75,7 @@ class ChatState {
         messages: const [],
         isSending: false,
         hasSafetyRisk: false,
+        thinkingCode: null,
         expertise: null,
         brand: null,
         model: null,
@@ -85,6 +88,7 @@ class ChatState {
     List<Message>? messages,
     bool? isSending,
     bool? hasSafetyRisk,
+    String? thinkingCode,
     int? expertise,
     String? brand,
     String? model,
@@ -97,6 +101,7 @@ class ChatState {
       messages: messages ?? this.messages,
       isSending: isSending ?? this.isSending,
       hasSafetyRisk: hasSafetyRisk ?? this.hasSafetyRisk,
+      thinkingCode: thinkingCode ?? this.thinkingCode,
       expertise: expertise ?? this.expertise,
       brand: brand ?? this.brand,
       model: model ?? this.model,
@@ -363,6 +368,7 @@ class ChatController extends StateNotifier<ChatState> {
       isSending: true,
       messages: msgs,
       hasSafetyRisk: _safetyRegex.hasMatch(newUser.text),
+      thinkingCode: 'thinking',
     );
     await repo.appendMessages(sessionId, [newUser.toDto()]);
 
@@ -374,10 +380,12 @@ class ChatController extends StateNotifier<ChatState> {
     try {
       String? webNotes;
       if (settings.webLookupEnabled) {
+        state = state.copyWith(thinkingCode: 'gathering');
         webNotes = await _fetchWebNotes(userText);
         debugPrint('webNotes: ${webNotes ?? '(none)'}');
       }
 
+      state = state.copyWith(thinkingCode: 'composing');
       final fullText = await client.completeChat(
         history,
         userText,
@@ -429,7 +437,7 @@ class ChatController extends StateNotifier<ChatState> {
       state = state.copyWith(messages: msgs, hasSafetyRisk: false);
       await repo.appendMessages(sessionId, [assistant.toDto()]);
     } finally {
-      state = state.copyWith(isSending: false);
+      state = state.copyWith(isSending: false, thinkingCode: null);
     }
   }
 

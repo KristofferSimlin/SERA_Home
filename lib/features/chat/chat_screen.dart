@@ -201,6 +201,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final hasEquipmentSummary = equipmentSummary.isNotEmpty;
     final equipmentSummaryText = hasEquipmentSummary ? equipmentSummary : 'Inget valt';
     final chat = _ctrl(); // typad notifier för enklare anrop nedan
+
+    String? thinkingText;
+    switch (state.thinkingCode) {
+      case 'thinking':
+        thinkingText = l.chatThinkingPreparing;
+        break;
+      case 'gathering':
+        thinkingText = l.chatThinkingGathering;
+        break;
+      case 'composing':
+        thinkingText = l.chatThinkingComposing;
+        break;
+    }
+
     final equipmentForm = Column(
       children: [
         if (isCompact) ...[
@@ -555,6 +569,31 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
 
           const SizedBox(height: 6),
+
+          if (thinkingText != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Row(
+                children: [
+                  const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2.2),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      thinkingText,
+                      style: TextStyle(
+                        color: cs.onSurface.withOpacity(0.8),
+                        fontSize: 13.5,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
           Expanded(
             child: ListView.builder(

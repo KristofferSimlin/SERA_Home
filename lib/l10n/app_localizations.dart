@@ -787,6 +787,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show safety notice'**
   String get chatSafetyShow;
+
+  /// No description provided for @chatThinkingPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Thinking…'**
+  String get chatThinkingPreparing;
+
+  /// No description provided for @chatThinkingGathering.
+  ///
+  /// In en, this message translates to:
+  /// **'Gathering info from the knowledge base…'**
+  String get chatThinkingGathering;
+
+  /// No description provided for @chatThinkingComposing.
+  ///
+  /// In en, this message translates to:
+  /// **'Composing a reply…'**
+  String get chatThinkingComposing;
 }
 
 class _AppLocalizationsDelegate

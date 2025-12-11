@@ -113,5 +113,8 @@
   "chatSend": "Send",
   "chatSafetyBanner": "Safety filter: Disconnect power, relieve pressure, ventilate when handling fuel. Use PPE. Always follow manufacturer instructions.",
   "chatSafetyHide": "Hide safety notice",
-  "chatSafetyShow": "Show safety notice"
+  "chatSafetyShow": "Show safety notice",
+  "chatThinkingPreparing": "Thinking…",
+  "chatThinkingGathering": "Gathering info from the knowledge base…",
+  "chatThinkingComposing": "Composing a reply…"
 }

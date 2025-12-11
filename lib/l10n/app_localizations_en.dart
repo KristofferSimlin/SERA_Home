@@ -378,4 +378,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatSafetyShow => 'Show safety notice';
+
+  @override
+  String get chatThinkingPreparing => 'Thinking…';
+
+  @override
+  String get chatThinkingGathering => 'Gathering info from the knowledge base…';
+
+  @override
+  String get chatThinkingComposing => 'Composing a reply…';
 }
