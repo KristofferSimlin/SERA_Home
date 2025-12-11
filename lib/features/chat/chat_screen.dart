@@ -570,37 +570,43 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
           const SizedBox(height: 6),
 
-          if (thinkingText != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              child: Row(
-                children: [
-                  const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2.2),
-                  ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: Text(
-                      thinkingText,
-                      style: TextStyle(
-                        color: cs.onSurface.withOpacity(0.8),
-                        fontSize: 13.5,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
           Expanded(
             child: ListView.builder(
               controller: _scrollCtrl,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              itemCount: state.messages.length,
+              itemCount: state.messages.length +
+                  (thinkingText != null ? 1 : 0),
               itemBuilder: (_, i) {
+                final isPlaceholder =
+                    i == state.messages.length && thinkingText != null;
+                if (isPlaceholder) {
+                  final placeholderText =
+                      thinkingText ?? l.chatThinkingPreparing;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2.2),
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            placeholderText,
+                            style: TextStyle(
+                              color: cs.onSurface.withOpacity(0.8),
+                              fontSize: 13.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
                 final m = state.messages[i];
                 return ChatBubble(
                   isUser: m.role == ChatRole.user,

@@ -89,6 +89,7 @@ class ChatState {
     bool? isSending,
     bool? hasSafetyRisk,
     String? thinkingCode,
+    bool thinkingCodeSet = false,
     int? expertise,
     String? brand,
     String? model,
@@ -101,7 +102,7 @@ class ChatState {
       messages: messages ?? this.messages,
       isSending: isSending ?? this.isSending,
       hasSafetyRisk: hasSafetyRisk ?? this.hasSafetyRisk,
-      thinkingCode: thinkingCode ?? this.thinkingCode,
+      thinkingCode: thinkingCodeSet ? thinkingCode : this.thinkingCode,
       expertise: expertise ?? this.expertise,
       brand: brand ?? this.brand,
       model: model ?? this.model,
@@ -343,6 +344,9 @@ class ChatController extends StateNotifier<ChatState> {
   }
 
   Future<void> send(String userText) async {
+    const minPhaseMs = 250;      // minimal fasvisning
+    const padTriggerMs = 600;    // bara padda om total tid redan är "lång"
+
     // /byt: påminn att använda rutorna – ändra inget automatiskt
     if (_isChangeEquipmentCommand(userText)) {
       final u = Message(role: ChatRole.user, text: userText);
@@ -364,11 +368,13 @@ class ChatController extends StateNotifier<ChatState> {
     final newUser = Message(role: ChatRole.user, text: userText);
     var msgs = [...state.messages, newUser];
 
+    final thinkingStarted = DateTime.now();
     state = state.copyWith(
       isSending: true,
       messages: msgs,
       hasSafetyRisk: _safetyRegex.hasMatch(newUser.text),
       thinkingCode: 'thinking',
+      thinkingCodeSet: true,
     );
     await repo.appendMessages(sessionId, [newUser.toDto()]);
 
@@ -379,13 +385,32 @@ class ChatController extends StateNotifier<ChatState> {
 
     try {
       String? webNotes;
+      DateTime? gatheringStarted;
+
       if (settings.webLookupEnabled) {
-        state = state.copyWith(thinkingCode: 'gathering');
+        state = state.copyWith(thinkingCode: 'gathering', thinkingCodeSet: true);
+        gatheringStarted = DateTime.now();
         webNotes = await _fetchWebNotes(userText);
         debugPrint('webNotes: ${webNotes ?? '(none)'}');
       }
 
-      state = state.copyWith(thinkingCode: 'composing');
+      // Om den totala väntetiden redan är "lång", ge senaste fasen en kort synlighet (minPhaseMs).
+      final totalElapsed = DateTime.now().difference(thinkingStarted).inMilliseconds;
+      if (totalElapsed > padTriggerMs) {
+        if (gatheringStarted != null) {
+          final gatherElapsed = DateTime.now().difference(gatheringStarted).inMilliseconds;
+          if (gatherElapsed < minPhaseMs) {
+            await Future.delayed(Duration(milliseconds: minPhaseMs - gatherElapsed));
+          }
+        } else {
+          final thinkingElapsed = totalElapsed;
+          if (thinkingElapsed < minPhaseMs) {
+            await Future.delayed(Duration(milliseconds: minPhaseMs - thinkingElapsed));
+          }
+        }
+      }
+
+      state = state.copyWith(thinkingCode: 'composing', thinkingCodeSet: true);
       final fullText = await client.completeChat(
         history,
         userText,
@@ -398,7 +423,12 @@ class ChatController extends StateNotifier<ChatState> {
 
       var assistant = Message(role: ChatRole.assistant, text: '');
       msgs = [...msgs, assistant];
-      state = state.copyWith(messages: msgs, hasSafetyRisk: false);
+      state = state.copyWith(
+        messages: msgs,
+        hasSafetyRisk: false,
+        thinkingCode: null,
+        thinkingCodeSet: true,
+      );
 
       // Simulerad "streaming"
       const stepMs = 12;
@@ -409,6 +439,8 @@ class ChatController extends StateNotifier<ChatState> {
         state = state.copyWith(
           messages: [...msgs],
           hasSafetyRisk: _safetyRegex.hasMatch(chunk),
+          thinkingCode: null,
+          thinkingCodeSet: true, // ta bort spinnern så fort första tecknet skrivs
         );
         await Future.delayed(const Duration(milliseconds: stepMs));
       }
@@ -437,7 +469,11 @@ class ChatController extends StateNotifier<ChatState> {
       state = state.copyWith(messages: msgs, hasSafetyRisk: false);
       await repo.appendMessages(sessionId, [assistant.toDto()]);
     } finally {
-      state = state.copyWith(isSending: false, thinkingCode: null);
+      state = state.copyWith(
+        isSending: false,
+        thinkingCode: null,
+        thinkingCodeSet: true,
+      );
     }
   }
 
