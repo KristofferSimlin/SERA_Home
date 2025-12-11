@@ -17,6 +17,7 @@ import 'features/settings/terms_screen.dart';
 import 'features/settings/subscription_terms_screen.dart';
 import 'features/chat/chat_controller.dart';
 import 'package:sera/l10n/app_localizations.dart';
+import 'features/work_order/work_order_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,15 +55,16 @@ class SeraApp extends ConsumerWidget {
         '/subscription-terms': (_) => const SubscriptionTermsScreen(),
         '/business-login': (_) => const BusinessLoginScreen(),
         '/personal-pricing': (_) => const PersonalPricingScreen(),
+        '/work-order': (_) => const WorkOrderScreen(),
       },
 
       // NY: fångar /chat och ger ett stabilt sessionId (default om inget skickas)
       onGenerateRoute: (RouteSettings settings) {
         if (settings.name == '/chat') {
-          final String sessionId =
-              (settings.arguments is String && (settings.arguments as String).isNotEmpty)
-                  ? settings.arguments as String
-                  : 'default'; // ← stabilt id om inget anges
+          final String sessionId = (settings.arguments is String &&
+                  (settings.arguments as String).isNotEmpty)
+              ? settings.arguments as String
+              : 'default'; // ← stabilt id om inget anges
 
           return MaterialPageRoute(
             builder: (_) => ChatScreen(sessionId: sessionId),

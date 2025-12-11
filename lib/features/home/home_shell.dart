@@ -41,6 +41,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     }
   }
 
+  Future<void> _openWorkOrder() async {
+    await Navigator.pushNamed(context, '/work-order');
+  }
+
   @override
   Widget build(BuildContext context) {
     // Responsiv layout: bred skärm -> fast sidofält, smal -> Drawer
@@ -50,6 +54,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     final sidebar = _Sidebar(
       onNewChat: () {
         _newChat();
+      },
+      onWorkOrder: () {
+        _openWorkOrder();
       },
       onOpenChat: (id) {
         _openChat(id);
@@ -116,6 +123,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               onNewChat: () {
                 _newChat();
               },
+              onWorkOrder: () {
+                _openWorkOrder();
+              },
             ),
           ),
         ],
@@ -127,12 +137,14 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 class _Sidebar extends ConsumerWidget {
   const _Sidebar({
     required this.onNewChat,
+    required this.onWorkOrder,
     required this.onOpenChat,
     required this.searchCtrl,
     required this.showNavLinks,
   });
 
   final VoidCallback onNewChat;
+  final VoidCallback onWorkOrder;
   final void Function(String id) onOpenChat;
   final TextEditingController searchCtrl;
   final bool showNavLinks;
@@ -170,6 +182,14 @@ class _Sidebar extends ConsumerWidget {
                   onPressed: onNewChat,
                   icon: const Icon(Icons.add),
                   label: Text(l.homeNewChat),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton.tonalIcon(
+                  onPressed: onWorkOrder,
+                  icon: const Icon(Icons.assignment_turned_in_outlined),
+                  label: Text(l.workOrderCta),
                 ),
               ),
               const SizedBox(width: 8),
@@ -334,8 +354,12 @@ class _NavButton extends StatelessWidget {
 }
 
 class _LandingArea extends StatelessWidget {
-  const _LandingArea({required this.onNewChat});
+  const _LandingArea({
+    required this.onNewChat,
+    required this.onWorkOrder,
+  });
   final VoidCallback onNewChat;
+  final VoidCallback onWorkOrder;
 
   @override
   Widget build(BuildContext context) {
@@ -431,10 +455,22 @@ class _LandingArea extends StatelessWidget {
                     const _FeatureCards(),
                     const SizedBox(height: 28),
 
-                    FilledButton.icon(
-                      onPressed: onNewChat,
-                      icon: const Icon(Icons.add_comment),
-                      label: Text(l.homeNewChat),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        FilledButton.icon(
+                          onPressed: onNewChat,
+                          icon: const Icon(Icons.add_comment),
+                          label: Text(l.homeNewChat),
+                        ),
+                        FilledButton.tonalIcon(
+                          onPressed: onWorkOrder,
+                          icon: const Icon(Icons.assignment_turned_in_outlined),
+                          label: Text(l.workOrderCta),
+                        ),
+                      ],
                     ),
 
                     const SizedBox(height: 32),

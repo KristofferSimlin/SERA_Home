@@ -172,6 +172,65 @@ class AppLocalizationsSv extends AppLocalizations {
       'Ett forum där tekniker, förare och entusiaster kan dela kunskap och erfarenheter.\nStäll frågor, diskutera lösningar och hjälp andra i branschen.\nBygger en stark gemenskap runt SERA och entreprenadmaskiner.\nEn plats att lära, inspireras och växa tillsammans.';
 
   @override
+  String get workOrderCta => 'Arbetsorder';
+
+  @override
+  String get workOrderTitle => 'Arbetsorder';
+
+  @override
+  String get workOrderHeadline => 'Skapa arbetsorder';
+
+  @override
+  String get workOrderSubhead =>
+      'Skriv kort vad som ska göras på maskinen så genererar SERA en proffsig arbetsbeskrivning.';
+
+  @override
+  String get workOrderDescriptionLabel => 'Beskrivning';
+
+  @override
+  String get workOrderDescriptionHint =>
+      'Exempel: Byta hydraulfilter på Volvo EC250E, kontrollera läckage, verifiera tryck efter byte.';
+
+  @override
+  String get workOrderGenerate => 'Generera';
+
+  @override
+  String get workOrderClear => 'Rensa';
+
+  @override
+  String get workOrderPreviewTitle => 'Förhandsvisning';
+
+  @override
+  String get workOrderPreviewEmpty =>
+      'Här visas den genererade arbetsordern. Skriv en kort beskrivning och tryck Generera.';
+
+  @override
+  String get workOrderCopy => 'Kopiera';
+
+  @override
+  String get workOrderExportPdf => 'Exportera PDF';
+
+  @override
+  String get workOrderCopied => 'Kopierat';
+
+  @override
+  String get workOrderPdfTitle => 'Arbetsorder';
+
+  @override
+  String get workOrderGeneratedAt => 'Genererad';
+
+  @override
+  String get workOrderPdfFileName => 'arbetsorder.pdf';
+
+  @override
+  String get workOrderErrorUnauthorized =>
+      'Behörighetsfel (401) – kontrollera proxy eller API-nyckel.';
+
+  @override
+  String get workOrderErrorGeneric =>
+      'Nätverksfel – kunde inte skapa arbetsorder.';
+
+  @override
   String get sidebarTipsTitle1 => 'Felsökning – motor startar inte';
 
   @override

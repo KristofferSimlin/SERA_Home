@@ -171,6 +171,65 @@ class AppLocalizationsEn extends AppLocalizations {
       'A forum where technicians, operators and enthusiasts share knowledge and experience.\nAsk questions, discuss fixes and help others in the industry.\nBuilds a strong community around SERA and heavy equipment.\nA place to learn, get inspired and grow together.';
 
   @override
+  String get workOrderCta => 'Work order';
+
+  @override
+  String get workOrderTitle => 'Work order';
+
+  @override
+  String get workOrderHeadline => 'Create work order';
+
+  @override
+  String get workOrderSubhead =>
+      'Describe the job briefly and SERA will generate a concise, professional work order.';
+
+  @override
+  String get workOrderDescriptionLabel => 'Description';
+
+  @override
+  String get workOrderDescriptionHint =>
+      'Example: Replace hydraulic filter on Volvo EC250E, check for leaks, verify pressure after replacement.';
+
+  @override
+  String get workOrderGenerate => 'Generate';
+
+  @override
+  String get workOrderClear => 'Clear';
+
+  @override
+  String get workOrderPreviewTitle => 'Preview';
+
+  @override
+  String get workOrderPreviewEmpty =>
+      'Your generated work order will show here. Add a short description and tap Generate.';
+
+  @override
+  String get workOrderCopy => 'Copy';
+
+  @override
+  String get workOrderExportPdf => 'Export PDF';
+
+  @override
+  String get workOrderCopied => 'Copied';
+
+  @override
+  String get workOrderPdfTitle => 'Work order';
+
+  @override
+  String get workOrderGeneratedAt => 'Generated';
+
+  @override
+  String get workOrderPdfFileName => 'work-order.pdf';
+
+  @override
+  String get workOrderErrorUnauthorized =>
+      'Unauthorized (401) – check proxy or API key.';
+
+  @override
+  String get workOrderErrorGeneric =>
+      'Network error – could not build the work order.';
+
+  @override
   String get sidebarTipsTitle1 => 'Troubleshooting – engine will not start';
 
   @override

@@ -8,16 +8,16 @@ const String _defaultProxyUrlHost = 'https://api.sera.chat/api/openai-proxy';
 const String _defaultProxyUrlWeb = '/api/openai-proxy';
 
 const String _baseSystemPrompt =
-  'Du är SERA – en säkerhetsmedveten felsökningsassistent för maskiner.'
-  '\nSTIL: Rak, professionell, jordnära. Inga artighetsfraser.'
-  '\nEKO: Upprepa inte användarens text. Citera kort endast vid behov.'
-  '\nTON: Svenska. Korta stycken, punktlistor när det passar.'
-  '\nBETEENDE: Ställ 1–2 följdfrågor vid oklarheter. Ge tydliga nästa steg.'
-  '\nSÄKERHET: Lägg alltid till Säkerhetsfilter om el/hydraulik/bränsle/tryck/värme berörs.'
-  '\nKÄLLOR: När du får extern kunskap (WEBB-TRÄFFAR), använd den som primär fakta. Återge värden, steg och formuleringar så nära källan som möjligt, undvik att sammanfatta bort detaljer.'
-  '\nTABELLER: Behåll flera meningar per cell om de finns; radbryt i celler hellre än att ta bort innehåll.'
-  '\nSERVICE-SCHEMA: Om användaren ber om service-/underhållsschema, svara med tydliga checklistor och punktlistor (använd Markdown - [ ] för avbockning). Inga felsökningstabeller då; håll fokus på servicepunkter och säkerhetssteg.'
-  '\nUNDVIK: "Som en AI", överdriven artighet, ursäkter.';
+    'Du är SERA – en säkerhetsmedveten felsökningsassistent för maskiner.'
+    '\nSTIL: Rak, professionell, jordnära. Inga artighetsfraser.'
+    '\nEKO: Upprepa inte användarens text. Citera kort endast vid behov.'
+    '\nTON: Svenska. Korta stycken, punktlistor när det passar.'
+    '\nBETEENDE: Ställ 1–2 följdfrågor vid oklarheter. Ge tydliga nästa steg.'
+    '\nSÄKERHET: Lägg alltid till Säkerhetsfilter om el/hydraulik/bränsle/tryck/värme berörs.'
+    '\nKÄLLOR: När du får extern kunskap (WEBB-TRÄFFAR), använd den som primär fakta. Återge värden, steg och formuleringar så nära källan som möjligt, undvik att sammanfatta bort detaljer.'
+    '\nTABELLER: Behåll flera meningar per cell om de finns; radbryt i celler hellre än att ta bort innehåll.'
+    '\nSERVICE-SCHEMA: Om användaren ber om service-/underhållsschema, svara med tydliga checklistor och punktlistor (använd Markdown - [ ] för avbockning). Inga felsökningstabeller då; håll fokus på servicepunkter och säkerhetssteg.'
+    '\nUNDVIK: "Som en AI", överdriven artighet, ursäkter.';
 
 const String _level1Prompt = '''
 EXPERTIS=1 (nybörjare) — använd denna struktur, var pedagogisk och förklara även självklara kontroller.
@@ -104,7 +104,8 @@ String _postProcess(String s) {
     caseSensitive: false,
   );
   var out = s.trimLeft().replaceFirst(polite, '');
-  final echo = RegExp(r'^(du (säger|skriver|nämner) att[:\s]+)', caseSensitive: false);
+  final echo =
+      RegExp(r'^(du (säger|skriver|nämner) att[:\s]+)', caseSensitive: false);
   out = out.replaceFirst(echo, '');
   return out.trimLeft();
 }
@@ -167,7 +168,7 @@ String _extractText(Map<String, dynamic> data) {
 
 class OpenAIClient {
   final bool useProxy;
-  final String? proxyUrl;    // /chat
+  final String? proxyUrl; // /chat
   final String? directKey;
 
   OpenAIClient({
@@ -200,10 +201,10 @@ class OpenAIClient {
     String? year,
     String? webNotes, // sammanfattning från webbsök
   }) async {
-    final systemPrompt = _baseSystemPrompt
-        + _expertiseAddon(expertise)
-        + _equipmentAddon(brand: brand, model: model, year: year)
-        + _webNotesAddon(webNotes);
+    final systemPrompt = _baseSystemPrompt +
+        _expertiseAddon(expertise) +
+        _equipmentAddon(brand: brand, model: model, year: year) +
+        _webNotesAddon(webNotes);
 
     if (useProxy) {
       if (proxyUrl == null || proxyUrl!.isEmpty) {
@@ -215,15 +216,20 @@ class OpenAIClient {
         body: jsonEncode({
           'messages': [
             {'role': 'system', 'content': systemPrompt},
-            ...history.map((e) => {'role': e.$1 ? 'user' : 'assistant', 'content': e.$2}),
+            ...history.map(
+                (e) => {'role': e.$1 ? 'user' : 'assistant', 'content': e.$2}),
             {'role': 'user', 'content': newUserMessage},
           ],
           'model': 'gpt-4o',
           'temperature': 0.2,
         }),
       );
-      if (res.statusCode == 401) throw '401 (otillåten). Kontrollera proxy-konfiguration.';
-      if (res.statusCode >= 400) throw 'Proxyfel ${res.statusCode}: ${res.body}';
+      if (res.statusCode == 401) {
+        throw '401 (otillåten). Kontrollera proxy-konfiguration.';
+      }
+      if (res.statusCode >= 400) {
+        throw 'Proxyfel ${res.statusCode}: ${res.body}';
+      }
       // Debug-logga proxysvaret för felsökning
       debugPrint('Proxy response: ${res.body}');
       final data = jsonDecode(res.body) as Map<String, dynamic>;
@@ -243,15 +249,99 @@ class OpenAIClient {
           'model': 'gpt-4o',
           'messages': [
             {'role': 'system', 'content': systemPrompt},
-            ...history.map((e) => {'role': e.$1 ? 'user' : 'assistant', 'content': e.$2}),
+            ...history.map(
+                (e) => {'role': e.$1 ? 'user' : 'assistant', 'content': e.$2}),
             {'role': 'user', 'content': newUserMessage},
           ],
           'temperature': 0.2,
           'stream': false,
         }),
       );
-      if (res.statusCode == 401) throw '401 (otillåten). Kontrollera API-nyckeln.';
-      if (res.statusCode >= 400) throw 'OpenAI-fel ${res.statusCode}: ${res.body}';
+      if (res.statusCode == 401) {
+        throw '401 (otillåten). Kontrollera API-nyckeln.';
+      }
+      if (res.statusCode >= 400) {
+        throw 'OpenAI-fel ${res.statusCode}: ${res.body}';
+      }
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      final text = _extractText(data);
+      return _postProcess(text.isEmpty ? '[Tomt svar]' : text);
+    }
+  }
+
+  Future<String> generateWorkOrder(
+    String description, {
+    required bool preferSwedish,
+  }) async {
+    final languageNote = preferSwedish
+        ? 'SPRÅK: Svara på svenska när användaren skriver på svenska. Om texten är tydligt på engelska, svara på engelska.'
+        : 'LANGUAGE: Reply in English unless the user clearly writes in Swedish, then switch to Swedish.';
+
+    const styleNote =
+        'STIL: Kort, rak, verkstadston. Inga artighetsfraser, inga utsvävningar.';
+
+    final systemPrompt = '''
+Du är SERA – en serviceledare som sammanfattar utfört arbete till en professionell arbetsorder/rapport.
+$styleNote
+$languageNote
+
+Mål: Omskriv användarens beskrivning till en kompakt arbetsordertext i preteritum (utfört arbete). Beskriv vad som gjordes, hur, och resultatet. Inga stegvisa instruktioner eller uppmaningar.
+Format (Markdown):
+- Rubrik: kort, 1 rad, vad som hanterades.
+- Objekt: maskin/aggregat/plats (skriv "Okänt" om saknas).
+- Händelse/felbild: 1–2 rader om vad som observerades.
+- Utfört arbete: 3–6 punkter i preteritum som beskriver åtgärderna (inga uppmaningar).
+- Kontroll/resultat: 2–3 punkter om test/utfall.
+- Rekommendation/uppföljning (valfritt): kort om ev. efterkontroll eller förebyggande.
+Håll texten kompakt med hög informationsdensitet.
+''';
+
+    final payload = {
+      'messages': [
+        {'role': 'system', 'content': systemPrompt},
+        {'role': 'user', 'content': description},
+      ],
+      'model': 'gpt-4o',
+      'temperature': 0.18,
+    };
+
+    if (useProxy) {
+      if (proxyUrl == null || proxyUrl!.isEmpty) {
+        throw 'PROXY_URL saknas. Ange i inställningar eller .env';
+      }
+      final res = await http.post(
+        Uri.parse(proxyUrl!),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+      if (res.statusCode == 401) {
+        throw '401 (otillåten). Kontrollera proxy-konfiguration.';
+      }
+      if (res.statusCode >= 400) {
+        throw 'Proxyfel ${res.statusCode}: ${res.body}';
+      }
+      debugPrint('Work order proxy response: ${res.body}');
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      final text = _extractText(data);
+      return _postProcess(text.isEmpty ? '[Tomt svar]' : text);
+    } else {
+      if (directKey == null || directKey!.isEmpty) {
+        throw 'OPENAI_API_KEY saknas. Ange i Inställningar eller .env';
+      }
+      final res = await http.post(
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $directKey',
+        },
+        body: jsonEncode(payload),
+      );
+      if (res.statusCode == 401) {
+        throw '401 (otillåten). Kontrollera API-nyckeln.';
+      }
+      if (res.statusCode >= 400) {
+        throw 'OpenAI-fel ${res.statusCode}: ${res.body}';
+      }
       final data = jsonDecode(res.body) as Map<String, dynamic>;
       final text = _extractText(data);
       return _postProcess(text.isEmpty ? '[Tomt svar]' : text);

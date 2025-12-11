@@ -404,6 +404,114 @@ abstract class AppLocalizations {
   /// **'A forum where technicians, operators and enthusiasts share knowledge and experience.\nAsk questions, discuss fixes and help others in the industry.\nBuilds a strong community around SERA and heavy equipment.\nA place to learn, get inspired and grow together.'**
   String get homeCardCommunityBody;
 
+  /// No description provided for @workOrderCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Work order'**
+  String get workOrderCta;
+
+  /// No description provided for @workOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Work order'**
+  String get workOrderTitle;
+
+  /// No description provided for @workOrderHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Create work order'**
+  String get workOrderHeadline;
+
+  /// No description provided for @workOrderSubhead.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe the job briefly and SERA will generate a concise, professional work order.'**
+  String get workOrderSubhead;
+
+  /// No description provided for @workOrderDescriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get workOrderDescriptionLabel;
+
+  /// No description provided for @workOrderDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: Replace hydraulic filter on Volvo EC250E, check for leaks, verify pressure after replacement.'**
+  String get workOrderDescriptionHint;
+
+  /// No description provided for @workOrderGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate'**
+  String get workOrderGenerate;
+
+  /// No description provided for @workOrderClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get workOrderClear;
+
+  /// No description provided for @workOrderPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get workOrderPreviewTitle;
+
+  /// No description provided for @workOrderPreviewEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your generated work order will show here. Add a short description and tap Generate.'**
+  String get workOrderPreviewEmpty;
+
+  /// No description provided for @workOrderCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get workOrderCopy;
+
+  /// No description provided for @workOrderExportPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Export PDF'**
+  String get workOrderExportPdf;
+
+  /// No description provided for @workOrderCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get workOrderCopied;
+
+  /// No description provided for @workOrderPdfTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Work order'**
+  String get workOrderPdfTitle;
+
+  /// No description provided for @workOrderGeneratedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated'**
+  String get workOrderGeneratedAt;
+
+  /// No description provided for @workOrderPdfFileName.
+  ///
+  /// In en, this message translates to:
+  /// **'work-order.pdf'**
+  String get workOrderPdfFileName;
+
+  /// No description provided for @workOrderErrorUnauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Unauthorized (401) – check proxy or API key.'**
+  String get workOrderErrorUnauthorized;
+
+  /// No description provided for @workOrderErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error – could not build the work order.'**
+  String get workOrderErrorGeneric;
+
   /// No description provided for @sidebarTipsTitle1.
   ///
   /// In en, this message translates to:
