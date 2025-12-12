@@ -171,6 +171,98 @@ class AppLocalizationsEn extends AppLocalizations {
       'A forum where technicians, operators and enthusiasts share knowledge and experience.\nAsk questions, discuss fixes and help others in the industry.\nBuilds a strong community around SERA and heavy equipment.\nA place to learn, get inspired and grow together.';
 
   @override
+  String get serviceCta => 'Service';
+
+  @override
+  String get serviceTitle => 'Service plan';
+
+  @override
+  String get serviceHeadline => 'Generate a service plan with specifications';
+
+  @override
+  String get serviceBrandLabel => 'Brand';
+
+  @override
+  String get serviceBrandHint => 'e.g. Volvo, CAT, Komatsu';
+
+  @override
+  String get serviceModelLabel => 'Model';
+
+  @override
+  String get serviceModelHint => 'e.g. EC250E, 320 GC';
+
+  @override
+  String get serviceYearLabel => 'Year';
+
+  @override
+  String get serviceYearHint => 'e.g. 2019';
+
+  @override
+  String get serviceTypeLabel => 'Service interval';
+
+  @override
+  String get serviceTypeYearly => 'Annual service';
+
+  @override
+  String get serviceTypeAfterRepair => 'Post-repair';
+
+  @override
+  String get serviceTypeCustom => 'Custom…';
+
+  @override
+  String get serviceTypeCustomLabel => 'Custom interval';
+
+  @override
+  String get serviceTypeCustomHint => 'e.g. 750 h, A-service';
+
+  @override
+  String get serviceGenerate => 'Generate';
+
+  @override
+  String get serviceClear => 'Clear';
+
+  @override
+  String get servicePreviewTitle => 'Preview';
+
+  @override
+  String get servicePreviewEmpty =>
+      'Your service plan will appear here. Fill in the fields and tap Generate.';
+
+  @override
+  String get serviceCopy => 'Copy';
+
+  @override
+  String get serviceExportPdf => 'Export PDF';
+
+  @override
+  String get serviceCopied => 'Copied';
+
+  @override
+  String get serviceGeneratedAt => 'Generated';
+
+  @override
+  String get servicePdfFileName => 'service-plan.pdf';
+
+  @override
+  String get serviceErrorUnauthorized =>
+      'Unauthorized (401) – check proxy or API key.';
+
+  @override
+  String get serviceErrorGeneric =>
+      'Network error – could not build the service plan.';
+
+  @override
+  String get generalChatTitle => 'General chat';
+
+  @override
+  String get generalChatNotice =>
+      'This is the general chat. For machine-specific troubleshooting, use Felsökning. For reports: Arbetsorder. For service plan: Service.';
+
+  @override
+  String get generalChatInfo =>
+      'Information is guidance only. For targeted troubleshooting, switch to Felsökning.';
+
+  @override
   String get workOrderCta => 'Work order';
 
   @override

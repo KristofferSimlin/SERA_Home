@@ -45,6 +45,19 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     await Navigator.pushNamed(context, '/work-order');
   }
 
+  Future<void> _openGeneralChat() async {
+    final id = await ref.read(chatRepoProvider).createSession();
+    if (!mounted) return;
+    await Navigator.pushNamed(context, '/general-chat', arguments: id);
+    if (mounted) {
+      ref.invalidate(sessionsProvider);
+    }
+  }
+
+  Future<void> _openService() async {
+    await Navigator.pushNamed(context, '/service');
+  }
+
   @override
   Widget build(BuildContext context) {
     // Responsiv layout: bred skärm -> fast sidofält, smal -> Drawer
@@ -54,9 +67,6 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     final sidebar = _Sidebar(
       onNewChat: () {
         _newChat();
-      },
-      onWorkOrder: () {
-        _openWorkOrder();
       },
       onOpenChat: (id) {
         _openChat(id);
@@ -123,6 +133,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               onNewChat: () {
                 _newChat();
               },
+              onService: () {
+                _openService();
+              },
               onWorkOrder: () {
                 _openWorkOrder();
               },
@@ -130,6 +143,15 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           ),
         ],
       ),
+      bottomNavigationBar: isWide
+          ? null
+          : _MobileBottomBar(
+              onService: _openService,
+              onFelsokning: _newChat,
+              onWorkOrder: _openWorkOrder,
+              onProfile: () => Navigator.pushNamed(context, '/profile'),
+              onChat: _openGeneralChat,
+            ),
     );
   }
 }
@@ -137,14 +159,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 class _Sidebar extends ConsumerWidget {
   const _Sidebar({
     required this.onNewChat,
-    required this.onWorkOrder,
     required this.onOpenChat,
     required this.searchCtrl,
     required this.showNavLinks,
   });
 
   final VoidCallback onNewChat;
-  final VoidCallback onWorkOrder;
   final void Function(String id) onOpenChat;
   final TextEditingController searchCtrl;
   final bool showNavLinks;
@@ -182,14 +202,6 @@ class _Sidebar extends ConsumerWidget {
                   onPressed: onNewChat,
                   icon: const Icon(Icons.add),
                   label: Text(l.homeNewChat),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: FilledButton.tonalIcon(
-                  onPressed: onWorkOrder,
-                  icon: const Icon(Icons.assignment_turned_in_outlined),
-                  label: Text(l.workOrderCta),
                 ),
               ),
               const SizedBox(width: 8),
@@ -356,9 +368,11 @@ class _NavButton extends StatelessWidget {
 class _LandingArea extends StatelessWidget {
   const _LandingArea({
     required this.onNewChat,
+    required this.onService,
     required this.onWorkOrder,
   });
   final VoidCallback onNewChat;
+  final VoidCallback onService;
   final VoidCallback onWorkOrder;
 
   @override
@@ -454,27 +468,6 @@ class _LandingArea extends StatelessWidget {
                     const SizedBox(height: 20),
                     const _FeatureCards(),
                     const SizedBox(height: 28),
-
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        FilledButton.icon(
-                          onPressed: onNewChat,
-                          icon: const Icon(Icons.add_comment),
-                          label: Text(l.homeNewChat),
-                        ),
-                        FilledButton.tonalIcon(
-                          onPressed: onWorkOrder,
-                          icon: const Icon(Icons.assignment_turned_in_outlined),
-                          label: Text(l.workOrderCta),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 32),
-                    const _Disclaimer(),
                   ],
                 ),
               ),
@@ -482,19 +475,6 @@ class _LandingArea extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Disclaimer extends StatelessWidget {
-  const _Disclaimer();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text(
-      'Informationen är vägledande. Följ alltid tillverkarens instruktioner och lokala säkerhetsregler. Egen risk.',
-      textAlign: TextAlign.center,
-      style: TextStyle(fontSize: 12.5, color: Colors.white70, height: 1.35),
     );
   }
 }
@@ -735,4 +715,132 @@ class _CardData {
   final String title;
   final String badge;
   final String description;
+}
+
+class _MobileBottomBar extends StatelessWidget {
+  const _MobileBottomBar({
+    required this.onService,
+    required this.onFelsokning,
+    required this.onWorkOrder,
+    required this.onProfile,
+    required this.onChat,
+  });
+
+  final VoidCallback onService;
+  final VoidCallback onFelsokning;
+  final VoidCallback onWorkOrder;
+  final VoidCallback onProfile;
+  final VoidCallback onChat;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final l = AppLocalizations.of(context)!;
+    final labelStyle = Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: Colors.white70,
+          fontSize: 11,
+        );
+
+    return SafeArea(
+      top: false,
+      child: SizedBox(
+        height: 86,
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Container(
+              height: 70,
+              decoration: const BoxDecoration(
+                color: Color(0xFF0F141A),
+                border: Border(top: BorderSide(color: Colors.white12)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _BottomItem(
+                      icon: Icons.build_circle_outlined,
+                      label: l.serviceCta,
+                      onTap: onService,
+                      labelStyle: labelStyle,
+                    ),
+                  ),
+                  Expanded(
+                    child: _BottomItem(
+                      icon: Icons.troubleshoot_outlined,
+                      label: l.homeNewChat,
+                      onTap: onFelsokning,
+                      labelStyle: labelStyle,
+                    ),
+                  ),
+                  const SizedBox(width: 76), // space for center fab
+                  Expanded(
+                    child: _BottomItem(
+                      icon: Icons.assignment_turned_in_outlined,
+                      label: l.workOrderCta,
+                      onTap: onWorkOrder,
+                      labelStyle: labelStyle,
+                    ),
+                  ),
+                  Expanded(
+                    child: _BottomItem(
+                      icon: Icons.person_outline,
+                      label: l.homeProfile,
+                      onTap: onProfile,
+                      labelStyle: labelStyle,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              bottom: 12,
+              child: SizedBox(
+                width: 66,
+                height: 66,
+                child: FloatingActionButton(
+                  onPressed: onChat,
+                  backgroundColor: cs.primary,
+                  child: const Icon(Icons.chat_bubble_outline, size: 28),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomItem extends StatelessWidget {
+  const _BottomItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    required this.labelStyle,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final TextStyle? labelStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 24, color: Colors.white70),
+            const SizedBox(height: 4),
+            Text(label, style: labelStyle, overflow: TextOverflow.ellipsis),
+          ],
+        ),
+      ),
+    );
+  }
 }

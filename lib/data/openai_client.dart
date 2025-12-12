@@ -347,4 +347,88 @@ Håll texten kompakt med hög informationsdensitet.
       return _postProcess(text.isEmpty ? '[Tomt svar]' : text);
     }
   }
+
+  Future<String> generateServicePlan({
+    required String brand,
+    required String model,
+    String? year,
+    required String serviceType,
+    required bool preferSwedish,
+  }) async {
+    final languageNote = preferSwedish
+        ? 'SPRÅK: Svenska som standard. Om input är tydligt på engelska, svara på engelska.'
+        : 'LANGUAGE: English unless the input is clearly Swedish, then answer in Swedish.';
+
+    const styleNote =
+        'STIL: Kort, teknisk, hög informationsdensitet. Ingen artighet.';
+
+    final systemPrompt = '''
+Du är SERA – en serviceplanerare som skriver en strukturerad serviceplan för maskinen nedan.
+$styleNote
+$languageNote
+
+MÅL: Ge en tydlig plan med arbetsmoment och specifikationer (vätskevolymer, kvaliteter). Om värde saknas: skriv "Kontrollera i manualen".
+FORMAT (Markdown, rubriker i exakt ordning):
+1) Rubrik (kort, vad för service och maskin)
+2) Objekt (märke, modell, årsmodell om känd – annars "Okänt")
+3) Servicetyp (t.ex. 50 h, 250 h, Årsservice)
+4) Förberedelser (2–3 korta punkter)
+5) Arbetsmoment (5–10 punktlista i imperativ, kort)
+6) Specifikationer & vätskor (lista med volymer och kvaliteter; skriv "Kontrollera i manualen" där uppgift saknas)
+7) Kontroll & dokumentation (2–4 punkter)
+''';
+
+    final description =
+        'Märke: $brand\nModell: $model\nÅrsmodell: ${year?.isNotEmpty == true ? year : "Okänt"}\nServicetyp: $serviceType';
+
+    final payload = {
+      'messages': [
+        {'role': 'system', 'content': systemPrompt},
+        {'role': 'user', 'content': description},
+      ],
+      'model': 'gpt-4o',
+      'temperature': 0.16,
+    };
+
+    if (useProxy) {
+      if (proxyUrl == null || proxyUrl!.isEmpty) {
+        throw 'PROXY_URL saknas. Ange i inställningar eller .env';
+      }
+      final res = await http.post(
+        Uri.parse(proxyUrl!),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+      if (res.statusCode == 401) {
+        throw '401 (otillåten). Kontrollera proxy-konfiguration.';
+      }
+      if (res.statusCode >= 400) {
+        throw 'Proxyfel ${res.statusCode}: ${res.body}';
+      }
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      final text = _extractText(data);
+      return _postProcess(text.isEmpty ? '[Tomt svar]' : text);
+    } else {
+      if (directKey == null || directKey!.isEmpty) {
+        throw 'OPENAI_API_KEY saknas. Ange i Inställningar eller .env';
+      }
+      final res = await http.post(
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $directKey',
+        },
+        body: jsonEncode(payload),
+      );
+      if (res.statusCode == 401) {
+        throw '401 (otillåten). Kontrollera API-nyckeln.';
+      }
+      if (res.statusCode >= 400) {
+        throw 'OpenAI-fel ${res.statusCode}: ${res.body}';
+      }
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      final text = _extractText(data);
+      return _postProcess(text.isEmpty ? '[Tomt svar]' : text);
+    }
+  }
 }

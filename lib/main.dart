@@ -18,6 +18,8 @@ import 'features/settings/subscription_terms_screen.dart';
 import 'features/chat/chat_controller.dart';
 import 'package:sera/l10n/app_localizations.dart';
 import 'features/work_order/work_order_screen.dart';
+import 'features/service/service_screen.dart';
+import 'features/chat/general_chat_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,6 +58,12 @@ class SeraApp extends ConsumerWidget {
         '/business-login': (_) => const BusinessLoginScreen(),
         '/personal-pricing': (_) => const PersonalPricingScreen(),
         '/work-order': (_) => const WorkOrderScreen(),
+        '/service': (_) => const ServiceScreen(),
+        '/general-chat': (ctx) {
+          final arg = ModalRoute.of(ctx)?.settings.arguments;
+          final sid = (arg is String && arg.isNotEmpty) ? arg : 'general';
+          return GeneralChatScreen(sessionId: sid);
+        },
       },
 
       // NY: fångar /chat och ger ett stabilt sessionId (default om inget skickas)

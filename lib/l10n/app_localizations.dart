@@ -404,6 +404,180 @@ abstract class AppLocalizations {
   /// **'A forum where technicians, operators and enthusiasts share knowledge and experience.\nAsk questions, discuss fixes and help others in the industry.\nBuilds a strong community around SERA and heavy equipment.\nA place to learn, get inspired and grow together.'**
   String get homeCardCommunityBody;
 
+  /// No description provided for @serviceCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get serviceCta;
+
+  /// No description provided for @serviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Service plan'**
+  String get serviceTitle;
+
+  /// No description provided for @serviceHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate a service plan with specifications'**
+  String get serviceHeadline;
+
+  /// No description provided for @serviceBrandLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Brand'**
+  String get serviceBrandLabel;
+
+  /// No description provided for @serviceBrandHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Volvo, CAT, Komatsu'**
+  String get serviceBrandHint;
+
+  /// No description provided for @serviceModelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get serviceModelLabel;
+
+  /// No description provided for @serviceModelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. EC250E, 320 GC'**
+  String get serviceModelHint;
+
+  /// No description provided for @serviceYearLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get serviceYearLabel;
+
+  /// No description provided for @serviceYearHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 2019'**
+  String get serviceYearHint;
+
+  /// No description provided for @serviceTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Service interval'**
+  String get serviceTypeLabel;
+
+  /// No description provided for @serviceTypeYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual service'**
+  String get serviceTypeYearly;
+
+  /// No description provided for @serviceTypeAfterRepair.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-repair'**
+  String get serviceTypeAfterRepair;
+
+  /// No description provided for @serviceTypeCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom…'**
+  String get serviceTypeCustom;
+
+  /// No description provided for @serviceTypeCustomLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom interval'**
+  String get serviceTypeCustomLabel;
+
+  /// No description provided for @serviceTypeCustomHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 750 h, A-service'**
+  String get serviceTypeCustomHint;
+
+  /// No description provided for @serviceGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate'**
+  String get serviceGenerate;
+
+  /// No description provided for @serviceClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get serviceClear;
+
+  /// No description provided for @servicePreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get servicePreviewTitle;
+
+  /// No description provided for @servicePreviewEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your service plan will appear here. Fill in the fields and tap Generate.'**
+  String get servicePreviewEmpty;
+
+  /// No description provided for @serviceCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get serviceCopy;
+
+  /// No description provided for @serviceExportPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Export PDF'**
+  String get serviceExportPdf;
+
+  /// No description provided for @serviceCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get serviceCopied;
+
+  /// No description provided for @serviceGeneratedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated'**
+  String get serviceGeneratedAt;
+
+  /// No description provided for @servicePdfFileName.
+  ///
+  /// In en, this message translates to:
+  /// **'service-plan.pdf'**
+  String get servicePdfFileName;
+
+  /// No description provided for @serviceErrorUnauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Unauthorized (401) – check proxy or API key.'**
+  String get serviceErrorUnauthorized;
+
+  /// No description provided for @serviceErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error – could not build the service plan.'**
+  String get serviceErrorGeneric;
+
+  /// No description provided for @generalChatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'General chat'**
+  String get generalChatTitle;
+
+  /// No description provided for @generalChatNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the general chat. For machine-specific troubleshooting, use Felsökning. For reports: Arbetsorder. For service plan: Service.'**
+  String get generalChatNotice;
+
+  /// No description provided for @generalChatInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Information is guidance only. For targeted troubleshooting, switch to Felsökning.'**
+  String get generalChatInfo;
+
   /// No description provided for @workOrderCta.
   ///
   /// In en, this message translates to:

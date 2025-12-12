@@ -99,7 +99,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get comingSoon => 'Kommer snart';
 
   @override
-  String get homeNewChat => 'Ny chatt';
+  String get homeNewChat => 'Felsökning';
 
   @override
   String get homeSettings => 'Inställningar';
@@ -170,6 +170,98 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get homeCardCommunityBody =>
       'Ett forum där tekniker, förare och entusiaster kan dela kunskap och erfarenheter.\nStäll frågor, diskutera lösningar och hjälp andra i branschen.\nBygger en stark gemenskap runt SERA och entreprenadmaskiner.\nEn plats att lära, inspireras och växa tillsammans.';
+
+  @override
+  String get serviceCta => 'Service';
+
+  @override
+  String get serviceTitle => 'Serviceplan';
+
+  @override
+  String get serviceHeadline => 'Generera en serviceplan med specifikationer';
+
+  @override
+  String get serviceBrandLabel => 'Märke';
+
+  @override
+  String get serviceBrandHint => 'ex. Volvo, CAT, Komatsu';
+
+  @override
+  String get serviceModelLabel => 'Modell';
+
+  @override
+  String get serviceModelHint => 'ex. EC250E, 320 GC';
+
+  @override
+  String get serviceYearLabel => 'Årsmodell';
+
+  @override
+  String get serviceYearHint => 'ex. 2019';
+
+  @override
+  String get serviceTypeLabel => 'Servicetyp';
+
+  @override
+  String get serviceTypeYearly => 'Årsservice';
+
+  @override
+  String get serviceTypeAfterRepair => 'Efter reparation';
+
+  @override
+  String get serviceTypeCustom => 'Egen text…';
+
+  @override
+  String get serviceTypeCustomLabel => 'Egen servicenivå';
+
+  @override
+  String get serviceTypeCustomHint => 'ex. 750 h, A-service';
+
+  @override
+  String get serviceGenerate => 'Generera';
+
+  @override
+  String get serviceClear => 'Rensa';
+
+  @override
+  String get servicePreviewTitle => 'Förhandsvisning';
+
+  @override
+  String get servicePreviewEmpty =>
+      'Din serviceplan visas här. Fyll i fälten och tryck Generera.';
+
+  @override
+  String get serviceCopy => 'Kopiera';
+
+  @override
+  String get serviceExportPdf => 'Exportera PDF';
+
+  @override
+  String get serviceCopied => 'Kopierat';
+
+  @override
+  String get serviceGeneratedAt => 'Genererad';
+
+  @override
+  String get servicePdfFileName => 'serviceplan.pdf';
+
+  @override
+  String get serviceErrorUnauthorized =>
+      'Behörighetsfel (401) – kontrollera proxy eller API-nyckel.';
+
+  @override
+  String get serviceErrorGeneric =>
+      'Nätverksfel – kunde inte skapa serviceplan.';
+
+  @override
+  String get generalChatTitle => 'Generell chatt';
+
+  @override
+  String get generalChatNotice =>
+      'Du är i den generella chatten. För maskinspecifik felsökning – gå till Felsökning. För rapport: Arbetsorder. För serviceplan: Service.';
+
+  @override
+  String get generalChatInfo =>
+      'Informationen är vägledande. För specifik felsökning, använd Felsökning-flödet.';
 
   @override
   String get workOrderCta => 'Arbetsorder';
