@@ -143,15 +143,13 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           ),
         ],
       ),
-      bottomNavigationBar: isWide
-          ? null
-          : _MobileBottomBar(
-              onService: _openService,
-              onFelsokning: _newChat,
-              onWorkOrder: _openWorkOrder,
-              onProfile: () => Navigator.pushNamed(context, '/profile'),
-              onChat: _openGeneralChat,
-            ),
+      bottomNavigationBar: _MobileBottomBar(
+        onService: _openService,
+        onFelsokning: _newChat,
+        onWorkOrder: _openWorkOrder,
+        onProfile: () => Navigator.pushNamed(context, '/profile'),
+        onChat: _openGeneralChat,
+      ),
     );
   }
 }
@@ -578,7 +576,8 @@ class _HoverCard extends StatefulWidget {
   State<_HoverCard> createState() => _HoverCardState();
 }
 
-class _HoverCardState extends State<_HoverCard> {
+class _HoverCardState extends State<_HoverCard>
+    with SingleTickerProviderStateMixin {
   bool _expanded = false;
 
   void _setHover(bool value) {
@@ -617,87 +616,91 @@ class _HoverCardState extends State<_HoverCard> {
             _setHover(!expanded); // tap support on touch devices
           }
         },
-        child: AnimatedContainer(
+        child: AnimatedSize(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeInOut,
-          padding: EdgeInsets.all(expanded ? 18 : 16),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: Colors.white.withOpacity(expanded ? 0.28 : 0.16),
+          alignment: Alignment.topCenter,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: Colors.white.withOpacity(expanded ? 0.28 : 0.16),
+              ),
+              boxShadow: expanded
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.18),
+                        blurRadius: 18,
+                        offset: const Offset(0, 10),
+                      ),
+                    ]
+                  : const [],
             ),
-            boxShadow: expanded
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.18),
-                      blurRadius: 18,
-                      offset: const Offset(0, 10),
-                    ),
-                  ]
-                : const [],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 2),
-                child: Center(
-                  child: Text(
-                    widget.data.title,
-                    textAlign: TextAlign.center,
-                    style: (widget.compactText
-                            ? theme.textTheme.titleSmall
-                            : theme.textTheme.titleMedium)
-                        ?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Center(
+                    child: Text(
+                      widget.data.title,
+                      textAlign: TextAlign.center,
+                      style: (widget.compactText
+                              ? theme.textTheme.titleSmall
+                              : theme.textTheme.titleMedium)
+                          ?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              TweenAnimationBuilder<double>(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeInOut,
-                tween: Tween<double>(begin: 0, end: expanded ? 1 : 0),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.data.badge,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          letterSpacing: 1.6,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white70,
+                TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  tween: Tween<double>(begin: 0, end: expanded ? 1 : 0),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.data.badge,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            letterSpacing: 1.6,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white70,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        widget.data.description,
-                        style: (widget.compactText
-                                ? theme.textTheme.bodySmall
-                                : theme.textTheme.bodyMedium)
-                            ?.copyWith(
-                          color: Colors.white70,
-                          height: 1.48,
+                        const SizedBox(height: 6),
+                        Text(
+                          widget.data.description,
+                          style: (widget.compactText
+                                  ? theme.textTheme.bodySmall
+                                  : theme.textTheme.bodyMedium)
+                              ?.copyWith(
+                            color: Colors.white70,
+                            height: 1.48,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                builder: (context, value, child) {
-                  return ClipRect(
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      heightFactor: value,
-                      child: Opacity(opacity: value, child: child),
+                      ],
                     ),
-                  );
-                },
-              ),
-            ],
+                  ),
+                  builder: (context, value, child) {
+                    return ClipRect(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        heightFactor: value,
+                        child: Opacity(opacity: value, child: child),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -743,69 +746,73 @@ class _MobileBottomBar extends StatelessWidget {
 
     return SafeArea(
       top: false,
-      child: SizedBox(
-        height: 86,
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            Container(
-              height: 70,
-              decoration: const BoxDecoration(
-                color: Color(0xFF0F141A),
-                border: Border(top: BorderSide(color: Colors.white12)),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _BottomItem(
-                      icon: Icons.build_circle_outlined,
-                      label: l.serviceCta,
-                      onTap: onService,
-                      labelStyle: labelStyle,
+      child: Material(
+        color: const Color(0xFF0F141A),
+        elevation: 8,
+        child: SizedBox(
+          height: 86,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Container(
+                height: 70,
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: Colors.white12)),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _BottomItem(
+                        icon: Icons.build_circle_outlined,
+                        label: l.serviceCta,
+                        onTap: onService,
+                        labelStyle: labelStyle,
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: _BottomItem(
-                      icon: Icons.troubleshoot_outlined,
-                      label: l.homeNewChat,
-                      onTap: onFelsokning,
-                      labelStyle: labelStyle,
+                    Expanded(
+                      child: _BottomItem(
+                        icon: Icons.troubleshoot_outlined,
+                        label: l.homeNewChat,
+                        onTap: onFelsokning,
+                        labelStyle: labelStyle,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 76), // space for center fab
-                  Expanded(
-                    child: _BottomItem(
-                      icon: Icons.assignment_turned_in_outlined,
-                      label: l.workOrderCta,
-                      onTap: onWorkOrder,
-                      labelStyle: labelStyle,
+                    const SizedBox(width: 76), // space for center fab
+                    Expanded(
+                      child: _BottomItem(
+                        icon: Icons.assignment_turned_in_outlined,
+                        label: l.workOrderCta,
+                        onTap: onWorkOrder,
+                        labelStyle: labelStyle,
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: _BottomItem(
-                      icon: Icons.person_outline,
-                      label: l.homeProfile,
-                      onTap: onProfile,
-                      labelStyle: labelStyle,
+                    Expanded(
+                      child: _BottomItem(
+                        icon: Icons.person_outline,
+                        label: l.homeProfile,
+                        onTap: onProfile,
+                        labelStyle: labelStyle,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 12,
-              child: SizedBox(
-                width: 66,
-                height: 66,
-                child: FloatingActionButton(
-                  onPressed: onChat,
-                  backgroundColor: cs.primary,
-                  child: const Icon(Icons.chat_bubble_outline, size: 28),
+                  ],
                 ),
               ),
-            ),
-          ],
+              Positioned(
+                bottom: 12,
+                child: SizedBox(
+                  width: 66,
+                  height: 66,
+                  child: FloatingActionButton(
+                    onPressed: onChat,
+                    backgroundColor: cs.primary,
+                    child: const Icon(Icons.chat_bubble_outline, size: 28),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
