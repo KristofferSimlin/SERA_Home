@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:sera/l10n/app_localizations.dart';
 
 import '../chat/widgets/chat_backdrop.dart';
@@ -342,9 +343,20 @@ class _PreviewCard extends StatelessWidget {
                 border: Border.all(color: Colors.white10),
               ),
               padding: const EdgeInsets.all(14),
-              child: SelectableText(
-                text,
-                style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
+              child: MarkdownBody(
+                data: text,
+                selectable: true,
+                styleSheet: MarkdownStyleSheet.fromTheme(
+                  theme.copyWith(
+                    textTheme: theme.textTheme.apply(
+                      bodyColor: Colors.white,
+                      displayColor: Colors.white,
+                    ),
+                  ),
+                ).copyWith(
+                  p: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
+                  listBullet: const TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],

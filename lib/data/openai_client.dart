@@ -373,12 +373,12 @@ $languageNote
 MÅL: Ge en tydlig plan med arbetsmoment och specifikationer (vätskevolymer, kvaliteter). Om värde saknas: skriv "Kontrollera i manualen".
 FORMAT (Markdown, rubriker i exakt ordning):
 1) Rubrik (kort, vad för service och maskin)
-2) Objekt (märke, modell, årsmodell om känd – annars "Okänt")
-3) Servicetyp (t.ex. 50 h, 250 h, Årsservice)
-4) Förberedelser (2–3 korta punkter)
-5) Arbetsmoment (5–10 punktlista i imperativ, kort)
-6) Specifikationer & vätskor (lista med volymer och kvaliteter; skriv "Kontrollera i manualen" där uppgift saknas)
-7) Kontroll & dokumentation (2–4 punkter)
+2) ## Objekt – märke, modell, årsmodell om känd (annars "Okänt")
+3) ## Servicetyp – t.ex. 50 h, 250 h, Årsservice
+4) ## Förberedelser – checklista med - [ ] (2–3 korta punkter)
+5) ## Arbetsmoment – checklista med - [ ] (5–10 korta, imperativ)
+6) ## Specifikationer & vätskor – checklista med - [ ] och volymer/kvaliteter; skriv "Kontrollera i manualen" där uppgift saknas
+7) ## Kontroll & dokumentation – checklista med - [ ] (2–4 punkter)
 ''';
 
     final description =

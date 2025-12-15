@@ -22,6 +22,7 @@ class _ServiceScreenState extends ConsumerState<ServiceScreen> {
   final _modelCtrl = TextEditingController();
   final _yearCtrl = TextEditingController();
   final _customTypeCtrl = TextEditingController();
+  final Map<int, bool> _checked = {};
 
   // TODO: Prefill brand/model/year from senaste chatt-session om tillgängligt.
 
@@ -32,6 +33,71 @@ class _ServiceScreenState extends ConsumerState<ServiceScreen> {
     _yearCtrl.dispose();
     _customTypeCtrl.dispose();
     super.dispose();
+  }
+
+  void _toggleLine(int index) {
+    setState(() {
+      _checked[index] = !(_checked[index] ?? false);
+    });
+  }
+
+  Widget _renderOutput(String text, ThemeData theme) {
+    final lines = text.split('\n');
+    final bodyStyle =
+        theme.textTheme.bodyMedium?.copyWith(color: Colors.white, height: 1.35);
+    final headingStyle = theme.textTheme.titleMedium
+        ?.copyWith(color: Colors.white, fontWeight: FontWeight.w700);
+    final checkboxColor = Colors.lightBlueAccent;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (int i = 0; i < lines.length; i++)
+          Builder(builder: (context) {
+            final line = lines[i].trimRight();
+            if (line.isEmpty) return const SizedBox(height: 6);
+            if (line.startsWith('## ')) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 4),
+                child: Text(line.substring(3), style: headingStyle),
+              );
+            }
+            final m = RegExp(r'^-\s*\[( |x|X)\]\s*(.*)').firstMatch(line);
+            if (m != null) {
+              final initiallyChecked =
+                  m.group(1)?.toLowerCase() == 'x' ? true : false;
+              final checked = _checked[i] ?? initiallyChecked;
+              final label = m.group(2) ?? '';
+              return InkWell(
+                onTap: () => _toggleLine(i),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Checkbox(
+                        value: checked,
+                        onChanged: (_) => _toggleLine(i),
+                        activeColor: checkboxColor,
+                      ),
+                      Expanded(
+                        child: Text(
+                          label,
+                          style: bodyStyle,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Text(line, style: bodyStyle),
+            );
+          }),
+      ],
+    );
   }
 
   Future<void> _copy(String text, AppLocalizations l) async {
@@ -362,17 +428,15 @@ class _ServiceScreenState extends ConsumerState<ServiceScreen> {
                                   border: Border.all(color: Colors.white10),
                                 ),
                                 padding: const EdgeInsets.all(14),
-                                child: SelectableText(
-                                  state.output?.isNotEmpty == true
-                                      ? state.output!
-                                      : l.servicePreviewEmpty,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    height: 1.4,
-                                    color: state.output == null
-                                        ? Colors.white70
-                                        : null,
-                                  ),
-                                ),
+                                child: state.output?.isNotEmpty == true
+                                    ? _renderOutput(state.output!, theme)
+                                    : Text(
+                                        l.servicePreviewEmpty,
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                                color: Colors.white70,
+                                                height: 1.4),
+                                      ),
                               ),
                             ],
                           ),
