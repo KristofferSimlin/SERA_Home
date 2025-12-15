@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sera/data/openai_client.dart';
 import '../chat/chat_controller.dart';
