@@ -357,6 +357,7 @@ Håll texten kompakt med hög informationsdensitet.
     String? year,
     required String serviceType,
     required bool preferSwedish,
+    String? webNotes,
   }) async {
     final languageNote = preferSwedish
         ? 'SPRÅK: Svenska som standard. Om input är tydligt på engelska, svara på engelska.'
@@ -382,7 +383,7 @@ FORMAT (Markdown, rubriker i exakt ordning):
 ''';
 
     final description =
-        'Märke: $brand\nModell: $model\nÅrsmodell: ${year?.isNotEmpty == true ? year : "Okänt"}\nServicetyp: $serviceType';
+        'Märke: $brand\nModell: $model\nÅrsmodell: ${year?.isNotEmpty == true ? year : "Okänt"}\nServicetyp: $serviceType${_webNotesAddon(webNotes)}';
 
     final payload = {
       'messages': [

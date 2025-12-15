@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sera/data/openai_client.dart';
 import '../chat/chat_controller.dart';
+import '../../data/web_search_client.dart';
 
 const _sentinel = Object();
 const String serviceTypeCustomKey = '__custom';
@@ -59,6 +60,7 @@ class ServiceController extends StateNotifier<ServiceState> {
 
   final OpenAIClient client;
   final SettingsState settings;
+  final WebSearchClient _webSearch = WebSearchClient();
 
   void updateBrand(String value) {
     state = state.copyWith(brand: value, error: null);
@@ -97,18 +99,43 @@ class ServiceController extends StateNotifier<ServiceState> {
         !state.isGenerating;
   }
 
+  Future<String?> _fetchWebNotes() async {
+    final parts = [
+      state.brand.trim(),
+      state.model.trim(),
+      state.year?.trim() ?? '',
+      _resolvedServiceType() ?? '',
+    ].where((s) => s.isNotEmpty).toList();
+    if (parts.isEmpty) return null;
+    final query = parts.join(' ');
+    try {
+      return await _webSearch.searchSummary(
+        query,
+        brand: state.brand,
+        model: state.model,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> generate() async {
     final resolvedType = _resolvedServiceType();
     if (!hasRequiredFields || resolvedType == null) return;
 
     state = state.copyWith(isGenerating: true, error: null);
     try {
+      String? webNotes;
+      if (settings.webLookupEnabled) {
+        webNotes = await _fetchWebNotes();
+      }
       final output = await client.generateServicePlan(
         brand: state.brand.trim(),
         model: state.model.trim(),
         year: state.year?.trim().isEmpty == true ? null : state.year?.trim(),
         serviceType: resolvedType,
         preferSwedish: settings.localeCode.startsWith('sv'),
+        webNotes: webNotes,
       );
       state = state.copyWith(isGenerating: false, output: output);
     } catch (e) {
