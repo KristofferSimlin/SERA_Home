@@ -378,7 +378,7 @@ FORMAT (Markdown, rubriker i exakt ordning):
 3) ## Servicetyp – t.ex. 50 h, 250 h, Årsservice
 4) ## Förberedelser – checklista med - [ ] (2–3 korta punkter)
 5) ## Arbetsmoment – checklista med - [ ] (5–10 korta, imperativ)
-6) ## Specifikationer & vätskor – checklista med - [ ] och volymer/kvaliteter; skriv "Kontrollera i manualen" där uppgift saknas
+6) ## Specifikationer & vätskor – checklista med - [ ] där varje vätska/material har tydlig typ + volym. Ex: "- [ ] Motorolja: 10W-40, API CH-4, volym 8 l" eller "- [ ] Hydraulik: HLP ISO VG 46, volym 68 l". Om värde saknas: skriv "Kontrollera i manualen".
 7) ## Kontroll & dokumentation – checklista med - [ ] (2–4 punkter)
 ''';
 
