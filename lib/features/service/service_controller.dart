@@ -62,6 +62,12 @@ class ServiceController extends StateNotifier<ServiceState> {
   final OpenAIClient client;
   final SettingsState settings;
   final WebSearchClient _webSearch = WebSearchClient();
+  static const _serviceSearchBoosters = [
+    'service manual',
+    'maintenance interval',
+    'fluid capacities',
+    'service spec',
+  ];
 
   void updateBrand(String value) {
     state = state.copyWith(brand: value, error: null);
@@ -106,6 +112,7 @@ class ServiceController extends StateNotifier<ServiceState> {
       state.model.trim(),
       state.year?.trim() ?? '',
       _resolvedServiceType() ?? '',
+      ..._serviceSearchBoosters,
     ].where((s) => s.isNotEmpty).toList();
     if (parts.isEmpty) return null;
     final query = parts.join(' ');
