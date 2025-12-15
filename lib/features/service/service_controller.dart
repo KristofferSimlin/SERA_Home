@@ -128,6 +128,7 @@ class ServiceController extends StateNotifier<ServiceState> {
       String? webNotes;
       if (settings.webLookupEnabled) {
         webNotes = await _fetchWebNotes();
+        debugPrint('service webNotes: ${webNotes ?? '(none)'}');
       }
       final output = await client.generateServicePlan(
         brand: state.brand.trim(),
