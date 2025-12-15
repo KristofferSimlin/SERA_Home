@@ -3,6 +3,8 @@
 
 import { knowledge } from './knowledge-data.js';
 
+const serpApiKey = process.env.SERPAPI_KEY;
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -40,6 +42,27 @@ function scoreEntry(entry, tokens, maybeYear) {
   }
 
   return score;
+}
+
+async function serpSearch(q) {
+  if (!serpApiKey) return null;
+  const url = new URL('https://serpapi.com/search.json');
+  url.searchParams.set('engine', 'google');
+  url.searchParams.set('q', q);
+  url.searchParams.set('api_key', serpApiKey);
+  url.searchParams.set('num', '8');
+
+  const res = await fetch(url, { headers: { Accept: 'application/json' } });
+  if (!res.ok) return null;
+  const data = await res.json();
+  const organic = Array.isArray(data.organic_results) ? data.organic_results : [];
+  if (!organic.length) return null;
+
+  return organic.slice(0, 8).map((it) => ({
+    title: it.title,
+    snippet: it.snippet || it.description || '',
+    link: it.link || it.cached_page_link || '',
+  }));
 }
 
 export default async function handler(req, res) {
@@ -80,6 +103,16 @@ export default async function handler(req, res) {
       link: entry.link,
     }));
 
+  let items = scored;
+  try {
+    const serpItems = await serpSearch(q);
+    if (serpItems && serpItems.length) {
+      items = serpItems;
+    }
+  } catch (e) {
+    // falla tillbaka till knowledge-data
+  }
+
   setCors(res);
-  return res.status(200).json({ items: scored });
+  return res.status(200).json({ items });
 }
