@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sera/l10n/app_localizations.dart';
 
 import 'widgets/floating_lines_background.dart';
+import 'widgets/floating_lines_light_background.dart';
 
 enum _StartVariant { webDesktop, webMobile, app }
 
@@ -149,6 +150,7 @@ class _StartScreenState extends State<StartScreen>
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final config = _resolveConfig(context);
     final l = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -178,27 +180,37 @@ class _StartScreenState extends State<StartScreen>
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF0B0D12),
-                      Color(0xFF0E141C),
-                    ],
+              if (isDark) ...[
+                Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF0B0D12),
+                        Color(0xFF0E141C),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Positioned.fill(
-                child: FloatingLinesBackground(
+                Positioned.fill(
+                  child: FloatingLinesBackground(
+                    enabledWaves: config.enabledWaves,
+                    lineCount: config.lineCount,
+                    lineDistance: config.lineDistance,
+                    animationSpeed: config.animationSpeed,
+                    opacity: config.opacity,
+                  ),
+                ),
+              ] else ...[
+                FloatingLinesLightBackground(
                   enabledWaves: config.enabledWaves,
                   lineCount: config.lineCount,
                   lineDistance: config.lineDistance,
                   animationSpeed: config.animationSpeed,
                   opacity: config.opacity,
                 ),
-              ),
+              ],
               SafeArea(
                 child: Center(
                   child: Padding(

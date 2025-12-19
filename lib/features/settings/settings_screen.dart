@@ -44,6 +44,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Utseende', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Mörkt läge'),
+                    subtitle: const Text('Stäng av för ljust läge'),
+                    value: settings.isDarkMode,
+                    onChanged: (v) => ref.read(settingsProvider.notifier).setDarkMode(v),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
           // Anslutning (proxy/direkt)
           Card(
             child: Padding(

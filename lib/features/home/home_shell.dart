@@ -8,6 +8,7 @@ import '../chats/chat_providers.dart' show sessionsProvider;
 import '../chats/chat_repository.dart';
 import '../chat/chat_screen.dart';
 import '../start/widgets/floating_lines_background.dart';
+import '../start/widgets/floating_lines_light_background.dart';
 
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
@@ -377,36 +378,54 @@ class _LandingArea extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final l = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseTextColor = isDark ? Colors.white : Colors.black87;
+    final mutedTextColor = isDark ? Colors.white70 : Colors.black54;
+    final badgeBg = isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.08);
     const isWeb = kIsWeb;
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+    final lineCount = isWeb ? const [4, 6, 8] : const [8, 12, 16];
+    final lineDistance = isWeb ? const [10.0, 8.0, 6.0] : const [7.0, 5.0, 4.0];
+    final backgroundLayers = isDark
+        ? <Widget>[
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    cs.surface.withOpacity(0.65),
+                    cs.surface.withOpacity(0.85),
+                  ],
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: FloatingLinesBackground(
+                enabledWaves: const ['top', 'middle', 'bottom'],
+                // Färre linjer och långsammare animering på web för bättre prestanda
+                lineCount: lineCount,
+                lineDistance: lineDistance,
+                animationSpeed: isWeb ? 0.08 : 0.16,
+                opacity: isWeb ? 0.55 : 0.8,
+              ),
+            ),
+          ]
+        : <Widget>[
+            FloatingLinesLightBackground(
+              enabledWaves: const ['top', 'middle', 'bottom'],
+              lineCount: lineCount,
+              lineDistance: lineDistance,
+              animationSpeed: isWeb ? 0.08 : 0.16,
+              opacity: isWeb ? 0.55 : 0.8,
+            ),
+          ];
     return TickerMode(
       enabled: isCurrentRoute,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  cs.surface.withOpacity(0.65),
-                  cs.surface.withOpacity(0.85),
-                ],
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: FloatingLinesBackground(
-              enabledWaves: const ['top', 'middle', 'bottom'],
-              // Färre linjer och långsammare animering på web för bättre prestanda
-              lineCount: isWeb ? const [4, 6, 8] : const [8, 12, 16],
-              lineDistance:
-                  isWeb ? const [10.0, 8.0, 6.0] : const [7.0, 5.0, 4.0],
-              animationSpeed: isWeb ? 0.08 : 0.16,
-              opacity: isWeb ? 0.55 : 0.8,
-            ),
-          ),
+          ...backgroundLayers,
           Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 920),
@@ -431,14 +450,17 @@ class _LandingArea extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .displaySmall
-                              ?.copyWith(fontWeight: FontWeight.w700),
+                              ?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: baseTextColor,
+                              ),
                         ),
                         const SizedBox(width: 6),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.08),
+                            color: badgeBg,
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
@@ -449,6 +471,7 @@ class _LandingArea extends StatelessWidget {
                                 ?.copyWith(
                                   letterSpacing: 2,
                                   fontWeight: FontWeight.w600,
+                                  color: baseTextColor,
                                 ),
                           ),
                         ),
@@ -461,12 +484,13 @@ class _LandingArea extends StatelessWidget {
                       style: Theme.of(context)
                           .textTheme
                           .titleMedium
-                          ?.copyWith(color: Colors.white70),
+                          ?.copyWith(color: mutedTextColor),
                     ),
                     const SizedBox(height: 20),
                     _FeatureCards(
                       onTroubleshootingTap: onNewChat,
                       onMaintenanceTap: onService,
+                      isDark: isDark,
                     ),
                     const SizedBox(height: 28),
                   ],
@@ -484,10 +508,12 @@ class _FeatureCards extends StatefulWidget {
   const _FeatureCards({
     required this.onTroubleshootingTap,
     required this.onMaintenanceTap,
+    required this.isDark,
   });
 
   final VoidCallback onTroubleshootingTap;
   final VoidCallback onMaintenanceTap;
+  final bool isDark;
 
   @override
   State<_FeatureCards> createState() => _FeatureCardsState();
@@ -530,6 +556,9 @@ class _FeatureCardsState extends State<_FeatureCards> {
         final width = constraints.maxWidth;
         const spacing = 10.0;
         final isMobile = width < 720;
+        final textColor = widget.isDark ? Colors.white : Colors.black87;
+        final mutedTextColor = widget.isDark ? Colors.white70 : Colors.black54;
+        final borderBaseColor = widget.isDark ? Colors.white : Colors.black87;
         // Försök hålla 2 kolumner även på mobil; fall back till 1 först vid riktigt smal viewport
         final columns = viewportWidth >= 880
             ? 4
@@ -574,6 +603,9 @@ class _FeatureCardsState extends State<_FeatureCards> {
                       compactText: compactText,
                       expandedOverride: expandedOverride,
                       onTap: onTap,
+                      textColor: textColor,
+                      mutedTextColor: mutedTextColor,
+                      borderBaseColor: borderBaseColor,
                     ),
                   );
                 }),
@@ -591,12 +623,18 @@ class _HoverCard extends StatefulWidget {
     required this.compactText,
     this.expandedOverride,
     this.onTap,
+    required this.textColor,
+    required this.mutedTextColor,
+    required this.borderBaseColor,
   });
 
   final _CardData data;
   final bool compactText;
   final bool? expandedOverride;
   final VoidCallback? onTap;
+  final Color textColor;
+  final Color mutedTextColor;
+  final Color borderBaseColor;
 
   @override
   State<_HoverCard> createState() => _HoverCardState();
@@ -617,8 +655,9 @@ class _HoverCardState extends State<_HoverCard>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final expanded = widget.expandedOverride ?? _expanded;
-    final bgColor = Colors.white
-        .withOpacity(expanded ? 0.12 : 0.08); // subtle glow on hover
+    final baseColor = widget.borderBaseColor;
+    final bgColor = baseColor.withOpacity(expanded ? 0.12 : 0.08);
+    final borderColor = baseColor.withOpacity(expanded ? 0.28 : 0.16);
 
     return MouseRegion(
       onEnter: (e) {
@@ -651,9 +690,7 @@ class _HoverCardState extends State<_HoverCard>
             decoration: BoxDecoration(
               color: bgColor,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: Colors.white.withOpacity(expanded ? 0.28 : 0.16),
-              ),
+              border: Border.all(color: borderColor),
               boxShadow: expanded
                   ? [
                       BoxShadow(
@@ -679,7 +716,7 @@ class _HoverCardState extends State<_HoverCard>
                               : theme.textTheme.titleMedium)
                           ?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: widget.textColor,
                       ),
                     ),
                   ),
@@ -698,7 +735,7 @@ class _HoverCardState extends State<_HoverCard>
                           style: theme.textTheme.labelSmall?.copyWith(
                             letterSpacing: 1.6,
                             fontWeight: FontWeight.w800,
-                            color: Colors.white70,
+                            color: widget.mutedTextColor,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -708,7 +745,7 @@ class _HoverCardState extends State<_HoverCard>
                                   ? theme.textTheme.bodySmall
                                   : theme.textTheme.bodyMedium)
                               ?.copyWith(
-                            color: Colors.white70,
+                            color: widget.mutedTextColor,
                             height: 1.48,
                           ),
                         ),

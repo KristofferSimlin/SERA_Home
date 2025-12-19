@@ -35,7 +35,9 @@ class SeraApp extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     return MaterialApp(
       title: 'SERA',
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       debugShowCheckedModeBanner: false,
       locale: Locale(settings.localeCode),
       supportedLocales: AppLocalizations.supportedLocales,

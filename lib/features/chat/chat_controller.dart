@@ -120,6 +120,7 @@ class SettingsState {
   final String? directApiKey;
   final bool webLookupEnabled;
   final String localeCode;
+  final bool isDarkMode;
 
   const SettingsState({
     required this.proxyEnabled,
@@ -127,6 +128,7 @@ class SettingsState {
     this.directApiKey,
     this.webLookupEnabled = false,
     this.localeCode = 'sv',
+    this.isDarkMode = true,
   });
 
   SettingsState copyWith({
@@ -135,6 +137,7 @@ class SettingsState {
     String? directApiKey,
     bool? webLookupEnabled,
     String? localeCode,
+    bool? isDarkMode,
   }) {
     return SettingsState(
       proxyEnabled: proxyEnabled ?? this.proxyEnabled,
@@ -142,6 +145,7 @@ class SettingsState {
       directApiKey: directApiKey ?? this.directApiKey,
       webLookupEnabled: webLookupEnabled ?? this.webLookupEnabled,
       localeCode: localeCode ?? this.localeCode,
+      isDarkMode: isDarkMode ?? this.isDarkMode,
     );
   }
 }
@@ -155,6 +159,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
           directApiKey: null,
           webLookupEnabled: true,
           localeCode: 'sv',
+          isDarkMode: true,
         ));
 
   void setProxyEnabled(bool v) => state = state.copyWith(proxyEnabled: v);
@@ -162,6 +167,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   void setDirectKey(String v) => state = state.copyWith(directApiKey: v);
   void setWebLookup(bool v) => state = state.copyWith(webLookupEnabled: v);
   void setLocale(String code) => state = state.copyWith(localeCode: code);
+  void setDarkMode(bool enabled) => state = state.copyWith(isDarkMode: enabled);
 }
 
 final settingsProvider =
