@@ -464,7 +464,10 @@ class _LandingArea extends StatelessWidget {
                           ?.copyWith(color: Colors.white70),
                     ),
                     const SizedBox(height: 20),
-                    const _FeatureCards(),
+                    _FeatureCards(
+                      onTroubleshootingTap: onNewChat,
+                      onMaintenanceTap: onService,
+                    ),
                     const SizedBox(height: 28),
                   ],
                 ),
@@ -478,7 +481,13 @@ class _LandingArea extends StatelessWidget {
 }
 
 class _FeatureCards extends StatefulWidget {
-  const _FeatureCards();
+  const _FeatureCards({
+    required this.onTroubleshootingTap,
+    required this.onMaintenanceTap,
+  });
+
+  final VoidCallback onTroubleshootingTap;
+  final VoidCallback onMaintenanceTap;
 
   @override
   State<_FeatureCards> createState() => _FeatureCardsState();
@@ -496,11 +505,13 @@ class _FeatureCardsState extends State<_FeatureCards> {
         title: l.homeCardTroubleshootingTitle,
         badge: l.homeCardTroubleshootingBadge,
         description: l.homeCardTroubleshootingBody,
+        onTap: widget.onTroubleshootingTap,
       ),
       _CardData(
         title: l.homeCardMaintenanceTitle,
         badge: l.homeCardMaintenanceBadge,
         description: l.homeCardMaintenanceBody,
+        onTap: widget.onMaintenanceTap,
       ),
       _CardData(
         title: l.homeCardTrainingTitle,
@@ -536,21 +547,36 @@ class _FeatureCardsState extends State<_FeatureCards> {
             runSpacing: 16,
             children: [
               for (var i = 0; i < cards.length; i++)
-                SizedBox(
-                  width: itemWidth,
-                  child: _HoverCard(
-                    data: cards[i],
-                    compactText: compactText,
-                    expandedOverride: isMobile ? _mobileExpanded == i : null,
-                    onTap: isMobile
-                        ? () {
+                Builder(builder: (context) {
+                  final card = cards[i];
+                  final onTap = isMobile
+                      ? () {
+                          if (card.onTap != null) {
+                            card.onTap!();
+                          } else {
                             setState(() {
-                              _mobileExpanded = _mobileExpanded == i ? null : i;
+                              _mobileExpanded =
+                                  _mobileExpanded == i ? null : i;
                             });
                           }
-                        : null,
-                  ),
-                ),
+                        }
+                      : card.onTap;
+                  final expandedOverride = isMobile
+                      ? (card.onTap != null
+                          ? true // keep description visible since tap navigates
+                          : _mobileExpanded == i)
+                      : null;
+
+                  return SizedBox(
+                    width: itemWidth,
+                    child: _HoverCard(
+                      data: card,
+                      compactText: compactText,
+                      expandedOverride: expandedOverride,
+                      onTap: onTap,
+                    ),
+                  );
+                }),
             ],
           ),
         );
@@ -713,11 +739,13 @@ class _CardData {
     required this.title,
     required this.badge,
     required this.description,
+    this.onTap,
   });
 
   final String title;
   final String badge;
   final String description;
+  final VoidCallback? onTap;
 }
 
 class _MobileBottomBar extends StatelessWidget {
