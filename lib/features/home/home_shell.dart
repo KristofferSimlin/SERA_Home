@@ -580,21 +580,12 @@ class _FeatureCardsState extends State<_FeatureCards> {
                   final card = cards[i];
                   final onTap = isMobile
                       ? () {
-                          if (card.onTap != null) {
-                            card.onTap!();
-                          } else {
-                            setState(() {
-                              _mobileExpanded =
-                                  _mobileExpanded == i ? null : i;
-                            });
-                          }
+                          setState(() {
+                            _mobileExpanded = _mobileExpanded == i ? null : i;
+                          });
                         }
                       : card.onTap;
-                  final expandedOverride = isMobile
-                      ? (card.onTap != null
-                          ? true // keep description visible since tap navigates
-                          : _mobileExpanded == i)
-                      : null;
+                  final expandedOverride = isMobile ? _mobileExpanded == i : null;
 
                   return SizedBox(
                     width: itemWidth,
@@ -606,6 +597,8 @@ class _FeatureCardsState extends State<_FeatureCards> {
                       textColor: textColor,
                       mutedTextColor: mutedTextColor,
                       borderBaseColor: borderBaseColor,
+                      showActionButton: isMobile,
+                      action: card.onTap,
                     ),
                   );
                 }),
@@ -626,6 +619,8 @@ class _HoverCard extends StatefulWidget {
     required this.textColor,
     required this.mutedTextColor,
     required this.borderBaseColor,
+    required this.showActionButton,
+    this.action,
   });
 
   final _CardData data;
@@ -635,6 +630,8 @@ class _HoverCard extends StatefulWidget {
   final Color textColor;
   final Color mutedTextColor;
   final Color borderBaseColor;
+  final bool showActionButton;
+  final VoidCallback? action;
 
   @override
   State<_HoverCard> createState() => _HoverCardState();
@@ -749,6 +746,15 @@ class _HoverCardState extends State<_HoverCard>
                             height: 1.48,
                           ),
                         ),
+                        if (widget.showActionButton && widget.action != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: FilledButton.icon(
+                              onPressed: widget.action,
+                              icon: const Icon(Icons.arrow_forward_rounded),
+                              label: Text(widget.data.title),
+                            ),
+                          ),
                       ],
                     ),
                   ),
