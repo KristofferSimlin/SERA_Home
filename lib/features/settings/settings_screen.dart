@@ -4,7 +4,6 @@ import 'package:sera/l10n/app_localizations.dart';
 
 import '../chat/chat_controller.dart';
 
-
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -13,28 +12,9 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  late final TextEditingController _proxyCtrl;
-  late final TextEditingController _keyCtrl;
-
-  @override
-  void initState() {
-    super.initState();
-    final s = ref.read(settingsProvider);
-    _proxyCtrl = TextEditingController(text: s.proxyUrl ?? '');
-    _keyCtrl = TextEditingController(text: s.directApiKey ?? '');
-  }
-
-  @override
-  void dispose() {
-    _proxyCtrl.dispose();
-    _keyCtrl.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
-    final cs = Theme.of(context).colorScheme;
     final l = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -64,81 +44,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
 
-          // Anslutning (proxy/direkt)
+          // Språk
           Card(
             child: Padding(
               padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l.settingsConnection, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 8),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l.settingsProxyToggle),
-                    subtitle: Text(l.settingsProxySubtitle),
-                    value: settings.proxyEnabled,
-                    onChanged: (v) => ref.read(settingsProvider.notifier).setProxyEnabled(v),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _proxyCtrl,
-                    onChanged: (v) => ref.read(settingsProvider.notifier).setProxyUrl(v.trim()),
-                    decoration: InputDecoration(
-                      labelText: l.settingsProxyUrlLabel,
-                      hintText: l.settingsProxyUrlHint,
-                      helperText: l.settingsProxyUrlHelper,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _keyCtrl,
-                    onChanged: (v) => ref.read(settingsProvider.notifier).setDirectKey(v.trim()),
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: l.settingsDirectKeyLabel,
-                      hintText: l.settingsDirectKeyHint,
-                      helperText: l.settingsDirectKeyHelper,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: cs.surfaceContainerHigh.withOpacity(0.25),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      l.settingsProxyTip,
-                      style: const TextStyle(fontSize: 12.5),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Webbsök (beta)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l.settingsWebSearchTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 8),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l.settingsWebSearchToggle),
-                    subtitle: Text(l.settingsWebSearchSubtitle),
-                    value: settings.webLookupEnabled,
-                    onChanged: (v) => ref.read(settingsProvider.notifier).setWebLookup(v),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l.settingsWebSearchInfo,
-                    style: const TextStyle(fontSize: 12.5),
-                  ),
+                  const Text('Språk', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -162,6 +75,37 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
+                ],
+              ),
+            ),
+          ),
+
+          // Policys och villkor
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.privacy_tip_outlined),
+                    title: Text(l.profilePrivacy),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.pushNamed(context, '/privacy'),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.description_outlined),
+                    title: Text(l.termsTitle),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.pushNamed(context, '/terms'),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.subscriptions_outlined),
+                    title: Text(l.subscriptionTitle),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.pushNamed(context, '/subscription-terms'),
+                  ),
                 ],
               ),
             ),
