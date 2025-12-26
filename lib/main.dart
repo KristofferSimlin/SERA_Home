@@ -59,7 +59,25 @@ class SeraApp extends ConsumerWidget {
         '/subscription-terms': (_) => const SubscriptionTermsScreen(),
         '/business-login': (_) => const BusinessLoginScreen(),
         '/personal-pricing': (_) => const PersonalPricingScreen(),
-        '/work-order': (_) => const WorkOrderScreen(),
+        '/work-order': (ctx) {
+          final args = ModalRoute.of(ctx)?.settings.arguments;
+          String? prefill;
+          bool autoGenerate = false;
+          bool fromChat = false;
+          if (args is Map) {
+            final pf = args['prefill'];
+            if (pf is String && pf.trim().isNotEmpty) {
+              prefill = pf;
+            }
+            autoGenerate = args['autoGenerate'] == true;
+            fromChat = args['fromChat'] == true;
+          }
+          return WorkOrderScreen(
+            prefill: prefill,
+            autoGenerate: autoGenerate,
+            fromChat: fromChat,
+          );
+        },
         '/service': (_) => const ServiceScreen(),
         '/general-chat': (ctx) {
           final arg = ModalRoute.of(ctx)?.settings.arguments;

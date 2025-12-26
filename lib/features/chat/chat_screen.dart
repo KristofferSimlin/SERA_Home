@@ -1,6 +1,7 @@
 // lib/features/chat/chat_screen.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sera/l10n/app_localizations.dart';
 
@@ -22,6 +23,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _input = TextEditingController();
   final ScrollController _scrollCtrl = ScrollController();
+  bool _autoScrollActive = true;
 
   late final TextEditingController _brandCtrl;
   late final TextEditingController _modelCtrl;
@@ -47,6 +49,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _modelCtrl = TextEditingController(text: st.model ?? '');
     _yearCtrl  = TextEditingController(text: st.year ?? '');
     _lock = st.equipmentLocked;
+
+    _scrollCtrl.addListener(_handleUserScroll);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -97,6 +101,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         .showSnackBar(const SnackBar(content: Text('Utrustning rensad')));
   }
 
+  void _handleUserScroll() {
+    if (!_scrollCtrl.hasClients) return;
+    const threshold = 80;
+    final distanceFromBottom =
+        _scrollCtrl.position.maxScrollExtent - _scrollCtrl.offset;
+    final atBottom = distanceFromBottom <= threshold;
+    final isUserScrolling =
+        _scrollCtrl.position.userScrollDirection != ScrollDirection.idle;
+    if (isUserScrolling) {
+      _autoScrollActive = false;
+    } else if (atBottom) {
+      _autoScrollActive = true;
+    }
+  }
+
   Future<void> _promptRenameSession() async {
     final repo = ref.read(chatRepoProvider);
     final current = await repo.getSession(widget.sessionId);
@@ -138,8 +157,35 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Future<void> _send() async {
     final text = _input.text.trim();
     if (text.isEmpty) return;
+    // Ny fråga: återaktivera auto-scroll.
+    _autoScrollActive = true;
     _input.clear();
     await _ctrl().send(text);
+  }
+
+  String _buildWorkOrderPrefill(ChatState state) {
+    final buffer = StringBuffer();
+    buffer.writeln(
+        'Sammanfatta denna felsökningschatt till en rapport. Lista utförda tester/åtgärder som teknikern skrev och tester/åtgärder SERA rekommenderade, och sammanfatta resultatet.');
+    buffer.writeln('Transkript (kronologiskt):');
+    for (final m in state.messages) {
+      final role = m.role == ChatRole.user ? 'Tekniker' : 'SERA';
+      buffer.writeln('- $role: ${m.text.replaceAll('\n', ' ')}');
+    }
+    return buffer.toString();
+  }
+
+  void _openWorkOrderFromChat(ChatState state) {
+    final prefill = _buildWorkOrderPrefill(state);
+    Navigator.pushNamed(
+      context,
+      '/work-order',
+      arguments: {
+        'prefill': prefill,
+        'autoGenerate': true,
+        'fromChat': true,
+      },
+    );
   }
 
   @override
@@ -566,7 +612,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   label: Text(l.chatSafetyShow),
                 ),
               ),
-            ),
+          ),
 
           const SizedBox(height: 6),
 
@@ -617,6 +663,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ),
 
+          if (state.messages.isNotEmpty &&
+              state.messages.last.role == ChatRole.assistant)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.description_outlined),
+                label: const Text('Skapa rapport från chatten'),
+                onPressed: () => _openWorkOrderFromChat(state),
+              ),
+            ),
+
           SafeArea(
             top: false,
             child: Padding(
@@ -664,7 +721,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void _scrollToBottom({bool animated = true}) {
-    if (!_scrollCtrl.hasClients) return;
+    if (!_scrollCtrl.hasClients || !_autoScrollActive) return;
     final pos = _scrollCtrl.position.maxScrollExtent;
     if (animated) {
       _scrollCtrl.animateTo(

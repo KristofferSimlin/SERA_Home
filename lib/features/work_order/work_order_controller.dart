@@ -45,6 +45,10 @@ class WorkOrderController extends StateNotifier<WorkOrderState> {
     state = state.copyWith(description: value, error: null);
   }
 
+  void setResult(String value) {
+    state = state.copyWith(result: value, error: null);
+  }
+
   Future<void> generate() async {
     final input = state.description.trim();
     if (input.isEmpty || state.isLoading) return;

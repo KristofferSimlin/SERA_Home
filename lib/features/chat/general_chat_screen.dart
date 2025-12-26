@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sera/l10n/app_localizations.dart';
 
@@ -20,6 +21,7 @@ class GeneralChatScreen extends ConsumerStatefulWidget {
 class _GeneralChatScreenState extends ConsumerState<GeneralChatScreen> {
   final _input = TextEditingController();
   final ScrollController _scrollCtrl = ScrollController();
+  bool _autoScrollActive = true;
   bool _showSafetyBanner = true;
 
   ChatController _ctrl() =>
@@ -28,6 +30,7 @@ class _GeneralChatScreenState extends ConsumerState<GeneralChatScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollCtrl.addListener(_handleUserScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _ctrl().suppressEquipmentQuestion();
@@ -44,8 +47,39 @@ class _GeneralChatScreenState extends ConsumerState<GeneralChatScreen> {
   Future<void> _send() async {
     final text = _input.text.trim();
     if (text.isEmpty) return;
+    // Ny fråga: återaktivera auto-scroll.
+    _autoScrollActive = true;
     _input.clear();
     await _ctrl().send(text);
+  }
+
+  void _handleUserScroll() {
+    if (!_scrollCtrl.hasClients) return;
+    const threshold = 80;
+    final distanceFromBottom =
+        _scrollCtrl.position.maxScrollExtent - _scrollCtrl.offset;
+    final atBottom = distanceFromBottom <= threshold;
+    final isUserScrolling =
+        _scrollCtrl.position.userScrollDirection != ScrollDirection.idle;
+    if (isUserScrolling) {
+      _autoScrollActive = false;
+    } else if (atBottom) {
+      _autoScrollActive = true;
+    }
+  }
+
+  void _scrollToBottom({bool animated = true}) {
+    if (!_scrollCtrl.hasClients || !_autoScrollActive) return;
+    final target = _scrollCtrl.position.maxScrollExtent + 120;
+    if (animated) {
+      _scrollCtrl.animateTo(
+        target,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+      );
+    } else {
+      _scrollCtrl.jumpTo(target);
+    }
   }
 
   @override
@@ -66,11 +100,7 @@ class _GeneralChatScreenState extends ConsumerState<GeneralChatScreen> {
             nextMessages.last.text != prevMessages.last.text;
         if (lengthChanged || lastUpdated) {
           WidgetsBinding.instance.addPostFrameCallback(
-            (_) => _scrollCtrl.animateTo(
-              _scrollCtrl.position.maxScrollExtent + 120,
-              duration: const Duration(milliseconds: 280),
-              curve: Curves.easeOutCubic,
-            ),
+            (_) => _scrollToBottom(animated: lengthChanged),
           );
         }
       },

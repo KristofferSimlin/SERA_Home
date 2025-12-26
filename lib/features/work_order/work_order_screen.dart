@@ -7,12 +7,22 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:sera/l10n/app_localizations.dart';
+import 'package:flutter/widgets.dart';
 
 import '../chat/widgets/chat_backdrop.dart';
 import 'work_order_controller.dart';
 
 class WorkOrderScreen extends ConsumerStatefulWidget {
-  const WorkOrderScreen({super.key});
+  const WorkOrderScreen({
+    super.key,
+    this.prefill,
+    this.autoGenerate = false,
+    this.fromChat = false,
+  });
+
+  final String? prefill;
+  final bool autoGenerate;
+  final bool fromChat;
 
   @override
   ConsumerState<WorkOrderScreen> createState() => _WorkOrderScreenState();
@@ -20,13 +30,95 @@ class WorkOrderScreen extends ConsumerStatefulWidget {
 
 class _WorkOrderScreenState extends ConsumerState<WorkOrderScreen> {
   final _descCtrl = TextEditingController();
+  final _resultCtrl = TextEditingController();
   final _descFocus = FocusNode();
+  bool _prefillApplied = false;
+  bool _autoTriggered = false;
 
   @override
   void dispose() {
     _descCtrl.dispose();
+    _resultCtrl.dispose();
     _descFocus.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_prefillApplied && widget.prefill?.isNotEmpty == true) {
+        _prefillApplied = true;
+        _descCtrl.text = widget.prefill!.trim();
+        ref
+            .read(workOrderControllerProvider.notifier)
+            .updateDescription(_descCtrl.text);
+      }
+      if (widget.autoGenerate && !_autoTriggered) {
+        _autoTriggered = true;
+        _handleAutoGenerate();
+      }
+    });
+  }
+
+  bool _hasFinalFault(String text) {
+    final t = text.toLowerCase();
+    const keywords = [
+      'slutliga felet',
+      'slutligt fel',
+      'felet var',
+      'orsaken var',
+      'root cause',
+      'löste',
+      'bytte',
+      'ersatte',
+    ];
+    return keywords.any(t.contains);
+  }
+
+  Future<void> _handleAutoGenerate() async {
+    final notifier = ref.read(workOrderControllerProvider.notifier);
+    var current = _descCtrl.text;
+    if (widget.fromChat && !_hasFinalFault(current)) {
+      final l = AppLocalizations.of(context);
+      final input = await showDialog<String>(
+        context: context,
+        builder: (ctx) {
+          final ctrl = TextEditingController();
+          return AlertDialog(
+            title: const Text('Slutligt fel?'),
+            content: TextField(
+              controller: ctrl,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'Vad var grundorsaken/felet?',
+                hintText: 'Exempel: Trasig tryckgivare P123',
+              ),
+              onSubmitted: (v) => Navigator.of(ctx).pop(v),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Hoppa över'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(ctrl.text),
+                child: const Text('Lägg till'),
+              ),
+            ],
+          );
+        },
+      );
+      final trimmed = input?.trim();
+      if (trimmed != null && trimmed.isNotEmpty) {
+        current = '$current\n\nSlutligt fel: $trimmed';
+        _descCtrl.text = current;
+        _descCtrl.selection =
+            TextSelection.collapsed(offset: _descCtrl.text.length);
+        notifier.updateDescription(current);
+      }
+    }
+    notifier.generate();
   }
 
   Future<void> _copyResult(String text) async {
@@ -120,6 +212,11 @@ class _WorkOrderScreenState extends ConsumerState<WorkOrderScreen> {
     final state = ref.watch(workOrderControllerProvider);
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    if (state.result != null && state.result != _resultCtrl.text) {
+      _resultCtrl.text = state.result!;
+      _resultCtrl.selection =
+          TextSelection.collapsed(offset: _resultCtrl.text.length);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -225,6 +322,7 @@ class _WorkOrderScreenState extends ConsumerState<WorkOrderScreen> {
                                 ? null
                                 : () {
                                     _descCtrl.clear();
+                                    _resultCtrl.clear();
                                     ref
                                         .read(workOrderControllerProvider
                                             .notifier)
@@ -240,6 +338,22 @@ class _WorkOrderScreenState extends ConsumerState<WorkOrderScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
+                      if (state.result != null) ...[
+                        TextField(
+                          controller: _resultCtrl,
+                          minLines: 6,
+                          maxLines: 14,
+                          onChanged: (v) => ref
+                              .read(workOrderControllerProvider.notifier)
+                              .setResult(v),
+                          decoration: const InputDecoration(
+                            labelText: 'Redigera/komplettera rapport (Markdown)',
+                            helperText:
+                                'Justera texten innan du kopierar eller exporterar.',
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                      ],
                       AnimatedSwitcher(
                         duration: const Duration(milliseconds: 220),
                         child: state.result == null
