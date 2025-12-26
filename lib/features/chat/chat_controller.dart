@@ -45,6 +45,7 @@ class ChatState {
   final bool isSending;
   final bool hasSafetyRisk;
   final String? thinkingCode; // 'thinking' | 'gathering' | 'composing'
+  final Map<int, Duration> responseDurations; // key: message.time.millisecondsSinceEpoch
 
   // Meta
   final int? expertise; // 1/2/3
@@ -62,6 +63,7 @@ class ChatState {
     required this.isSending,
     required this.hasSafetyRisk,
     required this.thinkingCode,
+    required this.responseDurations,
     required this.expertise,
     required this.brand,
     required this.model,
@@ -76,6 +78,7 @@ class ChatState {
         isSending: false,
         hasSafetyRisk: false,
         thinkingCode: null,
+        responseDurations: const {},
         expertise: null,
         brand: null,
         model: null,
@@ -90,6 +93,7 @@ class ChatState {
     bool? hasSafetyRisk,
     String? thinkingCode,
     bool thinkingCodeSet = false,
+    Map<int, Duration>? responseDurations,
     int? expertise,
     String? brand,
     String? model,
@@ -103,6 +107,7 @@ class ChatState {
       isSending: isSending ?? this.isSending,
       hasSafetyRisk: hasSafetyRisk ?? this.hasSafetyRisk,
       thinkingCode: thinkingCodeSet ? thinkingCode : this.thinkingCode,
+      responseDurations: responseDurations ?? this.responseDurations,
       expertise: expertise ?? this.expertise,
       brand: brand ?? this.brand,
       model: model ?? this.model,
@@ -450,6 +455,11 @@ class ChatController extends StateNotifier<ChatState> {
       }
 
       await repo.appendMessages(sessionId, [assistant.toDto()]);
+      final duration = DateTime.now().difference(thinkingStarted);
+      final key = assistant.time.millisecondsSinceEpoch;
+      final durations = Map<int, Duration>.from(state.responseDurations)
+        ..[key] = duration;
+      state = state.copyWith(responseDurations: durations);
 
       // Döp titel efter första riktiga svaret (frivilligt)
       if (msgs.length <= 3) {

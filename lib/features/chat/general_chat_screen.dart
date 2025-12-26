@@ -225,9 +225,12 @@ class _GeneralChatScreenState extends ConsumerState<GeneralChatScreen> {
                     }
 
                     final m = state.messages[i];
+                    final duration =
+                        state.responseDurations[m.time.millisecondsSinceEpoch];
                     return ChatBubble(
                       isUser: m.role == ChatRole.user,
                       text: m.text,
+                      responseDuration: duration,
                       time: m.time,
                     );
                   },

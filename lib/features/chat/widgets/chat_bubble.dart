@@ -8,11 +8,13 @@ class ChatBubble extends StatefulWidget {
     required this.isUser,
     required this.text,
     this.time,
+    this.responseDuration,
   });
 
   final bool isUser;
   final String text;
   final DateTime? time;
+  final Duration? responseDuration;
 
   @override
   State<ChatBubble> createState() => _ChatBubbleState();
@@ -43,6 +45,9 @@ class _ChatBubbleState extends State<ChatBubble> {
 
     final ts =
         widget.time != null ? DateFormat('HH:mm').format(widget.time!) : null;
+    final durationText = widget.responseDuration != null
+        ? _formatDuration(widget.responseDuration!)
+        : null;
     final tableParts = _extractTableBlock(text);
     final segments = _parseSegments(text);
 
@@ -75,7 +80,7 @@ class _ChatBubbleState extends State<ChatBubble> {
               if (ts != null) ...[
                 const SizedBox(height: 6),
                 Text(
-                  ts,
+                  durationText != null ? '$ts • $durationText' : ts,
                   style: TextStyle(
                     color: fg.withOpacity(0.75),
                     fontSize: 11.5,
@@ -87,6 +92,16 @@ class _ChatBubbleState extends State<ChatBubble> {
         ),
       ),
     );
+  }
+
+  String _formatDuration(Duration d) {
+    final totalMs = d.inMilliseconds;
+    if (totalMs < 1000) return '${totalMs} ms';
+    final seconds = totalMs / 1000;
+    if (seconds < 60) return '${seconds.toStringAsFixed(1)} s';
+    final minutes = d.inMinutes;
+    final remSeconds = d.inSeconds.remainder(60);
+    return '${minutes}m ${remSeconds}s';
   }
 
   bool _looksLikeTable(String text) {

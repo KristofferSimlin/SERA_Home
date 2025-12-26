@@ -654,10 +654,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 }
 
                 final m = state.messages[i];
+                final duration = state.responseDurations[m.time.millisecondsSinceEpoch];
                 return ChatBubble(
                   isUser: m.role == ChatRole.user,
                   text: m.text,
                   time: m.time,
+                  responseDuration: duration,
                 );
               },
             ),
