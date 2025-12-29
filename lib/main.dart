@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 import 'theme/app_theme.dart';
 import 'features/home/home_shell.dart';
@@ -20,10 +21,18 @@ import 'package:sera/l10n/app_localizations.dart';
 import 'features/work_order/work_order_screen.dart';
 import 'features/service/service_screen.dart';
 import 'features/chat/general_chat_screen.dart';
+import 'features/start/success_screen.dart';
+import 'features/start/cancel_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+  final stripeKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'];
+  if (stripeKey != null && stripeKey.isNotEmpty) {
+    Stripe.publishableKey = stripeKey;
+    Stripe.merchantIdentifier = 'sera.chat';
+    await Stripe.instance.applySettings();
+  }
   runApp(const ProviderScope(child: SeraApp()));
 }
 
@@ -59,6 +68,8 @@ class SeraApp extends ConsumerWidget {
         '/subscription-terms': (_) => const SubscriptionTermsScreen(),
         '/business-login': (_) => const BusinessLoginScreen(),
         '/personal-pricing': (_) => const PersonalPricingScreen(),
+        '/success': (_) => const SuccessScreen(),
+        '/cancel': (_) => const CancelScreen(),
         '/work-order': (ctx) {
           final args = ModalRoute.of(ctx)?.settings.arguments;
           String? prefill;

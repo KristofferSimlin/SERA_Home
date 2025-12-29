@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sera/l10n/app_localizations.dart';
 
 import 'widgets/floating_lines_background.dart';
+import '../../services/stripe_service.dart';
 
 class BusinessLoginScreen extends StatefulWidget {
   const BusinessLoginScreen({super.key});
@@ -13,6 +14,7 @@ class BusinessLoginScreen extends StatefulWidget {
 class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
   final _userCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  bool _isPaying = false;
 
   @override
   void dispose() {
@@ -144,6 +146,14 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                     );
                                   },
                                 ),
+                                const SizedBox(height: 12),
+                                _GradientButton(
+                                  label: _isPaying
+                                      ? 'Öppnar kassa...'
+                                      : 'Öppna kassa',
+                                  onPressed:
+                                      _isPaying ? null : () => _openCheckout(),
+                                ),
                                 const SizedBox(height: 10),
                                 Text(
                                   l.businessLoginFooter,
@@ -169,6 +179,29 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _openCheckout() async {
+    setState(() => _isPaying = true);
+    try {
+      await StripeService.instance.presentPaymentSheet(
+        context: context,
+        email: _userCtrl.text.trim(),
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Betalning klar')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Kunde inte öppna kassa: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isPaying = false);
+      }
+    }
   }
 }
 
@@ -220,7 +253,7 @@ class _GradientButton extends StatelessWidget {
   const _GradientButton({required this.label, required this.onPressed});
 
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
