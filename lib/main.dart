@@ -26,7 +26,11 @@ import 'features/start/cancel_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (_) {
+    // Ignore missing .env in web/production; rely on runtime env or defaults.
+  }
   final stripeKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'];
   if (stripeKey != null && stripeKey.isNotEmpty) {
     Stripe.publishableKey = stripeKey;

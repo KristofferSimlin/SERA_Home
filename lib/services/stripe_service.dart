@@ -16,7 +16,7 @@ class StripeService {
   }) async {
     final backend = dotenv.env['STRIPE_BACKEND_URL'] ?? '';
     if (backend.isEmpty) {
-      throw 'STRIPE_BACKEND_URL saknas i .env (krävs för att hämta PaymentIntent).';
+      throw 'STRIPE_BACKEND_URL saknas (krävs för att hämta PaymentIntent).';
     }
     final uri = Uri.parse('$backend/payment-sheet');
 
@@ -71,7 +71,7 @@ class StripeService {
   }) async {
     final backend = dotenv.env['STRIPE_BACKEND_URL'] ?? '';
     if (backend.isEmpty) {
-      throw 'STRIPE_BACKEND_URL saknas i .env (krävs för att skapa Checkout Session).';
+      throw 'STRIPE_BACKEND_URL saknas (krävs för att skapa Checkout Session).';
     }
     final resolvedPrice = priceId ?? dotenv.env['STRIPE_PRICE_ID'];
     if (resolvedPrice == null || resolvedPrice.isEmpty) {
