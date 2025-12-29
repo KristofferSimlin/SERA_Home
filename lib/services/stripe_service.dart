@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class StripeService {
   StripeService._();
@@ -61,5 +62,52 @@ class StripeService {
     );
 
     await Stripe.instance.presentPaymentSheet();
+  }
+
+  Future<void> startCheckoutSession({
+    required BuildContext context,
+    String? email,
+    String? priceId,
+  }) async {
+    final backend = dotenv.env['STRIPE_BACKEND_URL'] ?? '';
+    if (backend.isEmpty) {
+      throw 'STRIPE_BACKEND_URL saknas i .env (krävs för att skapa Checkout Session).';
+    }
+    final resolvedPrice = priceId ?? dotenv.env['STRIPE_PRICE_ID'];
+    if (resolvedPrice == null || resolvedPrice.isEmpty) {
+      throw 'STRIPE_PRICE_ID saknas (ange i .env eller skicka in som argument).';
+    }
+    final successUrl =
+        dotenv.env['STRIPE_SUCCESS_URL'] ?? 'https://sera.chat/success';
+    final cancelUrl =
+        dotenv.env['STRIPE_CANCEL_URL'] ?? 'https://sera.chat/cancel';
+
+    final uri = Uri.parse('$backend/stripe');
+    final res = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'priceId': resolvedPrice,
+        'successUrl': successUrl,
+        'cancelUrl': cancelUrl,
+        if (email != null && email.isNotEmpty) 'email': email,
+      }),
+    );
+    if (res.statusCode >= 400) {
+      throw 'Stripe backend fel ${res.statusCode}: ${res.body}';
+    }
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    final url = (data['url'] ?? data['checkoutUrl'] ?? data['sessionUrl'])
+        as String?;
+    if (url == null || url.isEmpty) {
+      throw 'Stripe backend returnerade ingen checkout-url.';
+    }
+    final ok = await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!ok) {
+      throw 'Kunde inte öppna checkout-url: $url';
+    }
   }
 }

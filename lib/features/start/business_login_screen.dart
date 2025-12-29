@@ -184,7 +184,7 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
   Future<void> _openCheckout() async {
     setState(() => _isPaying = true);
     try {
-      await StripeService.instance.presentPaymentSheet(
+      await StripeService.instance.startCheckoutSession(
         context: context,
         email: _userCtrl.text.trim(),
       );
