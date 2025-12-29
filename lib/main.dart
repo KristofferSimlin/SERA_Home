@@ -33,9 +33,14 @@ Future<void> main() async {
   }
   final stripeKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'];
   if (stripeKey != null && stripeKey.isNotEmpty) {
-    Stripe.publishableKey = stripeKey;
-    Stripe.merchantIdentifier = 'sera.chat';
-    await Stripe.instance.applySettings();
+    try {
+      Stripe.publishableKey = stripeKey;
+      Stripe.merchantIdentifier = 'sera.chat';
+      await Stripe.instance.applySettings();
+    } catch (e) {
+      // På web kan Stripe saknas/inte laddas; svälj så appen startar ändå.
+      debugPrint('Stripe init misslyckades: $e');
+    }
   }
   runApp(const ProviderScope(child: SeraApp()));
 }
