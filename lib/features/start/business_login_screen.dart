@@ -15,6 +15,7 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
   final _userCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   bool _isPaying = false;
+  String _role = 'admin';
 
   @override
   void dispose() {
@@ -124,17 +125,29 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                       ),
                                 ),
                                 const SizedBox(height: 18),
-                                _AuthField(
-                                  controller: _userCtrl,
-                                  label: l.businessLoginUsername,
-                                  icon: Icons.person_outline,
+                                _RoleTabs(
+                                  value: _role,
+                                  onChanged: (v) => setState(() => _role = v),
                                 ),
-                                const SizedBox(height: 12),
-                                _AuthField(
-                                  controller: _passCtrl,
-                                  label: l.businessLoginPassword,
-                                  icon: Icons.lock_outline,
-                                  obscure: true,
+                                const SizedBox(height: 14),
+                                _RoleContainer(
+                                  role: _role,
+                                  child: Column(
+                                    children: [
+                                      _AuthField(
+                                        controller: _userCtrl,
+                                        label: l.businessLoginUsername,
+                                        icon: Icons.person_outline,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _AuthField(
+                                        controller: _passCtrl,
+                                        label: l.businessLoginPassword,
+                                        icon: Icons.lock_outline,
+                                        obscure: true,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 const SizedBox(height: 18),
                                 _GradientButton(
@@ -150,7 +163,7 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                 _GradientButton(
                                   label: _isPaying
                                       ? 'Öppnar kassa...'
-                                      : 'Öppna kassa',
+                                      : 'Skapa företagskonto',
                                   onPressed:
                                       _isPaying ? null : () => _openCheckout(),
                                 ),
@@ -202,6 +215,122 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
         setState(() => _isPaying = false);
       }
     }
+  }
+}
+
+class _RoleTabs extends StatelessWidget {
+  const _RoleTabs({required this.value, required this.onChanged});
+
+  final String value;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        _pill(context, label: 'Admin', v: 'admin', selected: value == 'admin'),
+        const SizedBox(width: 12),
+        _pill(context, label: 'User', v: 'user', selected: value == 'user'),
+      ],
+    );
+  }
+
+  Widget _pill(BuildContext context,
+      {required String label, required String v, required bool selected}) {
+    final cs = Theme.of(context).colorScheme;
+    final borderColor = selected
+        ? cs.primary.withOpacity(0.7)
+        : cs.onSurface.withOpacity(0.2);
+    return Expanded(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0E121A).withOpacity(0.9),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor, width: selected ? 1.3 : 1),
+          boxShadow: [
+            if (selected)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.22),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+          ],
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => onChanged(v),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Center(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: cs.onSurface,
+                    ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RoleContainer extends StatelessWidget {
+  const _RoleContainer({required this.role, required this.child});
+
+  final String role;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final borderColor = cs.primary.withOpacity(0.6);
+    final alignRight = role != 'admin';
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: borderColor, width: 1.2),
+          ),
+          padding: const EdgeInsets.fromLTRB(12, 18, 12, 12),
+          child: child,
+        ),
+        Positioned(
+          top: -10,
+          left: alignRight ? null : 16,
+          right: alignRight ? 16 : null,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: borderColor,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Text(
+              role == 'admin' ? 'Admin' : 'User',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: cs.onSurface,
+                  ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
