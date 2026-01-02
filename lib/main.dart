@@ -72,6 +72,7 @@ class SeraApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
+    final initialRoute = _resolveInitialRoute();
     return MaterialApp(
       title: 'SERA',
       theme: AppTheme.lightTheme,
@@ -145,7 +146,30 @@ class SeraApp extends ConsumerWidget {
         return null; // låt övriga routes hanteras av 'routes' ovan
       },
 
-      initialRoute: '/start',
+      initialRoute: initialRoute,
     );
+  }
+}
+
+String _resolveInitialRoute() {
+  const fallback = '/start';
+  final uri = Uri.base;
+  // Stöd både hash-strategi (#/route) och path-strategi (/route)
+  final path = uri.path;
+  final fragment = uri.fragment;
+  String candidate = '';
+  if (fragment.isNotEmpty && fragment.startsWith('/')) {
+    candidate = fragment.split('?').first;
+  } else if (path.isNotEmpty && path != '/') {
+    candidate = path.split('?').first;
+  }
+  switch (candidate) {
+    case '/activate':
+    case '/success':
+    case '/cancel':
+    case '/admin-login':
+      return candidate;
+    default:
+      return fallback;
   }
 }
