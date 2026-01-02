@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import '../features/chat/chat_controller.dart';
 
 const String _defaultProxyUrlHost = 'https://api.sera.chat/api/openai-proxy';
-const String _defaultProxyUrlWeb = '/api/openai-proxy';
+const String _defaultProxyUrlWeb = 'https://api.sera.chat/api/openai-proxy';
 
 const String _baseSystemPrompt =
     'Du är SERA – en säkerhetsmedveten felsökningsassistent för maskiner.'
