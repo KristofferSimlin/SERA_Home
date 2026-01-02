@@ -72,7 +72,6 @@ class SeraApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
-    final initialRoute = _resolveInitialRoute();
     return MaterialApp(
       title: 'SERA',
       theme: AppTheme.lightTheme,
@@ -146,30 +145,48 @@ class SeraApp extends ConsumerWidget {
         return null; // låt övriga routes hanteras av 'routes' ovan
       },
 
-      initialRoute: initialRoute,
+      initialRoute: '/start',
+      builder: (context, child) {
+        _handleDeepLink(context);
+        return child ?? const SizedBox.shrink();
+      },
     );
   }
 }
 
-String _resolveInitialRoute() {
-  const fallback = '/start';
+bool _deepLinkHandled = false;
+
+void _handleDeepLink(BuildContext context) {
+  if (_deepLinkHandled) return;
+  _deepLinkHandled = true;
   final uri = Uri.base;
-  // Stöd både hash-strategi (#/route) och path-strategi (/route)
-  final path = uri.path;
-  final fragment = uri.fragment;
-  String candidate = '';
-  if (fragment.isNotEmpty && fragment.startsWith('/')) {
-    candidate = fragment.split('?').first;
-  } else if (path.isNotEmpty && path != '/') {
-    candidate = path.split('?').first;
+  String? target;
+  String? fullFragment;
+
+  // Hash-strategi: fragment kan vara "/activate?token..."
+  if (uri.fragment.isNotEmpty) {
+    fullFragment = uri.fragment;
+    final fragPath = uri.fragment.split('?').first;
+    if (fragPath.startsWith('/')) {
+      target = fragPath;
+    }
   }
-  switch (candidate) {
+
+  // Path-strategi
+  if (target == null && uri.path.isNotEmpty && uri.path != '/') {
+    target = uri.path.split('?').first;
+  }
+
+  switch (target) {
     case '/activate':
     case '/success':
     case '/cancel':
     case '/admin-login':
-      return candidate;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed(target!);
+      });
+      break;
     default:
-      return fallback;
+      break;
   }
 }
