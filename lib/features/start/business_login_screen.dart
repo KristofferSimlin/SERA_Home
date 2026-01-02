@@ -168,6 +168,12 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                       _isPaying ? null : () => _openCheckout(),
                                 ),
                                 const SizedBox(height: 10),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pushNamed(context, '/admin-login'),
+                                  child: const Text('Logga in som admin'),
+                                ),
+                                const SizedBox(height: 4),
                                 Text(
                                   l.businessLoginFooter,
                                   textAlign: TextAlign.center,

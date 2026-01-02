@@ -23,6 +23,11 @@ import 'features/service/service_screen.dart';
 import 'features/chat/general_chat_screen.dart';
 import 'features/start/success_screen.dart';
 import 'features/start/cancel_screen.dart';
+import 'features/start/activate_screen.dart';
+import 'features/start/admin_login_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'features/start/success_screen.dart';
+import 'features/start/cancel_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +45,22 @@ Future<void> main() async {
     } catch (e) {
       // På web kan Stripe saknas/inte laddas; svälj så appen startar ändå.
       debugPrint('Stripe init misslyckades: $e');
+    }
+  }
+
+  final supabaseUrl = dotenv.env['SUPABASE_URL'];
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+  if (supabaseUrl != null &&
+      supabaseUrl.isNotEmpty &&
+      supabaseAnonKey != null &&
+      supabaseAnonKey.isNotEmpty) {
+    try {
+      await Supabase.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseAnonKey,
+      );
+    } catch (e) {
+      debugPrint('Supabase init misslyckades: $e');
     }
   }
   runApp(const ProviderScope(child: SeraApp()));
@@ -76,9 +97,11 @@ class SeraApp extends ConsumerWidget {
         '/terms': (_) => const TermsScreen(),
         '/subscription-terms': (_) => const SubscriptionTermsScreen(),
         '/business-login': (_) => const BusinessLoginScreen(),
+        '/admin-login': (_) => const AdminLoginScreen(),
         '/personal-pricing': (_) => const PersonalPricingScreen(),
         '/success': (_) => const SuccessScreen(),
         '/cancel': (_) => const CancelScreen(),
+        '/activate': (_) => const ActivateScreen(),
         '/work-order': (ctx) {
           final args = ModalRoute.of(ctx)?.settings.arguments;
           String? prefill;
