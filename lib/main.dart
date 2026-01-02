@@ -101,7 +101,16 @@ class SeraApp extends ConsumerWidget {
         '/personal-pricing': (_) => const PersonalPricingScreen(),
         '/success': (_) => const SuccessScreen(),
         '/cancel': (_) => const CancelScreen(),
-        '/activate': (_) => const ActivateScreen(),
+        '/activate': (ctx) {
+          final arg = ModalRoute.of(ctx)?.settings.arguments;
+          Uri? source;
+          if (arg is Uri) {
+            source = arg;
+          } else if (arg is String) {
+            source = Uri.tryParse(arg);
+          }
+          return ActivateScreen(sourceUri: source);
+        },
         '/work-order': (ctx) {
           final args = ModalRoute.of(ctx)?.settings.arguments;
           String? prefill;
@@ -183,7 +192,10 @@ void _handleDeepLink(BuildContext context) {
     case '/cancel':
     case '/admin-login':
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed(target!);
+        Navigator.of(context).pushReplacementNamed(
+          target!,
+          arguments: uri,
+        );
       });
       break;
     default:

@@ -5,7 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../services/supabase_client.dart';
 
 class ActivateScreen extends StatefulWidget {
-  const ActivateScreen({super.key});
+  const ActivateScreen({super.key, this.sourceUri});
+
+  final Uri? sourceUri;
 
   @override
   State<ActivateScreen> createState() => _ActivateScreenState();
@@ -33,7 +35,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
   }
 
   Future<void> _handleInvite() async {
-    final uri = Uri.base;
+    final uri = widget.sourceUri ?? Uri.base;
     final token =
         uri.queryParameters['token_hash'] ?? uri.queryParameters['token'];
     final type = uri.queryParameters['type'] ?? 'invite';
