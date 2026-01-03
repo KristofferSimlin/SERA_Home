@@ -6,6 +6,7 @@ import 'dart:html' as html;
 
 import '../../services/supabase_client.dart';
 import '../../utils/auth_params.dart';
+import 'widgets/floating_lines_background.dart';
 
 class ActivateScreen extends StatefulWidget {
   const ActivateScreen({super.key, this.sourceUri, this.initialParams});
@@ -282,20 +283,98 @@ class _ActivateScreenState extends State<ActivateScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Aktivera konto')),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: _buildBody(cs),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const FloatingLinesBackground(
+            enabledWaves: ['middle'],
+            lineCount: [7, 9],
+            lineDistance: [12.0, 9.0],
+            animationSpeed: 0.08,
+            opacity: 0.55,
+          ),
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF0B0D12), Color(0xFF0E141C)],
               ),
             ),
           ),
-        ),
+          SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 540),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          cs.primary.withOpacity(0.5),
+                          cs.secondary.withOpacity(0.4),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    padding: const EdgeInsets.all(2.2),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0E121A).withOpacity(0.92),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.all(22),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0xFF6EE7FF),
+                                  Color(0xFF8A6DFF),
+                                  Color(0xFF55F273),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: const Icon(Icons.lock_outline,
+                                size: 38, color: Colors.white),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Aktivera konto',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Ställ in ditt lösenord för att komma igång.',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                    color: cs.onSurface.withOpacity(0.75)),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildBody(cs),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -304,82 +383,107 @@ class _ActivateScreenState extends State<ActivateScreen> {
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (_error != null) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Aktivering misslyckades',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
-          Text(_error!, textAlign: TextAlign.center),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: () => _handleInvite(),
-            child: const Text('Försök igen med samma länk'),
-          ),
-          TextButton(
-            onPressed: () => launchUrl(Uri.parse('mailto:support@sera.chat')),
-            child: const Text('Kontakta support'),
-          )
-        ],
-      );
-    }
-
-    if (_needsPassword) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Välj lösenord',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            _email ?? '',
-            style: TextStyle(color: cs.onSurfaceVariant),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _passCtrl,
-            obscureText: true,
-            decoration: const InputDecoration(labelText: 'Lösenord'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _pass2Ctrl,
-            obscureText: true,
-            decoration: const InputDecoration(labelText: 'Bekräfta lösenord'),
-          ),
-          const SizedBox(height: 16),
-          if (_error != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(
-                _error!,
-                style: TextStyle(color: cs.error),
-              ),
-            ),
-          FilledButton(
-            onPressed: _setPassword,
-            child: const Text('Aktivera konto'),
-          ),
-        ],
-      );
-    }
-
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Icon(Icons.check_circle_outline, size: 48, color: Colors.green),
-        const SizedBox(height: 10),
-        const Text('Kontot är aktiverat!'),
+        if (_error != null) ...[
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: cs.error.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.error_outline, color: cs.error),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Aktivering misslyckades',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: cs.error),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(_error!,
+                          style: TextStyle(color: cs.onSurfaceVariant)),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 10,
+                        children: [
+                          TextButton(
+                            onPressed: () => _handleInvite(),
+                            child: const Text('Försök igen'),
+                          ),
+                          TextButton(
+                            onPressed: () =>
+                                launchUrl(Uri.parse('mailto:support@sera.chat')),
+                            child: const Text('Kontakta support'),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+        if (_needsPassword) ...[
+          _buildPasswordForm(cs),
+        ] else ...[
+          const Icon(Icons.check_circle_outline,
+              size: 48, color: Colors.green),
+          const SizedBox(height: 10),
+          const Text('Kontot är aktiverat!'),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: _goDashboard,
+            child: const Text('Fortsätt'),
+          ),
+        ]
+      ],
+    );
+  }
+
+  Widget _buildPasswordForm(ColorScheme cs) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 6),
+        Text(
+          'Välj lösenord',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          _email ?? '',
+          style: TextStyle(color: cs.onSurfaceVariant),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _passCtrl,
+          obscureText: true,
+          decoration: const InputDecoration(labelText: 'Lösenord'),
+        ),
         const SizedBox(height: 12),
+        TextField(
+          controller: _pass2Ctrl,
+          obscureText: true,
+          decoration: const InputDecoration(labelText: 'Bekräfta lösenord'),
+        ),
+        const SizedBox(height: 16),
         FilledButton(
-          onPressed: _goDashboard,
-          child: const Text('Fortsätt'),
+          onPressed: _setPassword,
+          child: const Text('Aktivera konto'),
         ),
       ],
     );
