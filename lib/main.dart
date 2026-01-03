@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'theme/app_theme.dart';
 import 'features/home/home_shell.dart';
@@ -30,6 +31,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) {
+    // Använd path-baserad routing så /activate fungerar utan hash-krockar.
+    setUrlStrategy(PathUrlStrategy());
+  }
   try {
     await dotenv.load(fileName: ".env");
   } catch (_) {

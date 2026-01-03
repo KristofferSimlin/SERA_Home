@@ -47,13 +47,18 @@ class _ActivateScreenState extends State<ActivateScreen> {
     final qp = Map<String, String>.from(uri.queryParameters);
     if (qp.isEmpty && uri.fragment.isNotEmpty) {
       try {
-        final frag = uri.fragment.startsWith('/')
+        // Hantera både "/activate?..." och "/activate#access_token=..."
+        String frag = uri.fragment.startsWith('/')
             ? uri.fragment.substring(1)
             : uri.fragment;
+        // Om det finns en extra hash (#) efter path, plocka ut den sista delen
+        if (frag.contains('#')) {
+          frag = frag.split('#').last;
+        }
         final fragPathAndQuery = frag.split('?');
         if (fragPathAndQuery.length > 1) {
           qp.addAll(Uri.splitQueryString(fragPathAndQuery.sublist(1).join('?')));
-        } else {
+        } else if (frag.contains('=')) {
           qp.addAll(Uri.splitQueryString(frag));
         }
       } catch (_) {}
