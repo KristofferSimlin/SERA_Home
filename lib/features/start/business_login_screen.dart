@@ -237,9 +237,9 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
         email: email,
         password: pass,
       );
-      final meta = res.user?.userMetadata ?? {};
+      // Roll ska komma från app_metadata (systemstyrt), inte user_metadata.
       final appMeta = res.user?.appMetadata ?? {};
-      final role = (meta['role'] ?? appMeta['role'])?.toString();
+      final role = appMeta['role']?.toString();
       if (role == null || role.isEmpty) {
         throw 'Roll saknas på kontot';
       }
