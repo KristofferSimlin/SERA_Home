@@ -45,7 +45,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
       return;
     }
     final qp = Map<String, String>.from(uri.queryParameters);
-    if (qp.isEmpty && uri.fragment.isNotEmpty) {
+    if (uri.fragment.isNotEmpty) {
       try {
         // Hantera både "/activate?..." och "/activate#access_token=..."
         String frag = uri.fragment.startsWith('/')
@@ -71,15 +71,18 @@ class _ActivateScreenState extends State<ActivateScreen> {
       });
       return;
     }
-    // Access/refresh tokens direkt i URL (vanligt efter verifiering)
+    // Access/refresh tokens direkt i fragment (vanligt efter verifiering)
     final access = qp['access_token'];
     final refresh = qp['refresh_token'];
     if (access != null && refresh != null) {
       try {
-        await supabase.auth.getSessionFromUrl(uri);
-        final user = supabase.auth.currentUser;
+        final resp = await supabase.auth.setSession(refresh);
+        if (resp.session == null) {
+          throw 'Session saknas';
+        }
+        final user = resp.session!.user;
         setState(() {
-          _email = user?.email;
+          _email = user.email;
           _loading = false;
           _needsPassword = true;
         });
