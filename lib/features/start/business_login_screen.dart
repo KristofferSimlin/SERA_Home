@@ -159,6 +159,12 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                   onPressed: _loggingIn ? null : _submitLogin,
                                 ),
                                 const SizedBox(height: 12),
+                                TextButton(
+                                  onPressed: () => Navigator.pushNamed(
+                                      context, '/reset-password'),
+                                  child: const Text('Glömt lösenord?'),
+                                ),
+                                const SizedBox(height: 6),
                                 _GradientButton(
                                   label: _isPaying
                                       ? 'Öppnar kassa...'

@@ -28,6 +28,7 @@ import 'features/start/cancel_screen.dart';
 import 'features/start/activate_screen.dart';
 import 'features/start/admin_login_screen.dart';
 import 'features/admin/admin_panel_screen.dart';
+import 'features/start/reset_password_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'utils/auth_params.dart';
@@ -114,6 +115,7 @@ class SeraApp extends ConsumerWidget {
         '/personal-pricing': (_) => const PersonalPricingScreen(),
         '/success': (_) => const SuccessScreen(),
         '/cancel': (_) => const CancelScreen(),
+        '/reset-password': (_) => const ResetPasswordScreen(),
         '/activate': (ctx) {
           final arg = ModalRoute.of(ctx)?.settings.arguments;
           Uri? source;

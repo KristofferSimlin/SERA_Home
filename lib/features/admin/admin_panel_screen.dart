@@ -19,6 +19,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   String? _error;
   int _seatsTotal = 0;
   int _seatsClaimed = 0;
+  List<dynamic> _users = [];
   final _inviteEmailCtrl = TextEditingController();
 
   @override
@@ -57,12 +58,38 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     }
     final total = user.appMetadata['seats_total'];
     final claimed = user.appMetadata['seats_claimed'];
-    setState(() {
-      _seatsTotal = total is int ? total : int.tryParse('$total') ?? 0;
-      _seatsClaimed = claimed is int ? claimed : int.tryParse('$claimed') ?? 0;
-      _loading = false;
-      _error = null;
-    });
+    // Hämta aktuella seats + users från backend
+    try {
+      final access = supabase.auth.currentSession?.accessToken;
+      final resp = await http.get(
+        Uri.parse('$_apiBase/admin-users'),
+        headers: {
+          'Authorization': 'Bearer $access',
+        },
+      );
+      if (resp.statusCode >= 200 && resp.statusCode < 300) {
+        final data = jsonDecode(resp.body) as Map<String, dynamic>;
+        setState(() {
+          _seatsTotal =
+              int.tryParse('${data['seats_total']}') ?? (total is int ? total : 0);
+          _seatsClaimed =
+              int.tryParse('${data['seats_claimed']}') ?? (claimed is int ? claimed : 0);
+          _users = (data['users'] as List<dynamic>? ?? []);
+          _loading = false;
+          _error = null;
+        });
+      } else {
+        throw 'Misslyckades att hämta admin users (${resp.statusCode})';
+      }
+    } catch (e) {
+      setState(() {
+        _seatsTotal = total is int ? total : int.tryParse('$total') ?? 0;
+        _seatsClaimed =
+            claimed is int ? claimed : int.tryParse('$claimed') ?? 0;
+        _error = 'Kunde inte hämta användare: $e';
+        _loading = false;
+      });
+    }
   }
 
   Future<void> _inviteUser() async {
@@ -110,6 +137,60 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       );
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _promptUpdateEmail(Map<String, dynamic> user) async {
+    final ctrl = TextEditingController(text: user['email']?.toString() ?? '');
+    final newEmail = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Byt e-post'),
+          content: TextField(
+            controller: ctrl,
+            decoration: const InputDecoration(labelText: 'Ny e-post'),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Avbryt')),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+              child: const Text('Spara'),
+            ),
+          ],
+        );
+      },
+    );
+    if (newEmail == null || newEmail.isEmpty) return;
+    setState(() => _loading = true);
+    try {
+      final access = supabase.auth.currentSession?.accessToken;
+      final resp = await http.post(
+        Uri.parse('$_apiBase/admin-users'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $access',
+        },
+        body: jsonEncode({
+          'action': 'updateEmail',
+          'userId': user['id'],
+          'email': newEmail,
+          'sendInvite': true,
+        }),
+      );
+      if (resp.statusCode >= 200 && resp.statusCode < 300) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('E-post uppdaterad')),
+        );
+        await _load();
+      } else {
+        throw 'Misslyckades (${resp.statusCode}): ${resp.body}';
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Kunde inte uppdatera e-post: $e')),
+      );
+      setState(() => _loading = false);
     }
   }
 
@@ -240,6 +321,39 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                     Text('Använda: $_seatsClaimed'),
                                     Text('Kvar: $remaining'),
                                     const SizedBox(height: 20),
+                                    Text(
+                                      'Användare',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(fontWeight: FontWeight.w700),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    if (_users.isEmpty)
+                                      const Text('Inga användare')
+                                    else
+                                      ListView.separated(
+                                        shrinkWrap: true,
+                                        physics: const NeverScrollableScrollPhysics(),
+                                        itemCount: _users.length,
+                                        separatorBuilder: (_, __) =>
+                                            const Divider(height: 1),
+                                        itemBuilder: (_, i) {
+                                          final u = _users[i] as Map<String, dynamic>;
+                                          return ListTile(
+                                            contentPadding: EdgeInsets.zero,
+                                            leading: const Icon(Icons.person_outline),
+                                            title: Text(u['email']?.toString() ?? ''),
+                                            subtitle: Text(
+                                                'Roll: ${u['role'] ?? ''}  •  Id: ${u['id'] ?? ''}'),
+                                            trailing: IconButton(
+                                              icon: const Icon(Icons.edit),
+                                              onPressed: () => _promptUpdateEmail(u),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    const SizedBox(height: 16),
                                     Text(
                                       'Invite user',
                                       style: Theme.of(context)
