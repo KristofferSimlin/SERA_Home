@@ -50,11 +50,6 @@ class _ActivateScreenState extends State<ActivateScreen> {
   }
 
   Future<void> _handleInvite() async {
-    // Rensa eventuell tidigare session för att undvika krock med fel användare.
-    try {
-      await supabase.auth.signOut();
-    } catch (_) {}
-
     if (kIsWeb) {
       _storedRefresh = html.window.localStorage['sera_refresh_token'];
     }
@@ -160,11 +155,11 @@ class _ActivateScreenState extends State<ActivateScreen> {
         });
         return;
       } catch (e) {
-        setState(() {
-          _loading = false;
-          _error = 'Kunde inte sätta session: $e';
-        });
-        return;
+        // Rensa ev. trasig refresh_token och fortsätt till token_hash-flödet.
+        if (kIsWeb) {
+          html.window.localStorage.remove('sera_refresh_token');
+        }
+        _storedRefresh = null;
       }
     }
 
@@ -209,7 +204,12 @@ class _ActivateScreenState extends State<ActivateScreen> {
             _persistRefreshFromSession();
             return true;
           }
-        } catch (_) {}
+        } catch (_) {
+          if (kIsWeb) {
+            html.window.localStorage.remove('sera_refresh_token');
+          }
+          _storedRefresh = null;
+        }
       }
       final token = _lastParams['token_hash'] ?? _lastParams['token'];
       if (token != null && token.isNotEmpty) {
