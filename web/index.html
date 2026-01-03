@@ -34,6 +34,21 @@
   <link rel="manifest" href="manifest.json">
   <!-- Stripe JS for web Payment/Checkout support -->
   <script src="https://js.stripe.com/v3"></script>
+  <!-- Capture auth fragment early so Flutter router doesn't drop it -->
+  <script>
+    (function() {
+      try {
+        var href = window.location.href || '';
+        var hash = window.location.hash || '';
+        if (hash && hash.indexOf('access_token=') !== -1) {
+          window.sessionStorage.setItem('sera_auth_fragment', hash);
+          window.sessionStorage.setItem('sera_auth_href', href);
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    })();
+  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

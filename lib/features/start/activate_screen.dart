@@ -75,6 +75,18 @@ class _ActivateScreenState extends State<ActivateScreen> {
       // fortsätt till manuell parsning nedan
     }
     var qp = parseAuthParams(uri);
+    if (qp.isEmpty && kIsWeb) {
+      final storedHref = html.window.sessionStorage['sera_auth_href'];
+      final storedFrag = html.window.sessionStorage['sera_auth_fragment'];
+      if ((storedHref != null && storedHref.isNotEmpty) ||
+          (storedFrag != null && storedFrag.isNotEmpty)) {
+        final storedUri = storedHref != null && storedHref.isNotEmpty
+            ? Uri.parse(storedHref)
+            : Uri.parse('${uri.toString()}$storedFrag');
+        qp = parseAuthParams(storedUri);
+        debugPrint('activate using sessionStorage params: $qp');
+      }
+    }
     if (qp.isEmpty && fallbackParams.isNotEmpty) {
       qp = Map<String, String>.from(fallbackParams);
       debugPrint('activate using initial params snapshot');
