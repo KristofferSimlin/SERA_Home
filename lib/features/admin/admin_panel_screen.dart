@@ -446,7 +446,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Container(
                                             width: 64,
@@ -482,17 +481,42 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                               ],
                                             ),
                                           ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Adminpanel',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleLarge
+                                                      ?.copyWith(fontWeight: FontWeight.w700),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                if (supabase.auth.currentUser != null) ...[
+                                                  Text(
+                                                    supabase.auth.currentUser!.email ?? '',
+                                                    style: TextStyle(color: cs.onSurfaceVariant),
+                                                  ),
+                                                  Text(
+                                                    'Roll: ${supabase.auth.currentUser!.appMetadata['role'] ?? ''}',
+                                                    style: TextStyle(color: cs.onSurfaceVariant),
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          ElevatedButton.icon(
+                                            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                                                context, '/', (r) => false),
+                                            icon: const Icon(Icons.home_outlined),
+                                            label: const Text('Hem'),
+                                          ),
                                         ],
                                       ),
                                       const SizedBox(height: 12),
-                                      Text(
-                                        'Adminpanel',
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge
-                                            ?.copyWith(fontWeight: FontWeight.w700),
-                                      ),
                                       const SizedBox(height: 16),
                                       Text(
                                         'Licenser',
@@ -505,56 +529,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                       Text('Totalt: $_seatsTotal'),
                                       Text('Använda: $_seatsClaimed'),
                                       Text('Kvar: $remaining'),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        'Ändra seats',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(fontWeight: FontWeight.w700),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: TextField(
-                                              controller: _seatsCtrl,
-                                              keyboardType: TextInputType.number,
-                                              decoration: const InputDecoration(
-                                                labelText: 'Önskat antal seats',
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          DropdownButton<String>(
-                                            value: _proration,
-                                            items: const [
-                                              DropdownMenuItem(
-                                                value: 'create_prorations',
-                                                child: Text('Proratera'),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'none',
-                                                child: Text('Ingen proration'),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'always_invoice',
-                                                child: Text('Fakturera nu'),
-                                              ),
-                                            ],
-                                            onChanged: (v) {
-                                              if (v != null) {
-                                                setState(() => _proration = v);
-                                              }
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 12),
-                                      ElevatedButton(
-                                        onPressed: _updateSeats,
-                                        child: const Text('Uppdatera seats'),
-                                      ),
                                       const SizedBox(height: 20),
                                       Text(
                                         'Användare',
@@ -644,6 +618,58 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                           ),
                                         ),
                                       ],
+                                      const SizedBox(height: 20),
+                                      Text(
+                                        'Lägg till / ta bort licenser',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(fontWeight: FontWeight.w700),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: TextField(
+                                              controller: _seatsCtrl,
+                                              keyboardType: TextInputType.number,
+                                              decoration: const InputDecoration(
+                                                labelText: 'Önskat antal licenser',
+                                                helperText:
+                                                    'Öka eller minska totalt antal licenser',
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          DropdownButton<String>(
+                                            value: _proration,
+                                            items: const [
+                                              DropdownMenuItem(
+                                                value: 'create_prorations',
+                                                child: Text('Proratera'),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 'none',
+                                                child: Text('Ingen proration'),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 'always_invoice',
+                                                child: Text('Fakturera nu'),
+                                              ),
+                                            ],
+                                            onChanged: (v) {
+                                              if (v != null) {
+                                                setState(() => _proration = v);
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      ElevatedButton(
+                                        onPressed: _updateSeats,
+                                        child: const Text('Uppdatera licenser'),
+                                      ),
                                       const SizedBox(height: 24),
                                       Divider(color: cs.onSurfaceVariant.withOpacity(0.3)),
                                       const SizedBox(height: 12),

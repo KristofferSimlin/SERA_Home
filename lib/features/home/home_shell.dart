@@ -68,6 +68,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     final showAppBar = !isWide || kIsWeb;
     final l = AppLocalizations.of(context)!;
     final sidebar = _Sidebar(
+      onLogout: () async {
+        await supabase.auth.signOut();
+        if (!mounted) return;
+        Navigator.pushNamedAndRemoveUntil(context, '/', (r) => false);
+      },
       currentUserEmail: supabase.auth.currentUser?.email,
       currentUserRole:
           supabase.auth.currentUser?.appMetadata['role']?.toString(),
@@ -168,6 +173,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
 class _Sidebar extends ConsumerWidget {
   const _Sidebar({
+    required this.onLogout,
     required this.currentUserEmail,
     required this.currentUserRole,
     required this.onNewChat,
@@ -176,6 +182,7 @@ class _Sidebar extends ConsumerWidget {
     required this.showNavLinks,
   });
 
+  final Future<void> Function() onLogout;
   final String? currentUserEmail;
   final String? currentUserRole;
   final VoidCallback onNewChat;
@@ -206,14 +213,23 @@ class _Sidebar extends ConsumerWidget {
             if ((currentUserRole ?? '').isNotEmpty)
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  'Roll: ${currentUserRole!}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                ),
+              child: Text(
+                'Roll: ${currentUserRole!}',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: onLogout,
+                icon: const Icon(Icons.logout, size: 18),
+                label: const Text('Logga ut'),
+              ),
+            ),
             const SizedBox(height: 8),
             const Divider(height: 1),
             const SizedBox(height: 8),
