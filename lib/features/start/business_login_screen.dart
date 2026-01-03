@@ -3,6 +3,7 @@ import 'package:sera/l10n/app_localizations.dart';
 
 import 'widgets/floating_lines_background.dart';
 import '../../services/stripe_service.dart';
+import '../../services/supabase_client.dart';
 
 class BusinessLoginScreen extends StatefulWidget {
   const BusinessLoginScreen({super.key});
@@ -15,6 +16,7 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
   final _userCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   bool _isPaying = false;
+  bool _loggingIn = false;
   String _role = 'admin';
 
   @override
@@ -152,12 +154,7 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                 const SizedBox(height: 18),
                                 _GradientButton(
                                   label: l.businessLoginSubmit,
-                                  onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(l.businessLoginButton)),
-                                    );
-                                  },
+                                  onPressed: _loggingIn ? null : _submitLogin,
                                 ),
                                 const SizedBox(height: 12),
                                 _GradientButton(
@@ -166,12 +163,6 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                       : 'Skapa företagskonto',
                                   onPressed:
                                       _isPaying ? null : () => _openCheckout(),
-                                ),
-                                const SizedBox(height: 10),
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.pushNamed(context, '/admin-login'),
-                                  child: const Text('Logga in som admin'),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -220,6 +211,51 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
       if (mounted) {
         setState(() => _isPaying = false);
       }
+    }
+  }
+
+  Future<void> _submitLogin() async {
+    final email = _userCtrl.text.trim();
+    final pass = _passCtrl.text.trim();
+    if (email.isEmpty || pass.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Fyll i användarnamn och lösenord')),
+      );
+      return;
+    }
+    if (!isSupabaseReady()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Inloggning är inte konfigurerad.')),
+      );
+      return;
+    }
+    setState(() => _loggingIn = true);
+    try {
+      final res = await supabase.auth.signInWithPassword(
+        email: email,
+        password: pass,
+      );
+      final meta = res.user?.userMetadata ?? {};
+      final appMeta = res.user?.appMetadata ?? {};
+      final role = (meta['role'] ?? appMeta['role'])?.toString();
+      if (role == null || role.isEmpty) {
+        throw 'Roll saknas på kontot';
+      }
+      if (role != _role) {
+        await supabase.auth.signOut();
+        throw 'Du har rollen "$role" men valde "${_role == 'admin' ? 'Admin' : 'User'}".';
+      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Inloggad som $role')),
+      );
+      Navigator.pushNamedAndRemoveUntil(context, '/start', (r) => false);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loggingIn = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Kunde inte logga in: $e')),
+      );
     }
   }
 }
