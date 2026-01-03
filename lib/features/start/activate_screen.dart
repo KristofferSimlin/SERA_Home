@@ -47,7 +47,12 @@ class _ActivateScreenState extends State<ActivateScreen> {
 
     // Försök direkt med Supabase-helper om hela redirect-URL:en innehåller tokens.
     try {
-      final res = await supabase.auth.getSessionFromUrl(uri);
+      final fallbackUri = uri.fragment.contains('access_token=')
+          ? Uri.parse(
+              '${uri.scheme}://${uri.host}${uri.path}?${uri.fragment}',
+            )
+          : uri;
+      final res = await supabase.auth.getSessionFromUrl(fallbackUri);
       if (res.session != null) {
         setState(() {
           _email = res.session!.user.email;
@@ -87,9 +92,8 @@ class _ActivateScreenState extends State<ActivateScreen> {
       return;
     }
     // Access/refresh tokens direkt i fragment (vanligt efter verifiering)
-    final access = qp['access_token'];
     final refresh = qp['refresh_token'];
-    if (access != null && refresh != null) {
+    if (refresh != null) {
       try {
         final resp = await supabase.auth.setSession(refresh);
         if (resp.session == null) {
