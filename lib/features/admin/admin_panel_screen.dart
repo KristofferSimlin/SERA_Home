@@ -20,7 +20,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   int _seatsTotal = 0;
   int _seatsClaimed = 0;
   List<dynamic> _users = [];
+  bool _busyDanger = false;
   final _inviteEmailCtrl = TextEditingController();
+  final _seatsCtrl = TextEditingController();
+  String _proration = 'create_prorations';
 
   @override
   void initState() {
@@ -31,6 +34,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   @override
   void dispose() {
     _inviteEmailCtrl.dispose();
+    _seatsCtrl.dispose();
     super.dispose();
   }
 
@@ -75,6 +79,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           _seatsClaimed =
               int.tryParse('${data['seats_claimed']}') ?? (claimed is int ? claimed : 0);
           _users = (data['users'] as List<dynamic>? ?? []);
+          _seatsCtrl.text = _seatsTotal.toString();
           _loading = false;
           _error = null;
         });
@@ -122,12 +127,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         }),
       );
       if (resp.statusCode >= 200 && resp.statusCode < 300) {
-        setState(() {
-          _seatsClaimed = (_seatsClaimed + 1).clamp(0, _seatsTotal);
-        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Inbjudan skickad')),
         );
+        await _load();
       } else {
         throw 'Misslyckades (${resp.statusCode}): ${resp.body}';
       }
@@ -189,6 +192,140 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Kunde inte uppdatera e-post: $e')),
+      );
+      setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _deleteUser(Map<String, dynamic> user) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Ta bort användare'),
+        content: Text(
+            'Vill du ta bort ${user['email'] ?? 'användaren'}? Detta kan inte ångras.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Avbryt')),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Ta bort'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    setState(() => _loading = true);
+    try {
+      final access = supabase.auth.currentSession?.accessToken;
+      final resp = await http.post(
+        Uri.parse('$_apiBase/admin-users'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $access',
+        },
+        body: jsonEncode({
+          'action': 'deleteUser',
+          'userId': user['id'],
+        }),
+      );
+      if (resp.statusCode >= 200 && resp.statusCode < 300) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Användare borttagen')),
+        );
+        await _load();
+      } else {
+        throw 'Misslyckades (${resp.statusCode}): ${resp.body}';
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Kunde inte ta bort: $e')),
+      );
+      setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _deleteAdmin() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Ta bort organisation'),
+        content: const Text(
+            'Detta tar bort alla seats, användare och försöker avsluta Stripe-prenumerationen. Är du säker?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Avbryt')),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Ta bort allt'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    setState(() => _busyDanger = true);
+    try {
+      final access = supabase.auth.currentSession?.accessToken;
+      final resp = await http.post(
+        Uri.parse('$_apiBase/admin-users'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $access',
+        },
+        body: jsonEncode({
+          'action': 'deleteAdmin',
+          'confirm': true,
+        }),
+      );
+      if (resp.statusCode >= 200 && resp.statusCode < 300) {
+        await supabase.auth.signOut();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Organisation raderad')),
+        );
+        Navigator.pushNamedAndRemoveUntil(context, '/start', (r) => false);
+      } else {
+        throw 'Misslyckades (${resp.statusCode}): ${resp.body}';
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Kunde inte radera: $e')),
+      );
+      setState(() => _busyDanger = false);
+    }
+  }
+
+  Future<void> _updateSeats() async {
+    final desired = int.tryParse(_seatsCtrl.text.trim());
+    if (desired == null || desired <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ange ett giltigt antal seats')),
+      );
+      return;
+    }
+    setState(() => _loading = true);
+    try {
+      final access = supabase.auth.currentSession?.accessToken;
+      final resp = await http.post(
+        Uri.parse('$_apiBase/subscription-seats'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $access',
+        },
+        body: jsonEncode({
+          'desiredSeats': desired,
+          'prorationBehavior': _proration,
+        }),
+      );
+      if (resp.statusCode >= 200 && resp.statusCode < 300) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Seats uppdaterade')),
+        );
+        await _load();
+      } else {
+        throw 'Misslyckades (${resp.statusCode}): ${resp.body}';
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Kunde inte uppdatera seats: $e')),
       );
       setState(() => _loading = false);
     }
@@ -320,6 +457,56 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                     Text('Totalt: $_seatsTotal'),
                                     Text('Använda: $_seatsClaimed'),
                                     Text('Kvar: $remaining'),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      'Ändra seats',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(fontWeight: FontWeight.w700),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextField(
+                                            controller: _seatsCtrl,
+                                            keyboardType: TextInputType.number,
+                                            decoration: const InputDecoration(
+                                              labelText: 'Önskat antal seats',
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        DropdownButton<String>(
+                                          value: _proration,
+                                          items: const [
+                                            DropdownMenuItem(
+                                              value: 'create_prorations',
+                                              child: Text('Proratera'),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: 'none',
+                                              child: Text('Ingen proration'),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: 'always_invoice',
+                                              child: Text('Fakturera nu'),
+                                            ),
+                                          ],
+                                          onChanged: (v) {
+                                            if (v != null) {
+                                              setState(() => _proration = v);
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    ElevatedButton(
+                                      onPressed: _updateSeats,
+                                      child: const Text('Uppdatera seats'),
+                                    ),
                                     const SizedBox(height: 20),
                                     Text(
                                       'Användare',
@@ -346,9 +533,20 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                             title: Text(u['email']?.toString() ?? ''),
                                             subtitle: Text(
                                                 'Roll: ${u['role'] ?? ''}  •  Id: ${u['id'] ?? ''}'),
-                                            trailing: IconButton(
-                                              icon: const Icon(Icons.edit),
-                                              onPressed: () => _promptUpdateEmail(u),
+                                            trailing: Wrap(
+                                              spacing: 8,
+                                              children: [
+                                                IconButton(
+                                                  icon: const Icon(Icons.edit),
+                                                  tooltip: 'Byt e-post',
+                                                  onPressed: () => _promptUpdateEmail(u),
+                                                ),
+                                                IconButton(
+                                                  icon: const Icon(Icons.delete_outline),
+                                                  tooltip: 'Ta bort användare',
+                                                  onPressed: () => _deleteUser(u),
+                                                ),
+                                              ],
                                             ),
                                           );
                                         },
@@ -372,6 +570,28 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                     ElevatedButton(
                                       onPressed: _inviteUser,
                                       child: const Text('Skicka inbjudan'),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    Divider(color: cs.onSurfaceVariant.withOpacity(0.3)),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      'Farliga åtgärder',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                              fontWeight: FontWeight.w700,
+                                              color: cs.error),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: cs.error,
+                                        foregroundColor: cs.onError,
+                                      ),
+                                      onPressed: _busyDanger ? null : _deleteAdmin,
+                                      icon: const Icon(Icons.warning_amber_outlined),
+                                      label: const Text('Ta bort organisation'),
                                     ),
                                   ],
                                 ),

@@ -160,8 +160,7 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                 ),
                                 const SizedBox(height: 12),
                                 TextButton(
-                                  onPressed: () => Navigator.pushNamed(
-                                      context, '/reset-password'),
+                                  onPressed: _resetPassword,
                                   child: const Text('Glömt lösenord?'),
                                 ),
                                 const SizedBox(height: 6),
@@ -263,6 +262,37 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
       setState(() => _loggingIn = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Kunde inte logga in: $e')),
+      );
+    }
+  }
+
+  Future<void> _resetPassword() async {
+    final email = _userCtrl.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ange e-post för återställning')),
+      );
+      return;
+    }
+    if (!isSupabaseReady()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Supabase ej konfigurerat')),
+      );
+      return;
+    }
+    try {
+      await supabase.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'https://www.sera.chat/activate',
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Återställningslänk skickad')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Kunde inte skicka länk: $e')),
       );
     }
   }
