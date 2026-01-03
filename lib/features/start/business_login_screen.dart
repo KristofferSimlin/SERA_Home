@@ -153,7 +153,9 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                 ),
                                 const SizedBox(height: 18),
                                 _GradientButton(
-                                  label: l.businessLoginSubmit,
+                                  label: _role == 'admin'
+                                      ? 'Logga in som admin'
+                                      : 'Logga in som user',
                                   onPressed: _loggingIn ? null : _submitLogin,
                                 ),
                                 const SizedBox(height: 12),
