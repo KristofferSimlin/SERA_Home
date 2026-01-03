@@ -168,7 +168,9 @@ List<Route<dynamic>> _initialRoutesFromUri() {
   // Hash-strategi (Flutter web default)
   if (uri.fragment.isNotEmpty) {
     final fragPath = uri.fragment.split('?').first;
-    if (fragPath.startsWith('/')) {
+    if (fragPath.contains('/activate')) {
+      target = '/activate';
+    } else if (fragPath.startsWith('/')) {
       target = fragPath;
     }
   }
@@ -176,6 +178,14 @@ List<Route<dynamic>> _initialRoutesFromUri() {
   // Path-strategi fallback
   if (target == null && uri.path.isNotEmpty && uri.path != '/') {
     target = uri.path.split('?').first;
+  }
+
+  // Om token/typ finns i URL:en, forcera activate även om fragmentet inte innehöll path.
+  if (target == null) {
+    final all = uri.toString();
+    if (all.contains('token_hash=') || all.contains('type=invite')) {
+      target = '/activate';
+    }
   }
 
   Route<dynamic> routeFor(String name) {
