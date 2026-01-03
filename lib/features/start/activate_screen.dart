@@ -41,6 +41,11 @@ class _ActivateScreenState extends State<ActivateScreen> {
   }
 
   Future<void> _handleInvite() async {
+    // Rensa eventuell tidigare session för att undvika krock med fel användare.
+    try {
+      await supabase.auth.signOut();
+    } catch (_) {}
+
     if (kIsWeb) {
       _storedRefresh = html.window.localStorage['sera_refresh_token'];
     }
@@ -58,16 +63,6 @@ class _ActivateScreenState extends State<ActivateScreen> {
       } catch (_) {
         // fortsätt; kanske ogiltig
       }
-    }
-
-    final existing = supabase.auth.currentSession;
-    if (existing != null) {
-      setState(() {
-        _email = existing.user.email;
-        _loading = false;
-        _needsPassword = true;
-      });
-      return;
     }
 
     final uri = widget.sourceUri ?? Uri.base;
