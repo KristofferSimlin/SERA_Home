@@ -154,35 +154,48 @@ class SeraApp extends ConsumerWidget {
       },
 
       initialRoute: '/start',
-      builder: (context, child) {
-        _handleDeepLink(context);
-        return child ?? const SizedBox.shrink();
+      onGenerateInitialRoutes: (initialRouteName) {
+        return _initialRoutesFromUri();
       },
     );
   }
 }
 
-bool _deepLinkHandled = false;
-
-void _handleDeepLink(BuildContext context) {
-  if (_deepLinkHandled) return;
-  _deepLinkHandled = true;
+List<Route<dynamic>> _initialRoutesFromUri() {
   final uri = Uri.base;
   String? target;
-  String? fullFragment;
 
-  // Hash-strategi: fragment kan vara "/activate?token..."
+  // Hash-strategi (Flutter web default)
   if (uri.fragment.isNotEmpty) {
-    fullFragment = uri.fragment;
     final fragPath = uri.fragment.split('?').first;
     if (fragPath.startsWith('/')) {
       target = fragPath;
     }
   }
 
-  // Path-strategi
+  // Path-strategi fallback
   if (target == null && uri.path.isNotEmpty && uri.path != '/') {
     target = uri.path.split('?').first;
+  }
+
+  Route<dynamic> routeFor(String name) {
+    return MaterialPageRoute(
+      builder: (_) {
+        switch (name) {
+          case '/activate':
+            return ActivateScreen(sourceUri: uri);
+          case '/success':
+            return const SuccessScreen();
+          case '/cancel':
+            return const CancelScreen();
+          case '/admin-login':
+            return const AdminLoginScreen();
+          default:
+            return const StartScreen();
+        }
+      },
+      settings: RouteSettings(name: name, arguments: uri),
+    );
   }
 
   switch (target) {
@@ -190,14 +203,8 @@ void _handleDeepLink(BuildContext context) {
     case '/success':
     case '/cancel':
     case '/admin-login':
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed(
-          target!,
-          arguments: uri,
-        );
-      });
-      break;
+      return [routeFor(target!)];
     default:
-      break;
+      return [routeFor('/start')];
   }
 }
