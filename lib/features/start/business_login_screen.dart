@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sera/l10n/app_localizations.dart';
+import 'dart:html' as html;
 
 import 'widgets/floating_lines_background.dart';
 import '../../services/stripe_service.dart';
@@ -18,6 +20,19 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
   bool _isPaying = false;
   bool _loggingIn = false;
   String _role = 'admin';
+  bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (kIsWeb) {
+      final savedEmail = html.window.localStorage['sera_login_email'];
+      if (savedEmail != null && savedEmail.isNotEmpty) {
+        _userCtrl.text = savedEmail;
+        _rememberMe = true;
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -148,6 +163,29 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                         icon: Icons.lock_outline,
                                         obscure: true,
                                       ),
+                                      const SizedBox(height: 8),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Checkbox(
+                                              value: _rememberMe,
+                                              onChanged: (v) {
+                                                setState(() {
+                                                  _rememberMe = v ?? false;
+                                                });
+                                                if (kIsWeb && !(v ?? false)) {
+                                                  html.window.localStorage
+                                                      .remove('sera_login_email');
+                                                }
+                                              },
+                                            ),
+                                            const SizedBox(width: 4),
+                                            const Text('Kom ihåg mig'),
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -256,6 +294,9 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Inloggad som $role')),
       );
+      if (kIsWeb && _rememberMe) {
+        html.window.localStorage['sera_login_email'] = email;
+      }
       Navigator.pushNamedAndRemoveUntil(context, '/', (r) => false);
     } catch (e) {
       if (!mounted) return;

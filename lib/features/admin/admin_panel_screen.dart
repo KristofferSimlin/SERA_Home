@@ -579,8 +579,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                               contentPadding: EdgeInsets.zero,
                                               leading: const Icon(Icons.person_outline),
                                               title: Text(u['email']?.toString() ?? ''),
-                                              subtitle: Text(
-                                                  'Roll: ${u['role'] ?? ''}  •  Id: ${u['id'] ?? ''}'),
+                                            subtitle:
+                                                Text('Roll: ${u['role'] ?? ''}'),
                                               trailing: Wrap(
                                                 spacing: 8,
                                                 children: [
@@ -661,12 +661,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                         DropdownButton<String>(
                                           value: _selectedUserIdForRemoval,
                                           hint: const Text('Välj användare att ta bort'),
-                                          items: _users
-                                              .map((u) => DropdownMenuItem<String>(
-                                                    value: u['id']?.toString(),
-                                                    child: Text(u['email']?.toString() ?? u['id']?.toString() ?? ''),
-                                                  ))
-                                              .toList(),
+                                        items: _users
+                                            .map((u) => DropdownMenuItem<String>(
+                                                  value: u['id']?.toString(),
+                                                  child: Text(u['email']?.toString() ?? 'Okänd e-post'),
+                                                ))
+                                            .toList(),
                                           onChanged: (v) {
                                             setState(() => _selectedUserIdForRemoval = v);
                                           },
