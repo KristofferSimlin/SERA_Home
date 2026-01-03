@@ -29,6 +29,13 @@ import 'features/start/activate_screen.dart';
 import 'features/start/admin_login_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'utils/auth_params.dart';
+
+// Ta en ögonblicksbild av URL:en innan Flutter hinner skriva över fragmentet.
+final Uri initialUriBeforeFlutter = Uri.base;
+final Map<String, String> initialAuthParams =
+    parseAuthParams(initialUriBeforeFlutter);
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
@@ -167,7 +174,7 @@ class SeraApp extends ConsumerWidget {
 }
 
 List<Route<dynamic>> _initialRoutesFromUri() {
-  final uri = Uri.base;
+  final uri = initialUriBeforeFlutter;
   String? target;
 
   // Hash-strategi (Flutter web default)
@@ -201,7 +208,10 @@ List<Route<dynamic>> _initialRoutesFromUri() {
       builder: (_) {
         switch (name) {
           case '/activate':
-            return ActivateScreen(sourceUri: uri);
+            return ActivateScreen(
+              sourceUri: initialUriBeforeFlutter,
+              initialParams: initialAuthParams,
+            );
           case '/success':
             return const SuccessScreen();
           case '/cancel':

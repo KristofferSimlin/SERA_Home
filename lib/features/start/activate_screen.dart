@@ -5,11 +5,13 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:html' as html;
 
 import '../../services/supabase_client.dart';
+import '../../utils/auth_params.dart';
 
 class ActivateScreen extends StatefulWidget {
-  const ActivateScreen({super.key, this.sourceUri});
+  const ActivateScreen({super.key, this.sourceUri, this.initialParams});
 
   final Uri? sourceUri;
+  final Map<String, String>? initialParams;
 
   @override
   State<ActivateScreen> createState() => _ActivateScreenState();
@@ -38,6 +40,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
 
   Future<void> _handleInvite() async {
     final uri = widget.sourceUri ?? Uri.base;
+    final fallbackParams = widget.initialParams ?? const {};
     debugPrint('activate uri: $uri');
     if (kIsWeb) {
       debugPrint('activate href: ${html.window.location.href}');
@@ -56,8 +59,8 @@ class _ActivateScreenState extends State<ActivateScreen> {
     try {
       final fallbackUri = uri.fragment.contains('access_token=')
           ? Uri.parse(
-              '${uri.scheme}://${uri.host}${uri.path}?${uri.fragment}',
-            )
+            '${uri.scheme}://${uri.host}${uri.path}?${uri.fragment}',
+          )
           : uri;
       final res = await supabase.auth.getSessionFromUrl(fallbackUri);
       if (res.session != null) {
@@ -71,24 +74,10 @@ class _ActivateScreenState extends State<ActivateScreen> {
     } catch (_) {
       // fortsätt till manuell parsning nedan
     }
-    final qp = Map<String, String>.from(uri.queryParameters);
-    if (uri.fragment.isNotEmpty) {
-      try {
-        // Hantera både "/activate?..." och "/activate#access_token=..."
-        String frag = uri.fragment.startsWith('/')
-            ? uri.fragment.substring(1)
-            : uri.fragment;
-        // Om det finns en extra hash (#) efter path, plocka ut den sista delen
-        if (frag.contains('#')) {
-          frag = frag.split('#').last;
-        }
-        final fragPathAndQuery = frag.split('?');
-        if (fragPathAndQuery.length > 1) {
-          qp.addAll(Uri.splitQueryString(fragPathAndQuery.sublist(1).join('?')));
-        } else if (frag.contains('=')) {
-          qp.addAll(Uri.splitQueryString(frag));
-        }
-      } catch (_) {}
+    var qp = parseAuthParams(uri);
+    if (qp.isEmpty && fallbackParams.isNotEmpty) {
+      qp = Map<String, String>.from(fallbackParams);
+      debugPrint('activate using initial params snapshot');
     }
     debugPrint('activate parsed params: $qp');
     final error = qp['error'];
