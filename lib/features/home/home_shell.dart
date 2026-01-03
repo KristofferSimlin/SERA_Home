@@ -9,6 +9,7 @@ import '../chats/chat_repository.dart';
 import '../chat/chat_screen.dart';
 import '../start/widgets/floating_lines_background.dart';
 import '../start/widgets/floating_lines_light_background.dart';
+import '../../services/supabase_client.dart';
 
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
@@ -106,6 +107,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                   onPressed: () => Navigator.pushNamed(context, '/profile'),
                   icon: const Icon(Icons.person),
                 ),
+                if (supabase.auth.currentUser?.appMetadata['role'] == 'admin')
+                  IconButton(
+                    tooltip: 'Adminpanel',
+                    onPressed: () => Navigator.pushNamed(context, '/admin'),
+                    icon: const Icon(Icons.admin_panel_settings),
+                  ),
                 IconButton(
                   tooltip: l.homeNewChat,
                   onPressed: () {

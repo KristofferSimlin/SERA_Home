@@ -27,6 +27,7 @@ import 'features/start/success_screen.dart';
 import 'features/start/cancel_screen.dart';
 import 'features/start/activate_screen.dart';
 import 'features/start/admin_login_screen.dart';
+import 'features/admin/admin_panel_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'utils/auth_params.dart';
@@ -109,6 +110,7 @@ class SeraApp extends ConsumerWidget {
         '/subscription-terms': (_) => const SubscriptionTermsScreen(),
         '/business-login': (_) => const BusinessLoginScreen(),
         '/admin-login': (_) => const AdminLoginScreen(),
+        '/admin': (_) => const AdminPanelScreen(),
         '/personal-pricing': (_) => const PersonalPricingScreen(),
         '/success': (_) => const SuccessScreen(),
         '/cancel': (_) => const CancelScreen(),

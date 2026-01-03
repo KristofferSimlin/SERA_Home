@@ -251,7 +251,7 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Inloggad som $role')),
       );
-      Navigator.pushNamedAndRemoveUntil(context, '/start', (r) => false);
+      Navigator.pushNamedAndRemoveUntil(context, '/', (r) => false);
     } catch (e) {
       if (!mounted) return;
       setState(() => _loggingIn = false);
