@@ -10,6 +10,7 @@ import '../chat/chat_screen.dart';
 import '../start/widgets/floating_lines_background.dart';
 import '../start/widgets/floating_lines_light_background.dart';
 import '../../services/supabase_client.dart';
+import '../../utils/auth_params.dart';
 
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
@@ -67,6 +68,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     final showAppBar = !isWide || kIsWeb;
     final l = AppLocalizations.of(context)!;
     final sidebar = _Sidebar(
+      currentUserEmail: supabase.auth.currentUser?.email,
+      currentUserRole:
+          supabase.auth.currentUser?.appMetadata['role']?.toString(),
       onNewChat: () {
         _newChat();
       },
@@ -164,12 +168,16 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
 class _Sidebar extends ConsumerWidget {
   const _Sidebar({
+    required this.currentUserEmail,
+    required this.currentUserRole,
     required this.onNewChat,
     required this.onOpenChat,
     required this.searchCtrl,
     required this.showNavLinks,
   });
 
+  final String? currentUserEmail;
+  final String? currentUserRole;
   final VoidCallback onNewChat;
   final void Function(String id) onOpenChat;
   final TextEditingController searchCtrl;
@@ -184,6 +192,32 @@ class _Sidebar extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
+          if (currentUserEmail != null) ...[
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                currentUserEmail!,
+                style: Theme.of(context)
+                    .textTheme
+                    .labelSmall
+                    ?.copyWith(color: Theme.of(context).colorScheme.primary),
+              ),
+            ),
+            if ((currentUserRole ?? '').isNotEmpty)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Roll: ${currentUserRole!}',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+              ),
+            const SizedBox(height: 8),
+            const Divider(height: 1),
+            const SizedBox(height: 8),
+          ],
           if (showNavLinks) ...[
             Row(
               children: [
