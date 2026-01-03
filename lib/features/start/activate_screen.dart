@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -36,6 +37,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
 
   Future<void> _handleInvite() async {
     final uri = widget.sourceUri ?? Uri.base;
+    debugPrint('activate uri: $uri');
     if (!isSupabaseReady()) {
       setState(() {
         _loading = false;
@@ -83,6 +85,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
         }
       } catch (_) {}
     }
+    debugPrint('activate parsed params: $qp');
     final error = qp['error'];
     if (error != null && error.isNotEmpty) {
       setState(() {
