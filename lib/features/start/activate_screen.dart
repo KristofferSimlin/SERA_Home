@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:html' as html;
 
 import '../../services/supabase_client.dart';
 
@@ -38,6 +39,10 @@ class _ActivateScreenState extends State<ActivateScreen> {
   Future<void> _handleInvite() async {
     final uri = widget.sourceUri ?? Uri.base;
     debugPrint('activate uri: $uri');
+    if (kIsWeb) {
+      debugPrint('activate href: ${html.window.location.href}');
+      debugPrint('activate hash: ${html.window.location.hash}');
+    }
     if (!isSupabaseReady()) {
       setState(() {
         _loading = false;
