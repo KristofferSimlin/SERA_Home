@@ -40,6 +40,15 @@ class _ActivateScreenState extends State<ActivateScreen> {
     super.dispose();
   }
 
+  void _persistRefreshFromSession() {
+    if (!kIsWeb) return;
+    final token = supabase.auth.currentSession?.refreshToken;
+    if (token != null && token.isNotEmpty) {
+      html.window.localStorage['sera_refresh_token'] = token;
+      _storedRefresh = token;
+    }
+  }
+
   Future<void> _handleInvite() async {
     // Rensa eventuell tidigare session för att undvika krock med fel användare.
     try {
@@ -53,6 +62,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
       try {
         final resp = await supabase.auth.setSession(_storedRefresh!);
         if (resp.session != null) {
+          _persistRefreshFromSession();
           setState(() {
             _email = resp.session!.user.email;
             _loading = false;
@@ -90,6 +100,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
           : uri;
       final res = await supabase.auth.getSessionFromUrl(fallbackUri);
       if (res.session != null) {
+        _persistRefreshFromSession();
         setState(() {
           _email = res.session!.user.email;
           _loading = false;
@@ -140,6 +151,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
         if (resp.session == null) {
           throw 'Session saknas';
         }
+        _persistRefreshFromSession();
         final user = resp.session!.user;
         setState(() {
           _email = user.email;
@@ -168,6 +180,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
     }
     try {
       await supabase.auth.exchangeCodeForSession(token);
+      _persistRefreshFromSession();
       final user = supabase.auth.currentUser;
       setState(() {
         _email = user?.email;
@@ -184,19 +197,28 @@ class _ActivateScreenState extends State<ActivateScreen> {
 
   Future<void> _setPassword() async {
     Future<bool> _ensureSession() async {
-      if (supabase.auth.currentSession != null) return true;
+      if (supabase.auth.currentSession != null) {
+        _persistRefreshFromSession();
+        return true;
+      }
       final refresh = _lastParams['refresh_token'] ?? _storedRefresh;
       if (refresh != null && refresh.isNotEmpty) {
         try {
           final resp = await supabase.auth.setSession(refresh);
-          if (resp.session != null) return true;
+          if (resp.session != null) {
+            _persistRefreshFromSession();
+            return true;
+          }
         } catch (_) {}
       }
       final token = _lastParams['token_hash'] ?? _lastParams['token'];
       if (token != null && token.isNotEmpty) {
         try {
           await supabase.auth.exchangeCodeForSession(token);
-          if (supabase.auth.currentSession != null) return true;
+          if (supabase.auth.currentSession != null) {
+            _persistRefreshFromSession();
+            return true;
+          }
         } catch (_) {}
       }
       return false;
@@ -204,6 +226,9 @@ class _ActivateScreenState extends State<ActivateScreen> {
 
     final p1 = _passCtrl.text.trim();
     final p2 = _pass2Ctrl.text.trim();
+    setState(() {
+      _error = null;
+    });
     if (p1.isEmpty || p1.length < 8) {
       setState(() {
         _error = 'Lösenordet måste vara minst 8 tecken.';
