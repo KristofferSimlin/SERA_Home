@@ -183,7 +183,10 @@ List<Route<dynamic>> _initialRoutesFromUri() {
   // Om token/typ finns i URL:en, forcera activate även om fragmentet inte innehöll path.
   if (target == null) {
     final all = uri.toString();
-    if (all.contains('token_hash=') || all.contains('type=invite')) {
+    if (all.contains('token_hash=') ||
+        all.contains('type=invite') ||
+        all.contains('access_token=') ||
+        all.contains('refresh_token=')) {
       target = '/activate';
     }
   }
