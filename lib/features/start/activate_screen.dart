@@ -22,6 +22,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
   bool _needsPassword = false;
   String? _email;
   String? _error;
+  Map<String, String> _lastParams = {};
   final _passCtrl = TextEditingController();
   final _pass2Ctrl = TextEditingController();
 
@@ -102,6 +103,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
       debugPrint('activate using initial params snapshot');
     }
     debugPrint('activate parsed params: $qp');
+    _lastParams = qp;
     final error = qp['error'];
     if (error != null && error.isNotEmpty) {
       setState(() {
@@ -161,6 +163,25 @@ class _ActivateScreenState extends State<ActivateScreen> {
   }
 
   Future<void> _setPassword() async {
+    Future<bool> _ensureSession() async {
+      if (supabase.auth.currentSession != null) return true;
+      final refresh = _lastParams['refresh_token'];
+      if (refresh != null && refresh.isNotEmpty) {
+        try {
+          final resp = await supabase.auth.setSession(refresh);
+          if (resp.session != null) return true;
+        } catch (_) {}
+      }
+      final token = _lastParams['token_hash'] ?? _lastParams['token'];
+      if (token != null && token.isNotEmpty) {
+        try {
+          await supabase.auth.exchangeCodeForSession(token);
+          if (supabase.auth.currentSession != null) return true;
+        } catch (_) {}
+      }
+      return false;
+    }
+
     final p1 = _passCtrl.text.trim();
     final p2 = _pass2Ctrl.text.trim();
     if (p1.isEmpty || p1.length < 8) {
@@ -168,11 +189,24 @@ class _ActivateScreenState extends State<ActivateScreen> {
         _error = 'Lösenordet måste vara minst 8 tecken.';
         _loading = false;
       });
+      _passCtrl.clear();
+      _pass2Ctrl.clear();
       return;
     }
     if (p1 != p2) {
       setState(() {
         _error = 'Lösenorden matchar inte.';
+        _loading = false;
+      });
+      _passCtrl.clear();
+      _pass2Ctrl.clear();
+      return;
+    }
+    final hasSession = await _ensureSession();
+    if (!hasSession) {
+      setState(() {
+        _error =
+            'Session saknas eller har löpt ut. Öppna aktiveringslänken igen för att fortsätta.';
         _loading = false;
       });
       return;
