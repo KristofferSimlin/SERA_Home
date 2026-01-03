@@ -9,3 +9,12 @@ SupabaseClient get supabase {
     rethrow;
   }
 }
+
+bool isSupabaseReady() {
+  try {
+    Supabase.instance.client;
+    return true;
+  } catch (_) {
+    return false;
+  }
+}

@@ -1,4 +1,5 @@
 // lib/main.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -26,8 +27,6 @@ import 'features/start/cancel_screen.dart';
 import 'features/start/activate_screen.dart';
 import 'features/start/admin_login_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'features/start/success_screen.dart';
-import 'features/start/cancel_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,7 +36,7 @@ Future<void> main() async {
     // Ignore missing .env in web/production; rely on runtime env or defaults.
   }
   final stripeKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'];
-  if (stripeKey != null && stripeKey.isNotEmpty) {
+  if (!kIsWeb && stripeKey != null && stripeKey.isNotEmpty) {
     try {
       Stripe.publishableKey = stripeKey;
       Stripe.merchantIdentifier = 'sera.chat';

@@ -36,9 +36,33 @@ class _ActivateScreenState extends State<ActivateScreen> {
 
   Future<void> _handleInvite() async {
     final uri = widget.sourceUri ?? Uri.base;
-    final token =
-        uri.queryParameters['token_hash'] ?? uri.queryParameters['token'];
-    final type = uri.queryParameters['type'] ?? 'invite';
+    if (!isSupabaseReady()) {
+      setState(() {
+        _loading = false;
+        _error =
+            'Aktiveringssidan är inte konfigurerad (SUPABASE_URL/ANON_KEY saknas).';
+      });
+      return;
+    }
+    final qp = Map<String, String>.from(uri.queryParameters);
+    if (qp.isEmpty && uri.fragment.isNotEmpty) {
+      try {
+        final frag = uri.fragment.startsWith('/')
+            ? uri.fragment.substring(1)
+            : uri.fragment;
+        qp.addAll(Uri.splitQueryString(frag));
+      } catch (_) {}
+    }
+    final error = qp['error'];
+    if (error != null && error.isNotEmpty) {
+      setState(() {
+        _loading = false;
+        _error = 'Länken är ogiltig eller utgången: $error';
+      });
+      return;
+    }
+    final token = qp['token_hash'] ?? qp['token'];
+    final type = qp['type'] ?? 'invite';
     if (token == null || token.isEmpty) {
       setState(() {
         _loading = false;
