@@ -143,6 +143,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           const SnackBar(content: Text('Inbjudan skickad')),
         );
         await _load();
+        // Töm eventuella tomma fält som användes
+        for (final c in _slotCtrls.values) {
+          c.clear();
+        }
         return true;
       } else {
         throw 'Misslyckades (${resp.statusCode}): ${resp.body}';
@@ -346,6 +350,31 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         SnackBar(content: Text('Kunde inte uppdatera seats: $e')),
       );
       setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _sendResetLink(Map<String, dynamic> user) async {
+    final email = user['email']?.toString() ?? '';
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('E-post saknas för denna användare')),
+      );
+      return;
+    }
+    try {
+      await supabase.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'https://www.sera.chat/activate',
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Återställningslänk skickad till $email')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Kunde inte skicka länk: $e')),
+      );
     }
   }
 
@@ -561,6 +590,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                                     onPressed: () => _promptUpdateEmail(u),
                                                   ),
                                                   IconButton(
+                                                    icon: const Icon(Icons.lock_reset),
+                                                    tooltip: 'Skicka återställningslänk',
+                                                    onPressed: () => _sendResetLink(u),
+                                                  ),
+                                                  IconButton(
                                                     icon: const Icon(Icons.delete_outline),
                                                     tooltip: 'Ta bort användare',
                                                     onPressed: () => _deleteUser(u),
@@ -610,26 +644,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                           ),
                                         ),
                                       ],
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        'Invite user',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(fontWeight: FontWeight.w700),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      TextField(
-                                        controller: _inviteEmailCtrl,
-                                        decoration: const InputDecoration(
-                                          labelText: 'E-postadress',
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      ElevatedButton(
-                                        onPressed: _inviteUser,
-                                        child: const Text('Skicka inbjudan'),
-                                      ),
                                       const SizedBox(height: 24),
                                       Divider(color: cs.onSurfaceVariant.withOpacity(0.3)),
                                       const SizedBox(height: 12),

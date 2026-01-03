@@ -6,9 +6,6 @@ class SuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uri = Uri.base;
-    final sessionId = uri.queryParameters['session_id'];
-
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       body: Stack(
@@ -81,9 +78,7 @@ class SuccessScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            sessionId != null
-                                ? 'Stripe-session: $sessionId'
-                                : 'Vi har registrerat din betalning.',
+                            'Vi har registrerat din betalning. En aktiveringslänk skickas till e-posten du angav i checkouten.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 15,
