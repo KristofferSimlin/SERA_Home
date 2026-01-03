@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../services/supabase_client.dart';
 import '../start/widgets/floating_lines_background.dart';
@@ -20,11 +21,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   int _seatsTotal = 0;
   int _seatsClaimed = 0;
   List<Map<String, dynamic>> _users = [];
-  bool _busyDanger = false;
   final _inviteEmailCtrl = TextEditingController();
   final Map<int, TextEditingController> _slotCtrls = {};
-  final _seatsCtrl = TextEditingController();
-  String _proration = 'create_prorations';
   String? _selectedUserIdForRemoval;
 
   @override
@@ -39,7 +37,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     for (final c in _slotCtrls.values) {
       c.dispose();
     }
-    _seatsCtrl.dispose();
     super.dispose();
   }
 
@@ -85,7 +82,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
               int.tryParse('${data['seats_claimed']}') ?? (claimed is int ? claimed : 0);
           _users =
               (data['users'] as List<dynamic>? ?? []).cast<Map<String, dynamic>>();
-          _seatsCtrl.text = _seatsTotal.toString();
           final remaining = (_seatsTotal - _seatsClaimed).clamp(0, _seatsTotal);
           // Se till att vi har controllers för tomma slots
           for (int i = 0; i < remaining; i++) {
@@ -266,88 +262,31 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     }
   }
 
-  Future<void> _deleteAdmin() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Ta bort organisation'),
-        content: const Text(
-            'Detta tar bort alla seats, användare och försöker avsluta Stripe-prenumerationen. Är du säker?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Avbryt')),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Ta bort allt'),
-          ),
-        ],
-      ),
-    );
-    if (confirm != true) return;
-    setState(() => _busyDanger = true);
-    try {
-      final access = supabase.auth.currentSession?.accessToken;
-      final resp = await http.post(
-        Uri.parse('$_apiBase/admin-users'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $access',
-        },
-        body: jsonEncode({
-          'action': 'deleteAdmin',
-          'confirm': true,
-        }),
-      );
-      if (resp.statusCode >= 200 && resp.statusCode < 300) {
-        await supabase.auth.signOut();
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Organisation raderad')),
-        );
-        Navigator.pushNamedAndRemoveUntil(context, '/start', (r) => false);
-      } else {
-        throw 'Misslyckades (${resp.statusCode}): ${resp.body}';
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Kunde inte radera: $e')),
-      );
-      setState(() => _busyDanger = false);
-    }
-  }
-
-  Future<void> _updateSeats() async {
-    final desired = int.tryParse(_seatsCtrl.text.trim());
-    if (desired == null || desired <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ange ett giltigt antal seats')),
-      );
-      return;
-    }
+  Future<void> _openBillingPortal() async {
     setState(() => _loading = true);
     try {
       final access = supabase.auth.currentSession?.accessToken;
       final resp = await http.post(
-        Uri.parse('$_apiBase/subscription-seats'),
+        Uri.parse('$_apiBase/stripe-portal'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $access',
         },
-        body: jsonEncode({
-          'desiredSeats': desired,
-          'prorationBehavior': _proration,
-        }),
       );
       if (resp.statusCode >= 200 && resp.statusCode < 300) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Seats uppdaterade')),
-        );
-        await _load();
+        final data = jsonDecode(resp.body) as Map<String, dynamic>;
+        final url = data['url']?.toString();
+        if (url != null && url.isNotEmpty) {
+          await launchUrl(Uri.parse(url), mode: LaunchMode.platformDefault);
+        } else {
+          throw 'Portallänk saknas';
+        }
       } else {
         throw 'Misslyckades (${resp.statusCode}): ${resp.body}';
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Kunde inte uppdatera seats: $e')),
+        SnackBar(content: Text('Kunde inte öppna Stripe-portal: $e')),
       );
       setState(() => _loading = false);
     }
@@ -546,11 +485,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                           physics: const NeverScrollableScrollPhysics(),
                                           itemCount: _users.length,
                                           separatorBuilder: (_, __) =>
-                                              const Divider(height: 1),
-                                          itemBuilder: (_, i) {
-                                            final u = _users[i] as Map<String, dynamic>;
-                                            return ListTile(
-                                              contentPadding: EdgeInsets.zero,
+                                      const Divider(height: 1),
+                                      itemBuilder: (_, i) {
+                                        final u = _users[i] as Map<String, dynamic>;
+                                        return ListTile(
+                                          contentPadding: EdgeInsets.zero,
                                               leading: const Icon(Icons.person_outline),
                                               title: Text(u['email']?.toString() ?? ''),
                                             subtitle:
@@ -620,110 +559,70 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                       ],
                                       const SizedBox(height: 20),
                                       Text(
-                                        'Lägg till / ta bort licenser',
+                                        'Hantera fakturering och licenser',
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium
                                             ?.copyWith(fontWeight: FontWeight.w700),
                                       ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: TextField(
-                                              controller: _seatsCtrl,
-                                              keyboardType: TextInputType.number,
-                                              decoration: const InputDecoration(
-                                                labelText: 'Önskat antal licenser',
-                                                helperText:
-                                                    'Öka eller minska totalt antal licenser',
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          DropdownButton<String>(
-                                            value: _proration,
-                                            items: const [
-                                              DropdownMenuItem(
-                                                value: 'create_prorations',
-                                                child: Text('Proratera'),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'none',
-                                                child: Text('Ingen proration'),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'always_invoice',
-                                                child: Text('Fakturera nu'),
-                                              ),
-                                            ],
-                                            onChanged: (v) {
-                                              if (v != null) {
-                                                setState(() => _proration = v);
-                                              }
-                                            },
-                                          ),
-                                        ],
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        'Lägg till eller ta bort användare, uppdatera licenser och hantera betalning i Stripe-kundportalen.',
+                                        style: TextStyle(
+                                          color: cs.onSurfaceVariant,
+                                        ),
                                       ),
                                       const SizedBox(height: 12),
-                                      ElevatedButton(
-                                        onPressed: _updateSeats,
-                                        child: const Text('Uppdatera licenser'),
+                                      ElevatedButton.icon(
+                                        onPressed: _openBillingPortal,
+                                        icon: const Icon(Icons.open_in_new),
+                                        label: const Text('Öppna Stripe-kundportal'),
                                       ),
                                       const SizedBox(height: 24),
                                       Divider(color: cs.onSurfaceVariant.withOpacity(0.3)),
                                       const SizedBox(height: 12),
-                                      Text(
-                                        'Farliga åtgärder',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                                fontWeight: FontWeight.w700,
-                                                color: cs.error),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      if (_users.isNotEmpty) ...[
-                                        DropdownButton<String>(
-                                          value: _selectedUserIdForRemoval,
-                                          hint: const Text('Välj användare att ta bort'),
+                                    Text(
+                                      'Ta bort användare',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                              fontWeight: FontWeight.w700,
+                                              color: cs.error),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    if (_users.isNotEmpty) ...[
+                                      DropdownButton<String>(
+                                        value: _selectedUserIdForRemoval,
+                                        hint: const Text('Välj användare att ta bort'),
                                         items: _users
                                             .map((u) => DropdownMenuItem<String>(
                                                   value: u['id']?.toString(),
                                                   child: Text(u['email']?.toString() ?? 'Okänd e-post'),
                                                 ))
                                             .toList(),
-                                          onChanged: (v) {
-                                            setState(() => _selectedUserIdForRemoval = v);
-                                          },
-                                        ),
-                                        const SizedBox(height: 8),
-                                        ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: cs.error.withOpacity(0.15),
-                                          ),
-                                          onPressed: () {
-                                            final u = _users.firstWhere(
-                                                (u) => u['id']?.toString() == _selectedUserIdForRemoval,
-                                                orElse: () => <String, dynamic>{});
-                                            if (u.isNotEmpty) {
-                                              _deleteUser(u);
-                                            }
-                                          },
-                                          icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                          label: const Text('Ta bort vald användare'),
-                                        ),
-                                        const SizedBox(height: 16),
-                                      ],
+                                        onChanged: (v) {
+                                          setState(() => _selectedUserIdForRemoval = v);
+                                        },
+                                      ),
+                                      const SizedBox(height: 8),
                                       ElevatedButton.icon(
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: cs.error,
-                                          foregroundColor: cs.onError,
+                                          backgroundColor: cs.error.withOpacity(0.15),
                                         ),
-                                        onPressed: _busyDanger ? null : _deleteAdmin,
-                                        icon: const Icon(Icons.warning_amber_outlined),
-                                        label: const Text('Ta bort organisation'),
+                                        onPressed: () {
+                                          final u = _users.firstWhere(
+                                              (u) => u['id']?.toString() == _selectedUserIdForRemoval,
+                                              orElse: () => <String, dynamic>{});
+                                          if (u.isNotEmpty) {
+                                            _deleteUser(u);
+                                          }
+                                        },
+                                        icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                                        label: const Text('Ta bort vald användare'),
                                       ),
+                                      const SizedBox(height: 16),
+                                    ],
                                     ],
                                   ),
                                 ),

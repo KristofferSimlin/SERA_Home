@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sera/l10n/app_localizations.dart';
 import 'dart:html' as html;
 
@@ -149,44 +150,53 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                 const SizedBox(height: 14),
                                 _RoleContainer(
                                   role: _role,
-                                  child: Column(
-                                    children: [
-                                      _AuthField(
-                                        controller: _userCtrl,
-                                        label: l.businessLoginUsername,
-                                        icon: Icons.person_outline,
-                                      ),
-                                      const SizedBox(height: 12),
-                                      _AuthField(
-                                        controller: _passCtrl,
-                                        label: l.businessLoginPassword,
-                                        icon: Icons.lock_outline,
-                                        obscure: true,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Checkbox(
-                                              value: _rememberMe,
-                                              onChanged: (v) {
-                                                setState(() {
-                                                  _rememberMe = v ?? false;
-                                                });
-                                                if (kIsWeb && !(v ?? false)) {
-                                                  html.window.localStorage
-                                                      .remove('sera_login_email');
-                                                }
-                                              },
-                                            ),
-                                            const SizedBox(width: 4),
-                                            const Text('Kom ihåg mig'),
+                                  child: AutofillGroup(
+                                    child: Column(
+                                      children: [
+                                        _AuthField(
+                                          controller: _userCtrl,
+                                          label: l.businessLoginUsername,
+                                          icon: Icons.person_outline,
+                                          autofillHints: const [
+                                            AutofillHints.username,
+                                            AutofillHints.email
                                           ],
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(height: 12),
+                                        _AuthField(
+                                          controller: _passCtrl,
+                                          label: l.businessLoginPassword,
+                                          icon: Icons.lock_outline,
+                                          obscure: true,
+                                          autofillHints: const [
+                                            AutofillHints.password
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Checkbox(
+                                                value: _rememberMe,
+                                                onChanged: (v) {
+                                                  setState(() {
+                                                    _rememberMe = v ?? false;
+                                                  });
+                                                  if (kIsWeb && !(v ?? false)) {
+                                                    html.window.localStorage
+                                                        .remove('sera_login_email');
+                                                  }
+                                                },
+                                              ),
+                                              const SizedBox(width: 4),
+                                              const Text('Kom ihåg mig'),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 18),
@@ -296,6 +306,8 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
       );
       if (kIsWeb && _rememberMe) {
         html.window.localStorage['sera_login_email'] = email;
+      } else if (!kIsWeb && _rememberMe) {
+        TextInput.finishAutofillContext(shouldSave: true);
       }
       Navigator.pushNamedAndRemoveUntil(context, '/', (r) => false);
     } catch (e) {
@@ -461,12 +473,14 @@ class _AuthField extends StatelessWidget {
     required this.label,
     required this.icon,
     this.obscure = false,
+    this.autofillHints,
   });
 
   final TextEditingController controller;
   final String label;
   final IconData icon;
   final bool obscure;
+  final List<String>? autofillHints;
 
   @override
   Widget build(BuildContext context) {
@@ -474,6 +488,7 @@ class _AuthField extends StatelessWidget {
     return TextField(
       controller: controller,
       obscureText: obscure,
+      autofillHints: autofillHints,
       style: TextStyle(color: cs.onSurface),
       decoration: InputDecoration(
         filled: true,
