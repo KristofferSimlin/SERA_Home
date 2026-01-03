@@ -44,6 +44,21 @@ class _ActivateScreenState extends State<ActivateScreen> {
       });
       return;
     }
+
+    // Försök direkt med Supabase-helper om hela redirect-URL:en innehåller tokens.
+    try {
+      final res = await supabase.auth.getSessionFromUrl(uri);
+      if (res.session != null) {
+        setState(() {
+          _email = res.session!.user.email;
+          _loading = false;
+          _needsPassword = true;
+        });
+        return;
+      }
+    } catch (_) {
+      // fortsätt till manuell parsning nedan
+    }
     final qp = Map<String, String>.from(uri.queryParameters);
     if (uri.fragment.isNotEmpty) {
       try {
