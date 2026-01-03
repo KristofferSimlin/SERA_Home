@@ -50,7 +50,12 @@ class _ActivateScreenState extends State<ActivateScreen> {
         final frag = uri.fragment.startsWith('/')
             ? uri.fragment.substring(1)
             : uri.fragment;
-        qp.addAll(Uri.splitQueryString(frag));
+        final fragPathAndQuery = frag.split('?');
+        if (fragPathAndQuery.length > 1) {
+          qp.addAll(Uri.splitQueryString(fragPathAndQuery.sublist(1).join('?')));
+        } else {
+          qp.addAll(Uri.splitQueryString(frag));
+        }
       } catch (_) {}
     }
     final error = qp['error'];
@@ -61,6 +66,29 @@ class _ActivateScreenState extends State<ActivateScreen> {
       });
       return;
     }
+    // Access/refresh tokens direkt i URL (vanligt efter verifiering)
+    final access = qp['access_token'];
+    final refresh = qp['refresh_token'];
+    if (access != null && refresh != null) {
+      try {
+        await supabase.auth.getSessionFromUrl(uri);
+        final user = supabase.auth.currentUser;
+        setState(() {
+          _email = user?.email;
+          _loading = false;
+          _needsPassword = true;
+        });
+        return;
+      } catch (e) {
+        setState(() {
+          _loading = false;
+          _error = 'Kunde inte sätta session: $e';
+        });
+        return;
+      }
+    }
+
+    // Magic link / invite token
     final token = qp['token_hash'] ?? qp['token'];
     final type = qp['type'] ?? 'invite';
     if (token == null || token.isEmpty) {
