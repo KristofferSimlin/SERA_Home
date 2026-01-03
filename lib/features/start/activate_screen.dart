@@ -39,6 +39,16 @@ class _ActivateScreenState extends State<ActivateScreen> {
   }
 
   Future<void> _handleInvite() async {
+    final existing = supabase.auth.currentSession;
+    if (existing != null) {
+      setState(() {
+        _email = existing.user.email;
+        _loading = false;
+        _needsPassword = true;
+      });
+      return;
+    }
+
     final uri = widget.sourceUri ?? Uri.base;
     final fallbackParams = widget.initialParams ?? const {};
     debugPrint('activate uri: $uri');
@@ -154,11 +164,17 @@ class _ActivateScreenState extends State<ActivateScreen> {
     final p1 = _passCtrl.text.trim();
     final p2 = _pass2Ctrl.text.trim();
     if (p1.isEmpty || p1.length < 8) {
-      setState(() => _error = 'Lösenordet måste vara minst 8 tecken.');
+      setState(() {
+        _error = 'Lösenordet måste vara minst 8 tecken.';
+        _loading = false;
+      });
       return;
     }
     if (p1 != p2) {
-      setState(() => _error = 'Lösenorden matchar inte.');
+      setState(() {
+        _error = 'Lösenorden matchar inte.';
+        _loading = false;
+      });
       return;
     }
     setState(() => _loading = true);
