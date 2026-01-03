@@ -19,11 +19,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   String? _error;
   int _seatsTotal = 0;
   int _seatsClaimed = 0;
-  List<dynamic> _users = [];
+  List<Map<String, dynamic>> _users = [];
   bool _busyDanger = false;
   final _inviteEmailCtrl = TextEditingController();
+  final Map<int, TextEditingController> _slotCtrls = {};
   final _seatsCtrl = TextEditingController();
   String _proration = 'create_prorations';
+  String? _selectedUserIdForRemoval;
 
   @override
   void initState() {
@@ -34,6 +36,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   @override
   void dispose() {
     _inviteEmailCtrl.dispose();
+    for (final c in _slotCtrls.values) {
+      c.dispose();
+    }
     _seatsCtrl.dispose();
     super.dispose();
   }
@@ -78,8 +83,16 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
               int.tryParse('${data['seats_total']}') ?? (total is int ? total : 0);
           _seatsClaimed =
               int.tryParse('${data['seats_claimed']}') ?? (claimed is int ? claimed : 0);
-          _users = (data['users'] as List<dynamic>? ?? []);
+          _users =
+              (data['users'] as List<dynamic>? ?? []).cast<Map<String, dynamic>>();
           _seatsCtrl.text = _seatsTotal.toString();
+          final remaining = (_seatsTotal - _seatsClaimed).clamp(0, _seatsTotal);
+          // Se till att vi har controllers för tomma slots
+          for (int i = 0; i < remaining; i++) {
+            _slotCtrls.putIfAbsent(i, () => TextEditingController());
+          }
+          _selectedUserIdForRemoval =
+              _users.isNotEmpty ? _users.first['id']?.toString() : null;
           _loading = false;
           _error = null;
         });
@@ -97,13 +110,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     }
   }
 
-  Future<void> _inviteUser() async {
-    final email = _inviteEmailCtrl.text.trim();
+  Future<bool> _inviteUserEmail(String email, {String role = 'user'}) async {
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ange e-post att bjuda in')),
       );
-      return;
+      return false;
     }
     setState(() => _loading = true);
     try {
@@ -123,7 +135,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         body: jsonEncode({
           'adminEmail': adminEmail,
           'email': email,
-          'role': 'user',
+          'role': role,
         }),
       );
       if (resp.statusCode >= 200 && resp.statusCode < 300) {
@@ -131,6 +143,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           const SnackBar(content: Text('Inbjudan skickad')),
         );
         await _load();
+        return true;
       } else {
         throw 'Misslyckades (${resp.statusCode}): ${resp.body}';
       }
@@ -138,9 +151,14 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Kunde inte bjuda in: $e')),
       );
+      return false;
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<void> _inviteUser() async {
+    await _inviteUserEmail(_inviteEmailCtrl.text.trim());
   }
 
   Future<void> _promptUpdateEmail(Map<String, dynamic> user) async {
@@ -358,7 +376,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           SafeArea(
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 560),
+                constraints: const BoxConstraints(maxWidth: 700),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Container(
@@ -393,207 +411,281 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                     ),
                                   ],
                                 )
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          width: 64,
-                                          height: 64,
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Color(0xFF6EE7FF),
-                                                Color(0xFF8A6DFF),
-                                                Color(0xFF55F273),
+                              : SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            width: 64,
+                                            height: 64,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  Color(0xFF6EE7FF),
+                                                  Color(0xFF8A6DFF),
+                                                  Color(0xFF55F273),
+                                                ],
+                                              ),
+                                            ),
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: const [
+                                                Icon(Icons.person_outline,
+                                                    size: 32, color: Colors.white),
+                                                Positioned(
+                                                  right: 8,
+                                                  bottom: 8,
+                                                  child: CircleAvatar(
+                                                    radius: 10,
+                                                    backgroundColor: Colors.white,
+                                                    child: Icon(
+                                                      Icons.add,
+                                                      size: 14,
+                                                      color: Color(0xFF0E121A),
+                                                    ),
+                                                  ),
+                                                )
                                               ],
                                             ),
                                           ),
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: const [
-                                              Icon(Icons.person_outline,
-                                                  size: 32, color: Colors.white),
-                                              Positioned(
-                                                right: 8,
-                                                bottom: 8,
-                                                child: CircleAvatar(
-                                                  radius: 10,
-                                                  backgroundColor: Colors.white,
-                                                  child: Icon(
-                                                    Icons.add,
-                                                    size: 14,
-                                                    color: Color(0xFF0E121A),
-                                                  ),
-                                                ),
-                                              )
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        'Adminpanel',
+                                        textAlign: TextAlign.center,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(fontWeight: FontWeight.w700),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'Licenser',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(fontWeight: FontWeight.w700),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text('Totalt: $_seatsTotal'),
+                                      Text('Använda: $_seatsClaimed'),
+                                      Text('Kvar: $remaining'),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        'Ändra seats',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(fontWeight: FontWeight.w700),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: TextField(
+                                              controller: _seatsCtrl,
+                                              keyboardType: TextInputType.number,
+                                              decoration: const InputDecoration(
+                                                labelText: 'Önskat antal seats',
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          DropdownButton<String>(
+                                            value: _proration,
+                                            items: const [
+                                              DropdownMenuItem(
+                                                value: 'create_prorations',
+                                                child: Text('Proratera'),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 'none',
+                                                child: Text('Ingen proration'),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 'always_invoice',
+                                                child: Text('Fakturera nu'),
+                                              ),
                                             ],
+                                            onChanged: (v) {
+                                              if (v != null) {
+                                                setState(() => _proration = v);
+                                              }
+                                            },
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      'Adminpanel',
-                                      textAlign: TextAlign.center,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.copyWith(fontWeight: FontWeight.w700),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Licenser',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(fontWeight: FontWeight.w700),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text('Totalt: $_seatsTotal'),
-                                    Text('Använda: $_seatsClaimed'),
-                                    Text('Kvar: $remaining'),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      'Ändra seats',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(fontWeight: FontWeight.w700),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: TextField(
-                                            controller: _seatsCtrl,
-                                            keyboardType: TextInputType.number,
-                                            decoration: const InputDecoration(
-                                              labelText: 'Önskat antal seats',
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        DropdownButton<String>(
-                                          value: _proration,
-                                          items: const [
-                                            DropdownMenuItem(
-                                              value: 'create_prorations',
-                                              child: Text('Proratera'),
-                                            ),
-                                            DropdownMenuItem(
-                                              value: 'none',
-                                              child: Text('Ingen proration'),
-                                            ),
-                                            DropdownMenuItem(
-                                              value: 'always_invoice',
-                                              child: Text('Fakturera nu'),
-                                            ),
-                                          ],
-                                          onChanged: (v) {
-                                            if (v != null) {
-                                              setState(() => _proration = v);
-                                            }
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      ElevatedButton(
+                                        onPressed: _updateSeats,
+                                        child: const Text('Uppdatera seats'),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Text(
+                                        'Användare',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(fontWeight: FontWeight.w700),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      if (_users.isEmpty)
+                                        const Text('Inga användare')
+                                      else
+                                        ListView.separated(
+                                          shrinkWrap: true,
+                                          physics: const NeverScrollableScrollPhysics(),
+                                          itemCount: _users.length,
+                                          separatorBuilder: (_, __) =>
+                                              const Divider(height: 1),
+                                          itemBuilder: (_, i) {
+                                            final u = _users[i] as Map<String, dynamic>;
+                                            return ListTile(
+                                              contentPadding: EdgeInsets.zero,
+                                              leading: const Icon(Icons.person_outline),
+                                              title: Text(u['email']?.toString() ?? ''),
+                                              subtitle: Text(
+                                                  'Roll: ${u['role'] ?? ''}  •  Id: ${u['id'] ?? ''}'),
+                                              trailing: Wrap(
+                                                spacing: 8,
+                                                children: [
+                                                  IconButton(
+                                                    icon: const Icon(Icons.edit),
+                                                    tooltip: 'Byt e-post',
+                                                    onPressed: () => _promptUpdateEmail(u),
+                                                  ),
+                                                  IconButton(
+                                                    icon: const Icon(Icons.delete_outline),
+                                                    tooltip: 'Ta bort användare',
+                                                    onPressed: () => _deleteUser(u),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
                                           },
                                         ),
+                                      const SizedBox(height: 12),
+                                      if ((_seatsTotal - _seatsClaimed) > 0) ...[
+                                        Text(
+                                          'Tomma licenser',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(fontWeight: FontWeight.w700),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Column(
+                                          children: List.generate(
+                                            (_seatsTotal - _seatsClaimed)
+                                                .clamp(0, _seatsTotal),
+                                            (i) {
+                                              final ctrl = _slotCtrls[i]!;
+                                              return Padding(
+                                                padding: const EdgeInsets.only(bottom: 8),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: TextField(
+                                                        controller: ctrl,
+                                                        decoration:
+                                                            InputDecoration(labelText: 'E-post (plats ${i + 1})'),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    ElevatedButton(
+                                                      onPressed: () =>
+                                                          _inviteUserEmail(ctrl.text.trim()),
+                                                      child: const Text('Bjud in'),
+                                                    )
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
                                       ],
-                                    ),
-                                    const SizedBox(height: 12),
-                                    ElevatedButton(
-                                      onPressed: _updateSeats,
-                                      child: const Text('Uppdatera seats'),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    Text(
-                                      'Användare',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(fontWeight: FontWeight.w700),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    if (_users.isEmpty)
-                                      const Text('Inga användare')
-                                    else
-                                      ListView.separated(
-                                        shrinkWrap: true,
-                                        physics: const NeverScrollableScrollPhysics(),
-                                        itemCount: _users.length,
-                                        separatorBuilder: (_, __) =>
-                                            const Divider(height: 1),
-                                        itemBuilder: (_, i) {
-                                          final u = _users[i] as Map<String, dynamic>;
-                                          return ListTile(
-                                            contentPadding: EdgeInsets.zero,
-                                            leading: const Icon(Icons.person_outline),
-                                            title: Text(u['email']?.toString() ?? ''),
-                                            subtitle: Text(
-                                                'Roll: ${u['role'] ?? ''}  •  Id: ${u['id'] ?? ''}'),
-                                            trailing: Wrap(
-                                              spacing: 8,
-                                              children: [
-                                                IconButton(
-                                                  icon: const Icon(Icons.edit),
-                                                  tooltip: 'Byt e-post',
-                                                  onPressed: () => _promptUpdateEmail(u),
-                                                ),
-                                                IconButton(
-                                                  icon: const Icon(Icons.delete_outline),
-                                                  tooltip: 'Ta bort användare',
-                                                  onPressed: () => _deleteUser(u),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'Invite user',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(fontWeight: FontWeight.w700),
                                       ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Invite user',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(fontWeight: FontWeight.w700),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    TextField(
-                                      controller: _inviteEmailCtrl,
-                                      decoration: const InputDecoration(
-                                        labelText: 'E-postadress',
+                                      const SizedBox(height: 8),
+                                      TextField(
+                                        controller: _inviteEmailCtrl,
+                                        decoration: const InputDecoration(
+                                          labelText: 'E-postadress',
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    ElevatedButton(
-                                      onPressed: _inviteUser,
-                                      child: const Text('Skicka inbjudan'),
-                                    ),
-                                    const SizedBox(height: 24),
-                                    Divider(color: cs.onSurfaceVariant.withOpacity(0.3)),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      'Farliga åtgärder',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                              fontWeight: FontWeight.w700,
-                                              color: cs.error),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: cs.error,
-                                        foregroundColor: cs.onError,
+                                      const SizedBox(height: 12),
+                                      ElevatedButton(
+                                        onPressed: _inviteUser,
+                                        child: const Text('Skicka inbjudan'),
                                       ),
-                                      onPressed: _busyDanger ? null : _deleteAdmin,
-                                      icon: const Icon(Icons.warning_amber_outlined),
-                                      label: const Text('Ta bort organisation'),
-                                    ),
-                                  ],
+                                      const SizedBox(height: 24),
+                                      Divider(color: cs.onSurfaceVariant.withOpacity(0.3)),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        'Farliga åtgärder',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                                fontWeight: FontWeight.w700,
+                                                color: cs.error),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      if (_users.isNotEmpty) ...[
+                                        DropdownButton<String>(
+                                          value: _selectedUserIdForRemoval,
+                                          hint: const Text('Välj användare att ta bort'),
+                                          items: _users
+                                              .map((u) => DropdownMenuItem<String>(
+                                                    value: u['id']?.toString(),
+                                                    child: Text(u['email']?.toString() ?? u['id']?.toString() ?? ''),
+                                                  ))
+                                              .toList(),
+                                          onChanged: (v) {
+                                            setState(() => _selectedUserIdForRemoval = v);
+                                          },
+                                        ),
+                                        const SizedBox(height: 8),
+                                        ElevatedButton.icon(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: cs.error.withOpacity(0.15),
+                                          ),
+                                          onPressed: () {
+                                            final u = _users.firstWhere(
+                                                (u) => u['id']?.toString() == _selectedUserIdForRemoval,
+                                                orElse: () => <String, dynamic>{});
+                                            if (u.isNotEmpty) {
+                                              _deleteUser(u);
+                                            }
+                                          },
+                                          icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                                          label: const Text('Ta bort vald användare'),
+                                        ),
+                                        const SizedBox(height: 16),
+                                      ],
+                                      ElevatedButton.icon(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: cs.error,
+                                          foregroundColor: cs.onError,
+                                        ),
+                                        onPressed: _busyDanger ? null : _deleteAdmin,
+                                        icon: const Icon(Icons.warning_amber_outlined),
+                                        label: const Text('Ta bort organisation'),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                     ),
                   ),
