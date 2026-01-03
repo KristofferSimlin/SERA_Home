@@ -23,6 +23,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
   String? _email;
   String? _error;
   Map<String, String> _lastParams = {};
+  String? _storedRefresh;
   final _passCtrl = TextEditingController();
   final _pass2Ctrl = TextEditingController();
 
@@ -40,6 +41,25 @@ class _ActivateScreenState extends State<ActivateScreen> {
   }
 
   Future<void> _handleInvite() async {
+    if (kIsWeb) {
+      _storedRefresh = html.window.localStorage['sera_refresh_token'];
+    }
+    if (_storedRefresh != null && _storedRefresh!.isNotEmpty) {
+      try {
+        final resp = await supabase.auth.setSession(_storedRefresh!);
+        if (resp.session != null) {
+          setState(() {
+            _email = resp.session!.user.email;
+            _loading = false;
+            _needsPassword = true;
+          });
+          return;
+        }
+      } catch (_) {
+        // fortsätt; kanske ogiltig
+      }
+    }
+
     final existing = supabase.auth.currentSession;
     if (existing != null) {
       setState(() {
@@ -104,6 +124,11 @@ class _ActivateScreenState extends State<ActivateScreen> {
     }
     debugPrint('activate parsed params: $qp');
     _lastParams = qp;
+    final refreshFromParams = qp['refresh_token'];
+    if (kIsWeb && refreshFromParams != null && refreshFromParams.isNotEmpty) {
+      html.window.localStorage['sera_refresh_token'] = refreshFromParams;
+      _storedRefresh = refreshFromParams;
+    }
     final error = qp['error'];
     if (error != null && error.isNotEmpty) {
       setState(() {
@@ -165,7 +190,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
   Future<void> _setPassword() async {
     Future<bool> _ensureSession() async {
       if (supabase.auth.currentSession != null) return true;
-      final refresh = _lastParams['refresh_token'];
+      final refresh = _lastParams['refresh_token'] ?? _storedRefresh;
       if (refresh != null && refresh.isNotEmpty) {
         try {
           final resp = await supabase.auth.setSession(refresh);
@@ -215,12 +240,17 @@ class _ActivateScreenState extends State<ActivateScreen> {
     try {
       await supabase.auth.updateUser(UserAttributes(password: p1));
       if (!mounted) return;
+      if (kIsWeb) {
+        html.window.localStorage.remove('sera_refresh_token');
+      }
       _goDashboard();
     } catch (e) {
       setState(() {
         _loading = false;
         _error = 'Kunde inte sätta lösenord: $e';
       });
+      _passCtrl.clear();
+      _pass2Ctrl.clear();
     }
   }
 
@@ -265,6 +295,10 @@ class _ActivateScreenState extends State<ActivateScreen> {
           const SizedBox(height: 8),
           Text(_error!, textAlign: TextAlign.center),
           const SizedBox(height: 12),
+          TextButton(
+            onPressed: () => _handleInvite(),
+            child: const Text('Försök igen med samma länk'),
+          ),
           TextButton(
             onPressed: () => launchUrl(Uri.parse('mailto:support@sera.chat')),
             child: const Text('Kontakta support'),
