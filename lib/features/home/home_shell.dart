@@ -201,21 +201,25 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             late final double cx;
             late final String text;
             late final String counter;
+            late final int stepIndex;
             final isLast = _hintStep == 3;
             switch (_hintStep) {
               case 1:
+                stepIndex = 1;
                 cx = centerFor(0);
                 text =
                     'Service: modellspecifika servicescheman, servicepunkter och oljespecifikationer i tabellformat.';
                 counter = '2/4';
                 break;
               case 2:
+                stepIndex = 2;
                 cx = centerFor(1);
                 text =
                     'Felsökning: modellspecifik felsökning i chatformat. Ange maskin och din expertis för träffsäkra svar.';
                 counter = '3/4';
                 break;
               default:
+                stepIndex = 3;
                 cx = centerFor(2);
                 text =
                     'Arbetsorder: genererar en professionell arbetsrapport för garantiärenden och kunder.';
@@ -253,6 +257,20 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                             style: const TextStyle(
                                 color: Colors.white, fontWeight: FontWeight.w700),
                           ),
+                          if (stepIndex > 1) ...[
+                            const SizedBox(width: 8),
+                            TextButton(
+                              onPressed: () => setState(() => _hintStep--),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: const Text('Return'),
+                            ),
+                          ],
                           if (!isLast) ...[
                             const SizedBox(width: 8),
                             TextButton(
