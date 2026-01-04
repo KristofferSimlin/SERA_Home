@@ -183,47 +183,67 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               ],
             )
           : null,
-      body: Stack(
-        children: [
-          bodyContent,
-          if (_showAdminOnboarding)
-            Positioned(
-              top: kToolbarHeight + MediaQuery.of(context).padding.top + 4,
-              right: 16,
-              child: Material(
-                color: Colors.transparent,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Icon(Icons.arrow_drop_up, color: Colors.orange, size: 32),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.orange.withOpacity(0.6)),
-                      ),
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.info_outline, color: Colors.orange),
-                          const SizedBox(width: 6),
-                          const Text('Adminpanelen: lägg till användare/licenser'),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: _dismissOnboarding,
-                            child: const Icon(Icons.close, size: 16),
+          body: Stack(
+            children: [
+              bodyContent,
+              if (_showAdminOnboarding)
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + kToolbarHeight - 10,
+                  right: 72,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Icon(Icons.arrow_drop_up, color: Colors.grey, size: 32),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1F2228),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.black.withOpacity(0.4)),
                           ),
-                        ],
-                      ),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(width: 6),
+                              const Text(
+                                'Adminpanelen: lägg till användare/licenser',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                '1/1',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              TextButton(
+                                onPressed: _dismissOnboarding,
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: const Text('Next'),
+                              ),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: _dismissOnboarding,
+                                child: const Icon(Icons.close, size: 16, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-        ],
-      ),
+            ],
+          ),
       bottomNavigationBar: _MobileBottomBar(
         onService: _openService,
         onFelsokning: _newChat,
