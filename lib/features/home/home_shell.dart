@@ -209,7 +209,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
             Widget hint(double centerX, String text, VoidCallback onClose) {
               return Positioned(
-                bottom: 20,
+                bottom: 3,
                 left: centerX - 120,
                 child: Material(
                   color: Colors.transparent,
