@@ -70,19 +70,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   }
 
   Future<void> _initOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    final shown = prefs.getBool('onboard_admin_shown') ?? false;
     final role = supabase.auth.currentUser?.appMetadata['role']?.toString();
-    if (!shown && role == 'admin') {
-      setState(() {
-        _showAdminOnboarding = true;
-      });
-    }
+    // Visa alltid för admin under felsökning
+    if (role == 'admin') setState(() => _showAdminOnboarding = true);
   }
 
   Future<void> _dismissOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboard_admin_shown', true);
     if (mounted) {
       setState(() {
         _showAdminOnboarding = false;
@@ -113,6 +106,30 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       },
       searchCtrl: _search,
       showNavLinks: !isWide,
+    );
+
+    final bodyContent = Row(
+      children: [
+        if (isWide)
+          SizedBox(
+              width: 320,
+              child: Material(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: SafeArea(child: sidebar))),
+        Expanded(
+          child: _LandingArea(
+            onNewChat: () {
+              _newChat();
+            },
+            onService: () {
+              _openService();
+            },
+            onWorkOrder: () {
+              _openWorkOrder();
+            },
+          ),
+        ),
+      ],
     );
 
     return Scaffold(
@@ -146,47 +163,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                   icon: const Icon(Icons.person),
                 ),
                 if (supabase.auth.currentUser?.appMetadata['role'] == 'admin')
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        tooltip: 'Adminpanel',
-                        onPressed: () => Navigator.pushNamed(context, '/admin'),
-                        icon: const Icon(Icons.admin_panel_settings),
-                      ),
-                      if (_showAdminOnboarding)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Column(
-                            children: [
-                              const Icon(Icons.arrow_drop_up, color: Colors.orange),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Colors.orange.withOpacity(0.6)),
-                                ),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.info_outline, color: Colors.orange),
-                                    const SizedBox(width: 6),
-                                    const Text(
-                                        'Här lägger du till fler användare och licenser'),
-                                    const SizedBox(width: 8),
-                                    GestureDetector(
-                                      onTap: _dismissOnboarding,
-                                      child: const Icon(Icons.close, size: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
+                  IconButton(
+                    tooltip: 'Adminpanel',
+                    onPressed: () => Navigator.pushNamed(context, '/admin'),
+                    icon: const Icon(Icons.admin_panel_settings),
                   ),
                 IconButton(
                   tooltip: l.homeNewChat,
@@ -203,27 +183,45 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               ],
             )
           : null,
-      body: Row(
+      body: Stack(
         children: [
-          if (isWide)
-            SizedBox(
-                width: 320,
-                child: Material(
-                    color: Theme.of(context).colorScheme.surface,
-                    child: SafeArea(child: sidebar))),
-          Expanded(
-            child: _LandingArea(
-              onNewChat: () {
-                _newChat();
-              },
-              onService: () {
-                _openService();
-              },
-              onWorkOrder: () {
-                _openWorkOrder();
-              },
+          bodyContent,
+          if (_showAdminOnboarding)
+            Positioned(
+              top: kToolbarHeight + MediaQuery.of(context).padding.top + 4,
+              right: 16,
+              child: Material(
+                color: Colors.transparent,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Icon(Icons.arrow_drop_up, color: Colors.orange, size: 32),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.orange.withOpacity(0.6)),
+                      ),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.info_outline, color: Colors.orange),
+                          const SizedBox(width: 6),
+                          const Text('Adminpanelen: lägg till användare/licenser'),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: _dismissOnboarding,
+                            child: const Icon(Icons.close, size: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
         ],
       ),
       bottomNavigationBar: _MobileBottomBar(
