@@ -188,8 +188,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               bodyContent,
               if (_showAdminOnboarding)
                 Positioned(
-                  top: MediaQuery.of(context).padding.top + kToolbarHeight - 10,
-                  right: 72,
+                  top: MediaQuery.of(context).padding.top + kToolbarHeight - 20,
+                  right: 110,
                   child: Material(
                     color: Colors.transparent,
                     child: Column(
