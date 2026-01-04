@@ -207,9 +207,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const SizedBox(width: 6),
-                              const Text(
-                                'Adminpanelen: lägg till användare/licenser',
-                                style: TextStyle(color: Colors.white),
+                              const SizedBox(
+                                width: 220,
+                                child: Text(
+                                  'Adminpanel: hantera abonnemang och användardata.\nLägg till/ta bort licenser och användare.',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ),
                               const SizedBox(width: 12),
                               const Text(

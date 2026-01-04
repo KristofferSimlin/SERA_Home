@@ -73,10 +73,15 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
             ),
           SafeArea(
             child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 720),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 20,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                ),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
