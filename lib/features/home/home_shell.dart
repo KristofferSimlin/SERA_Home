@@ -10,7 +10,6 @@ import '../chat/chat_screen.dart';
 import '../start/widgets/floating_lines_background.dart';
 import '../start/widgets/floating_lines_light_background.dart';
 import '../../services/supabase_client.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/auth_params.dart';
 
 class HomeShell extends ConsumerStatefulWidget {
@@ -22,10 +21,7 @@ class HomeShell extends ConsumerStatefulWidget {
 
 class _HomeShellState extends ConsumerState<HomeShell> {
   final _search = TextEditingController();
-  bool _showAdminOnboarding = false;
-  bool _showHintService = true;
-  bool _showHintFelsokning = true;
-  bool _showHintWorkOrder = true;
+  int _hintStep = 0; // 0=admin,1=service,2=felsökning,3=arbetsorder, -1=ingen
 
   Future<void> _newChat() async {
     final id = await ref.read(chatRepoProvider).createSession();
@@ -73,20 +69,14 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   }
 
   Future<void> _initOnboarding() async {
-    final role = supabase.auth.currentUser?.appMetadata['role']?.toString();
-    // Visa alltid för admin under felsökning
-    if (role == 'admin') setState(() => _showAdminOnboarding = true);
-    setState(() {
-      _showHintService = true;
-      _showHintFelsokning = true;
-      _showHintWorkOrder = true;
-    });
+    // Starta alltid på första hinten under felsökning
+    _hintStep = 0;
   }
 
   Future<void> _dismissOnboarding() async {
     if (mounted) {
       setState(() {
-        _showAdminOnboarding = false;
+        _hintStep = -1;
       });
     }
   }
@@ -195,6 +185,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
         children: [
           bodyContent,
           Builder(builder: (ctx) {
+            if (_hintStep < 1 || _hintStep > 3) return const SizedBox.shrink();
             final w = MediaQuery.of(ctx).size.width;
             final double padding = 12;
             final double gap = 76;
@@ -207,65 +198,90 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               return padding + itemWidth * 3.5 + gap;
             }
 
-            Widget hint(double centerX, String text, VoidCallback onClose) {
-              return Positioned(
-                bottom: 3,
-                left: centerX - 120,
-                child: Material(
-                  color: Colors.transparent,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 240,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1F2228),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black.withOpacity(0.4)),
-                        ),
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                text,
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            GestureDetector(
-                              onTap: onClose,
-                              child: const Icon(Icons.close, size: 16, color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(Icons.arrow_drop_down, color: Colors.grey, size: 28),
-                    ],
-                  ),
-                ),
-              );
+            late final double cx;
+            late final String text;
+            late final String counter;
+            final isLast = _hintStep == 3;
+            switch (_hintStep) {
+              case 1:
+                cx = centerFor(0);
+                text =
+                    'Service: modellspecifika servicescheman, servicepunkter och oljespecifikationer i tabellformat.';
+                counter = '2/4';
+                break;
+              case 2:
+                cx = centerFor(1);
+                text =
+                    'Felsökning: modellspecifik felsökning i chatformat. Ange maskin och din expertis för träffsäkra svar.';
+                counter = '3/4';
+                break;
+              default:
+                cx = centerFor(2);
+                text =
+                    'Arbetsorder: genererar en professionell arbetsrapport för garantiärenden och kunder.';
+                counter = '4/4';
             }
 
-            return Stack(
-              children: [
-                if (_showHintService)
-                  hint(centerFor(0),
-                      'Service: modellspecifika servicescheman, servicepunkter och oljespecifikationer i tabellformat.',
-                      () => setState(() => _showHintService = false)),
-                if (_showHintFelsokning)
-                  hint(centerFor(1),
-                      'Felsökning: modellspecifik felsökning i chatformat. Ange maskin och din expertis för träffsäkra svar.',
-                      () => setState(() => _showHintFelsokning = false)),
-                if (_showHintWorkOrder)
-                  hint(centerFor(2),
-                      'Arbetsorder: genererar en professionell arbetsrapport för garantiärenden och kunder.',
-                      () => setState(() => _showHintWorkOrder = false)),
-              ],
+            return Positioned(
+              bottom: 90,
+              left: cx - 120,
+              child: Material(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 240,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1F2228),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.black.withOpacity(0.4)),
+                      ),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              text,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            counter,
+                            style: const TextStyle(
+                                color: Colors.white, fontWeight: FontWeight.w700),
+                          ),
+                          if (!isLast) ...[
+                            const SizedBox(width: 8),
+                            TextButton(
+                              onPressed: () => setState(() => _hintStep++),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: const Text('Next'),
+                            ),
+                          ],
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: _dismissOnboarding,
+                            child: const Icon(Icons.close, size: 16, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_drop_down, color: Colors.grey, size: 28),
+                  ],
+                ),
+              ),
             );
           }),
-          if (_showAdminOnboarding)
+          if (_hintStep == 0)
             Positioned(
                   top: MediaQuery.of(context).padding.top + kToolbarHeight - 55,
                   right: 88,
@@ -295,7 +311,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                               ),
                               const SizedBox(width: 12),
                               const Text(
-                                '1/1',
+                                '1/4',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
@@ -303,7 +319,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                               ),
                               const SizedBox(width: 12),
                               TextButton(
-                                onPressed: _dismissOnboarding,
+                                onPressed: () => setState(() => _hintStep = 1),
                                 style: TextButton.styleFrom(
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
