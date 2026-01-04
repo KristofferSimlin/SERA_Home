@@ -23,6 +23,9 @@ class HomeShell extends ConsumerStatefulWidget {
 class _HomeShellState extends ConsumerState<HomeShell> {
   final _search = TextEditingController();
   bool _showAdminOnboarding = false;
+  bool _showHintService = true;
+  bool _showHintFelsokning = true;
+  bool _showHintWorkOrder = true;
 
   Future<void> _newChat() async {
     final id = await ref.read(chatRepoProvider).createSession();
@@ -73,6 +76,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     final role = supabase.auth.currentUser?.appMetadata['role']?.toString();
     // Visa alltid för admin under felsökning
     if (role == 'admin') setState(() => _showAdminOnboarding = true);
+    setState(() {
+      _showHintService = true;
+      _showHintFelsokning = true;
+      _showHintWorkOrder = true;
+    });
   }
 
   Future<void> _dismissOnboarding() async {
@@ -183,11 +191,82 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               ],
             )
           : null,
-          body: Stack(
-            children: [
-              bodyContent,
-              if (_showAdminOnboarding)
-                Positioned(
+      body: Stack(
+        children: [
+          bodyContent,
+          Builder(builder: (ctx) {
+            final w = MediaQuery.of(ctx).size.width;
+            final double padding = 12;
+            final double gap = 76;
+            final double rowWidth = w - padding * 2;
+            final double itemWidth = (rowWidth - gap) / 4;
+            double centerFor(int idx) {
+              if (idx == 0) return padding + itemWidth / 2;
+              if (idx == 1) return padding + itemWidth * 1.5;
+              if (idx == 2) return padding + itemWidth * 2.5 + gap;
+              return padding + itemWidth * 3.5 + gap;
+            }
+
+            Widget hint(double centerX, String text, VoidCallback onClose) {
+              return Positioned(
+                bottom: 110,
+                left: centerX - 120,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Column(
+                    children: [
+                      const Icon(Icons.arrow_drop_down, color: Colors.grey, size: 28),
+                      Container(
+                        width: 240,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1F2228),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.black.withOpacity(0.4)),
+                        ),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                text,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: onClose,
+                              child: const Icon(Icons.close, size: 16, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return Stack(
+              children: [
+                if (_showHintService)
+                  hint(centerFor(0),
+                      'Service: modellspecifika servicescheman, servicepunkter och oljespecifikationer i tabellformat.',
+                      () => setState(() => _showHintService = false)),
+                if (_showHintFelsokning)
+                  hint(centerFor(1),
+                      'Felsökning: modellspecifik felsökning i chatformat. Ange maskin och din expertis för träffsäkra svar.',
+                      () => setState(() => _showHintFelsokning = false)),
+                if (_showHintWorkOrder)
+                  hint(centerFor(2),
+                      'Arbetsorder: genererar en professionell arbetsrapport för garantiärenden och kunder.',
+                      () => setState(() => _showHintWorkOrder = false)),
+              ],
+            );
+          }),
+          if (_showAdminOnboarding)
+            Positioned(
                   top: MediaQuery.of(context).padding.top + kToolbarHeight - 55,
                   right: 88,
                   child: Material(
