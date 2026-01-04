@@ -209,13 +209,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
             Widget hint(double centerX, String text, VoidCallback onClose) {
               return Positioned(
-                bottom: 110,
+                bottom: 80,
                 left: centerX - 120,
                 child: Material(
                   color: Colors.transparent,
                   child: Column(
                     children: [
-                      const Icon(Icons.arrow_drop_down, color: Colors.grey, size: 28),
                       Container(
                         width: 240,
                         decoration: BoxDecoration(
@@ -242,6 +241,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                           ],
                         ),
                       ),
+                      const Icon(Icons.arrow_drop_down, color: Colors.grey, size: 28),
                     ],
                   ),
                 ),
