@@ -10,6 +10,7 @@ import '../chat/chat_screen.dart';
 import '../start/widgets/floating_lines_background.dart';
 import '../start/widgets/floating_lines_light_background.dart';
 import '../../services/supabase_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/auth_params.dart';
 
 class HomeShell extends ConsumerStatefulWidget {
@@ -21,6 +22,7 @@ class HomeShell extends ConsumerStatefulWidget {
 
 class _HomeShellState extends ConsumerState<HomeShell> {
   final _search = TextEditingController();
+  bool _showAdminOnboarding = false;
 
   Future<void> _newChat() async {
     final id = await ref.read(chatRepoProvider).createSession();
@@ -59,6 +61,33 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
   Future<void> _openService() async {
     await Navigator.pushNamed(context, '/service');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initOnboarding();
+  }
+
+  Future<void> _initOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    final shown = prefs.getBool('onboard_admin_shown') ?? false;
+    final role = supabase.auth.currentUser?.appMetadata['role']?.toString();
+    if (!shown && role == 'admin') {
+      setState(() {
+        _showAdminOnboarding = true;
+      });
+    }
+  }
+
+  Future<void> _dismissOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboard_admin_shown', true);
+    if (mounted) {
+      setState(() {
+        _showAdminOnboarding = false;
+      });
+    }
   }
 
   @override
@@ -117,10 +146,47 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                   icon: const Icon(Icons.person),
                 ),
                 if (supabase.auth.currentUser?.appMetadata['role'] == 'admin')
-                  IconButton(
-                    tooltip: 'Adminpanel',
-                    onPressed: () => Navigator.pushNamed(context, '/admin'),
-                    icon: const Icon(Icons.admin_panel_settings),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: 'Adminpanel',
+                        onPressed: () => Navigator.pushNamed(context, '/admin'),
+                        icon: const Icon(Icons.admin_panel_settings),
+                      ),
+                      if (_showAdminOnboarding)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Column(
+                            children: [
+                              const Icon(Icons.arrow_drop_up, color: Colors.orange),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.orange.withOpacity(0.6)),
+                                ),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.info_outline, color: Colors.orange),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                        'Här lägger du till fler användare och licenser'),
+                                    const SizedBox(width: 8),
+                                    GestureDetector(
+                                      onTap: _dismissOnboarding,
+                                      child: const Icon(Icons.close, size: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
                 IconButton(
                   tooltip: l.homeNewChat,
