@@ -22,6 +22,7 @@ class HomeShell extends ConsumerStatefulWidget {
 class _HomeShellState extends ConsumerState<HomeShell> {
   final _search = TextEditingController();
   int _hintStep = 0; // 0=admin,1=service,2=felsökning,3=arbetsorder, -1=ingen
+  bool _isAdmin = false;
 
   Future<void> _newChat() async {
     final id = await ref.read(chatRepoProvider).createSession();
@@ -69,8 +70,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   }
 
   Future<void> _initOnboarding() async {
-    // Starta alltid på första hinten under felsökning
-    _hintStep = 0;
+    final role = supabase.auth.currentUser?.appMetadata['role']?.toString();
+    _isAdmin = role == 'admin';
+    _hintStep = _isAdmin ? 0 : 1; // om user: hoppa direkt till service (1/3)
   }
 
   Future<void> _dismissOnboarding() async {
@@ -201,29 +203,30 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             late final double cx;
             late final String text;
             late final String counter;
+            final total = _isAdmin ? 4 : 3;
             final isLast = _hintStep == 3;
             switch (_hintStep) {
               case 1:
                 cx = centerFor(0);
                 text =
                     'Service: modellspecifika servicescheman, servicepunkter och oljespecifikationer i tabellformat.';
-                counter = '2/4';
+                counter = _isAdmin ? '2/4' : '1/3';
                 break;
               case 2:
                 cx = centerFor(1);
                 text =
                     'Felsökning: modellspecifik felsökning i chatformat. Ange maskin och din expertis för träffsäkra svar.';
-                counter = '3/4';
+                counter = _isAdmin ? '3/4' : '2/3';
                 break;
               default:
                 cx = centerFor(2);
                 text =
                     'Arbetsorder: genererar en professionell arbetsrapport för garantiärenden och kunder.';
-                counter = '4/4';
+                counter = _isAdmin ? '4/4' : '3/3';
             }
 
             return Positioned(
-              bottom: 5,
+              bottom: 60,
               left: cx - 120,
               child: Material(
                 color: Colors.transparent,
