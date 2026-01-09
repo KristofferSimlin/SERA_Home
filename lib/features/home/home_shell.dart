@@ -226,7 +226,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             }
 
             return Positioned(
-              bottom: 25,
+              bottom: 15,
               left: cx - 130,
               child: Material(
                 color: Colors.transparent,
