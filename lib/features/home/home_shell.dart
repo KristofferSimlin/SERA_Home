@@ -226,14 +226,14 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             }
 
             return Positioned(
-              bottom: 60,
-              left: cx - 120,
+              bottom: 25,
+              left: cx - 130,
               child: Material(
                 color: Colors.transparent,
                 child: Column(
                   children: [
                     Container(
-                      width: 240,
+                      width: 260,
                       decoration: BoxDecoration(
                         color: const Color(0xFF1F2228),
                         borderRadius: BorderRadius.circular(10),

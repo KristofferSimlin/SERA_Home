@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:sera/l10n/app_localizations.dart';
 import 'dart:html' as html;
+import 'package:flutter/services.dart';
 
 import 'widgets/floating_lines_background.dart';
 import '../../services/stripe_service.dart';
@@ -166,6 +166,10 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                             AutofillHints.username,
                                             AutofillHints.email
                                           ],
+                                          keyboardType: TextInputType.emailAddress,
+                                          textInputAction: TextInputAction.next,
+                                          onSubmitted: () =>
+                                              FocusScope.of(context).nextFocus(),
                                         ),
                                         const SizedBox(height: 12),
                                         _AuthField(
@@ -176,6 +180,9 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                           autofillHints: const [
                                             AutofillHints.password
                                           ],
+                                          textInputAction: TextInputAction.done,
+                                          onSubmitted: () =>
+                                              FocusScope.of(context).unfocus(),
                                         ),
                                         const SizedBox(height: 8),
                                         Align(
@@ -479,6 +486,9 @@ class _AuthField extends StatelessWidget {
     required this.icon,
     this.obscure = false,
     this.autofillHints,
+    this.textInputAction,
+    this.onSubmitted,
+    this.keyboardType,
   });
 
   final TextEditingController controller;
@@ -486,14 +496,20 @@ class _AuthField extends StatelessWidget {
   final IconData icon;
   final bool obscure;
   final List<String>? autofillHints;
+  final TextInputAction? textInputAction;
+  final VoidCallback? onSubmitted;
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return TextField(
+    return TextFormField(
       controller: controller,
       obscureText: obscure,
       autofillHints: autofillHints,
+      textInputAction: textInputAction,
+      keyboardType: keyboardType,
+      onFieldSubmitted: (_) => onSubmitted?.call(),
       style: TextStyle(color: cs.onSurface),
       decoration: InputDecoration(
         filled: true,
