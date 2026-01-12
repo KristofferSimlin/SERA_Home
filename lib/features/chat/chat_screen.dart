@@ -238,7 +238,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     final cs = Theme.of(context).colorScheme;
     final isCompact = MediaQuery.sizeOf(context).width < 720;
-    final isWebMobile = kIsWeb && isCompact;
     final equipmentSummary = [
       state.brand?.trim(),
       state.model?.trim(),
@@ -453,7 +452,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ],
               ),
               FilledButton.icon(
-                onPressed: () => _applyEquipment(collapse: isWebMobile),
+                onPressed: () => _applyEquipment(collapse: isCompact),
                 icon: const Icon(Icons.save),
                 label: Text(l.chatSave),
               ),
@@ -487,7 +486,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Text(l.chatLock),
             const SizedBox(width: 8),
             FilledButton.icon(
-              onPressed: () => _applyEquipment(collapse: isWebMobile),
+              onPressed: () => _applyEquipment(collapse: isCompact),
               icon: const Icon(Icons.save),
               label: Text(l.chatSave),
             ),
@@ -553,31 +552,28 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (isWebMobile)
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              _equipmentCollapsed ? equipmentSummaryText : 'Utrustning',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: _equipmentCollapsed ? Colors.white70 : null,
+                    if (isCompact)
+                      InkWell(
+                        onTap: () {
+                          setState(() => _equipmentCollapsed = !_equipmentCollapsed);
+                        },
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                _equipmentCollapsed ? equipmentSummaryText : 'Utrustning',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: _equipmentCollapsed ? Colors.white70 : null,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          const Spacer(),
-                          TextButton.icon(
-                            onPressed: () {
-                              setState(() => _equipmentCollapsed = !_equipmentCollapsed);
-                            },
-                            icon: Icon(_equipmentCollapsed ? Icons.unfold_more : Icons.unfold_less),
-                            label: Text(_equipmentCollapsed ? 'Ändra' : 'Göm'),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    if (isWebMobile) const SizedBox(height: 8),
-                    if (isWebMobile)
+                    if (isCompact) const SizedBox(height: 8),
+                    if (isCompact)
                       AnimatedCrossFade(
                         firstChild: const SizedBox.shrink(),
                         secondChild: equipmentForm,

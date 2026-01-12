@@ -291,6 +291,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               final rightOffset = isMobile ? 8.0 : 88.0;
               final columnWidth = isMobile ? w - 16 : null;
               final boxMaxWidth = isMobile ? (w - 72).clamp(220.0, 280.0) : null;
+              final arrowOffset = isMobile ? const Offset(-36, 0) : Offset.zero;
 
               Widget controlsRow() {
                 return Row(
@@ -336,8 +337,14 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                         Align(
                           alignment:
                               isMobile ? Alignment.centerLeft : Alignment.centerRight,
-                          child:
-                              const Icon(Icons.arrow_drop_up, color: Colors.grey, size: 32),
+                          child: Transform.translate(
+                            offset: arrowOffset,
+                            child: const Icon(
+                              Icons.arrow_drop_up,
+                              color: Colors.grey,
+                              size: 32,
+                            ),
+                          ),
                         ),
                         Align(
                           alignment: Alignment.centerRight,
