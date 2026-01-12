@@ -1,11 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:html' as html;
 
 import '../../services/supabase_client.dart';
 import '../../utils/auth_params.dart';
+import '../../utils/web_storage.dart' as storage;
 import 'widgets/floating_lines_background.dart';
 
 class ActivateScreen extends StatefulWidget {
@@ -41,24 +40,21 @@ class _ActivateScreenState extends State<ActivateScreen> {
     super.dispose();
   }
 
-  void _persistRefreshFromSession() {
-    if (!kIsWeb) return;
+  Future<void> _persistRefreshFromSession() async {
     final token = supabase.auth.currentSession?.refreshToken;
     if (token != null && token.isNotEmpty) {
-      html.window.localStorage['sera_refresh_token'] = token;
+      await storage.writeLocal('sera_refresh_token', token);
       _storedRefresh = token;
     }
   }
 
   Future<void> _handleInvite() async {
-    if (kIsWeb) {
-      _storedRefresh = html.window.localStorage['sera_refresh_token'];
-    }
+    _storedRefresh = await storage.readLocal('sera_refresh_token');
     if (_storedRefresh != null && _storedRefresh!.isNotEmpty) {
       try {
         final resp = await supabase.auth.setSession(_storedRefresh!);
         if (resp.session != null) {
-          _persistRefreshFromSession();
+          await _persistRefreshFromSession();
           setState(() {
             _email = resp.session!.user.email;
             _loading = false;
@@ -74,10 +70,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
     final uri = widget.sourceUri ?? Uri.base;
     final fallbackParams = widget.initialParams ?? const {};
     debugPrint('activate uri: $uri');
-    if (kIsWeb) {
-      debugPrint('activate href: ${html.window.location.href}');
-      debugPrint('activate hash: ${html.window.location.hash}');
-    }
+    debugPrint('activate fragment: ${uri.fragment}');
     if (!isSupabaseReady()) {
       setState(() {
         _loading = false;
@@ -96,7 +89,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
           : uri;
       final res = await supabase.auth.getSessionFromUrl(fallbackUri);
       if (res.session != null) {
-        _persistRefreshFromSession();
+        await _persistRefreshFromSession();
         setState(() {
           _email = res.session!.user.email;
           _loading = false;
@@ -108,9 +101,9 @@ class _ActivateScreenState extends State<ActivateScreen> {
       // fortsätt till manuell parsning nedan
     }
     var qp = parseAuthParams(uri);
-    if (qp.isEmpty && kIsWeb) {
-      final storedHref = html.window.sessionStorage['sera_auth_href'];
-      final storedFrag = html.window.sessionStorage['sera_auth_fragment'];
+    if (qp.isEmpty) {
+      final storedHref = await storage.readSession('sera_auth_href');
+      final storedFrag = await storage.readSession('sera_auth_fragment');
       if ((storedHref != null && storedHref.isNotEmpty) ||
           (storedFrag != null && storedFrag.isNotEmpty)) {
         final storedUri = storedHref != null && storedHref.isNotEmpty
@@ -127,8 +120,8 @@ class _ActivateScreenState extends State<ActivateScreen> {
     debugPrint('activate parsed params: $qp');
     _lastParams = qp;
     final refreshFromParams = qp['refresh_token'];
-    if (kIsWeb && refreshFromParams != null && refreshFromParams.isNotEmpty) {
-      html.window.localStorage['sera_refresh_token'] = refreshFromParams;
+    if (refreshFromParams != null && refreshFromParams.isNotEmpty) {
+      await storage.writeLocal('sera_refresh_token', refreshFromParams);
       _storedRefresh = refreshFromParams;
     }
     final error = qp['error'];
@@ -147,7 +140,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
         if (resp.session == null) {
           throw 'Session saknas';
         }
-        _persistRefreshFromSession();
+        await _persistRefreshFromSession();
         final user = resp.session!.user;
         setState(() {
           _email = user.email;
@@ -157,9 +150,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
         return;
       } catch (e) {
         // Rensa ev. trasig refresh_token och fortsätt till token_hash-flödet.
-        if (kIsWeb) {
-          html.window.localStorage.remove('sera_refresh_token');
-        }
+        await storage.removeLocal('sera_refresh_token');
         _storedRefresh = null;
       }
     }
@@ -176,7 +167,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
     }
     try {
       await supabase.auth.exchangeCodeForSession(token);
-      _persistRefreshFromSession();
+      await _persistRefreshFromSession();
       final user = supabase.auth.currentUser;
       setState(() {
         _email = user?.email;
@@ -194,7 +185,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
   Future<void> _setPassword() async {
     Future<bool> _ensureSession() async {
       if (supabase.auth.currentSession != null) {
-        _persistRefreshFromSession();
+        await _persistRefreshFromSession();
         return true;
       }
       final refresh = _lastParams['refresh_token'] ?? _storedRefresh;
@@ -202,13 +193,11 @@ class _ActivateScreenState extends State<ActivateScreen> {
         try {
           final resp = await supabase.auth.setSession(refresh);
           if (resp.session != null) {
-            _persistRefreshFromSession();
+            await _persistRefreshFromSession();
             return true;
           }
         } catch (_) {
-          if (kIsWeb) {
-            html.window.localStorage.remove('sera_refresh_token');
-          }
+          await storage.removeLocal('sera_refresh_token');
           _storedRefresh = null;
         }
       }
@@ -217,7 +206,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
         try {
           await supabase.auth.exchangeCodeForSession(token);
           if (supabase.auth.currentSession != null) {
-            _persistRefreshFromSession();
+            await _persistRefreshFromSession();
             return true;
           }
         } catch (_) {}
@@ -261,9 +250,7 @@ class _ActivateScreenState extends State<ActivateScreen> {
     try {
       await supabase.auth.updateUser(UserAttributes(password: p1));
       if (!mounted) return;
-      if (kIsWeb) {
-        html.window.localStorage.remove('sera_refresh_token');
-      }
+      await storage.removeLocal('sera_refresh_token');
       _goDashboard();
     } catch (e) {
       setState(() {

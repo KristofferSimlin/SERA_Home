@@ -285,64 +285,113 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             );
           }),
           if (_hintStep == 0)
-            Positioned(
-                  top: MediaQuery.of(context).padding.top + kToolbarHeight - 55,
-                  right: 88,
-                  child: Material(
-                    color: Colors.transparent,
+            Builder(builder: (ctx) {
+              final w = MediaQuery.of(ctx).size.width;
+              final isMobile = w < 720;
+              final rightOffset = isMobile ? 8.0 : 88.0;
+              final columnWidth = isMobile ? w - 16 : null;
+              final boxMaxWidth = isMobile ? (w - 72).clamp(220.0, 280.0) : null;
+
+              Widget controlsRow() {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      '1/4',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    TextButton(
+                      onPressed: () => setState(() => _hintStep = 1),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: const Text('Next'),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: _dismissOnboarding,
+                      child: const Icon(Icons.close, size: 16, color: Colors.white),
+                    ),
+                  ],
+                );
+              }
+
+              return Positioned(
+                top: MediaQuery.of(ctx).padding.top + kToolbarHeight - 55,
+                right: rightOffset,
+                child: Material(
+                  color: Colors.transparent,
+                  child: SizedBox(
+                    width: columnWidth,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Icon(Icons.arrow_drop_up, color: Colors.grey, size: 32),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF1F2228),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.black.withOpacity(0.4)),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const SizedBox(width: 6),
-                              const SizedBox(
-                                width: 220,
-                                child: Text(
-                                  'Adminpanel: hantera abonnemang och användardata.\nLägg till/ta bort licenser och användare.',
-                                  style: TextStyle(color: Colors.white),
-                                ),
+                        Align(
+                          alignment:
+                              isMobile ? Alignment.centerLeft : Alignment.centerRight,
+                          child:
+                              const Icon(Icons.arrow_drop_up, color: Colors.grey, size: 32),
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ConstrainedBox(
+                            constraints: isMobile
+                                ? BoxConstraints(maxWidth: boxMaxWidth!)
+                                : const BoxConstraints(),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1F2228),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.black.withOpacity(0.4)),
                               ),
-                              const SizedBox(width: 12),
-                              const Text(
-                                '1/4',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              TextButton(
-                                onPressed: () => setState(() => _hintStep = 1),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: const Text('Next'),
-                              ),
-                              const SizedBox(width: 8),
-                              GestureDetector(
-                                onTap: _dismissOnboarding,
-                                child: const Icon(Icons.close, size: 16, color: Colors.white),
-                              ),
-                            ],
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              child: isMobile
+                                  ? Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Adminpanel: hantera abonnemang och användardata.\nLägg till/ta bort licenser och användare.',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: controlsRow(),
+                                        ),
+                                      ],
+                                    )
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const SizedBox(width: 6),
+                                        const SizedBox(
+                                          width: 220,
+                                          child: Text(
+                                            'Adminpanel: hantera abonnemang och användardata.\nLägg till/ta bort licenser och användare.',
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        controlsRow(),
+                                      ],
+                                    ),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
+              );
+            }),
             ],
           ),
       bottomNavigationBar: _MobileBottomBar(
@@ -681,7 +730,7 @@ class _LandingArea extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'sera_logo/SERA6.png',
+                          'sera_logo/SERA6_original.png',
                           height: 70,
                           semanticLabel: 'SERA logo',
                         ),

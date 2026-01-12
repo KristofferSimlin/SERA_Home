@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sera/l10n/app_localizations.dart';
-import 'dart:html' as html;
 import 'package:flutter/services.dart';
 
 import 'widgets/floating_lines_background.dart';
 import '../../services/stripe_service.dart';
 import '../../services/supabase_client.dart';
+import '../../utils/web_storage.dart' as storage;
 
 class BusinessLoginScreen extends StatefulWidget {
   const BusinessLoginScreen({super.key});
@@ -26,12 +26,17 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
   @override
   void initState() {
     super.initState();
-    if (kIsWeb) {
-      final savedEmail = html.window.localStorage['sera_login_email'];
-      if (savedEmail != null && savedEmail.isNotEmpty) {
+    _loadRememberedEmail();
+  }
+
+  Future<void> _loadRememberedEmail() async {
+    final savedEmail = await storage.readLocal('sera_login_email');
+    if (!mounted) return;
+    if (savedEmail != null && savedEmail.isNotEmpty) {
+      setState(() {
         _userCtrl.text = savedEmail;
         _rememberMe = true;
-      }
+      });
     }
   }
 
@@ -47,6 +52,8 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
     final l = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+    final showCompanySignup =
+        kIsWeb || defaultTargetPlatform != TargetPlatform.iOS;
     return Scaffold(
       appBar: AppBar(title: Text(l.startLoginBusiness)),
       body: Stack(
@@ -193,12 +200,13 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                               Checkbox(
                                                 value: _rememberMe,
                                                 onChanged: (v) {
+                                                  final next = v ?? false;
                                                   setState(() {
-                                                    _rememberMe = v ?? false;
+                                                    _rememberMe = next;
                                                   });
-                                                  if (kIsWeb && !(v ?? false)) {
-                                                    html.window.localStorage
-                                                        .remove('sera_login_email');
+                                                  if (!next) {
+                                                    storage.removeLocal(
+                                                        'sera_login_email');
                                                   }
                                                 },
                                               ),
@@ -223,15 +231,20 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
                                   onPressed: _resetPassword,
                                   child: const Text('Glömt lösenord?'),
                                 ),
-                                const SizedBox(height: 6),
-                                _GradientButton(
-                                  label: _isPaying
-                                      ? 'Öppnar kassa...'
-                                      : 'Skapa företagskonto',
-                                  onPressed:
-                                      _isPaying ? null : () => _openCheckout(),
-                                ),
-                                const SizedBox(height: 4),
+                                if (showCompanySignup) ...[
+                                  const SizedBox(height: 6),
+                                  _GradientButton(
+                                    label: _isPaying
+                                        ? 'Öppnar kassa...'
+                                        : 'Skapa företagskonto',
+                                    onPressed: _isPaying
+                                        ? null
+                                        : () => _openCheckout(),
+                                  ),
+                                  const SizedBox(height: 4),
+                                ] else ...[
+                                  const SizedBox(height: 10),
+                                ],
                                 Text(
                                   l.businessLoginFooter,
                                   textAlign: TextAlign.center,
@@ -316,10 +329,13 @@ class _BusinessLoginScreenState extends State<BusinessLoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Inloggad som $role')),
       );
-      if (kIsWeb && _rememberMe) {
-        html.window.localStorage['sera_login_email'] = email;
-      } else if (!kIsWeb && _rememberMe) {
-        TextInput.finishAutofillContext(shouldSave: true);
+      if (_rememberMe) {
+        await storage.writeLocal('sera_login_email', email);
+        if (!kIsWeb) {
+          TextInput.finishAutofillContext(shouldSave: true);
+        }
+      } else {
+        await storage.removeLocal('sera_login_email');
       }
       Navigator.pushNamedAndRemoveUntil(context, '/', (r) => false);
     } catch (e) {

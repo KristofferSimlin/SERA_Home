@@ -228,7 +228,7 @@ class _StartScreenState extends State<StartScreen>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Image.asset(
-                                  'sera_logo/SERA6.png',
+                                  'sera_logo/SERA6_original.png',
                                   height: logoSize,
                                   semanticLabel: 'SERA logo',
                                 ),

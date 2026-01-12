@@ -1,5 +1,6 @@
 name: sera
 description: SERA – Service & Equipment Repair Assistant (Flutter)
+version: 1.0.0+1
 publish_to: "none"
 
 environment:
@@ -41,3 +42,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "sera_logo/SERA6.png"
+  remove_alpha_ios: true

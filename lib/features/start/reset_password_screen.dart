@@ -1,11 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:html' as html;
 
 import '../../services/supabase_client.dart';
 import '../start/widgets/floating_lines_background.dart';
 import '../../utils/auth_params.dart';
+import '../../utils/web_storage.dart' as storage;
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -51,8 +50,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     } catch (_) {}
 
     var qp = parseAuthParams(uri);
-    if (qp.isEmpty && kIsWeb) {
-      final storedHref = html.window.sessionStorage['sera_auth_href'];
+    if (qp.isEmpty) {
+      final storedHref = await storage.readSession('sera_auth_href');
       if (storedHref != null && storedHref.isNotEmpty) {
         qp = parseAuthParams(Uri.parse(storedHref));
       }
