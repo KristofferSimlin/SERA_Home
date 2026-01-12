@@ -291,7 +291,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               final rightOffset = isMobile ? 8.0 : 88.0;
               final columnWidth = isMobile ? w - 16 : null;
               final boxMaxWidth = isMobile ? (w - 72).clamp(220.0, 280.0) : null;
-              final arrowOffset = isMobile ? const Offset(250, 0) : Offset.zero;
+              final arrowOffset = isMobile ? const Offset(251, 0) : Offset.zero;
 
               Widget controlsRow() {
                 return Row(
