@@ -229,13 +229,13 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
             return Positioned(
               bottom: 15,
-              left: cx - 130 + serviceBoxDx,
+              left: cx - 130,
               child: Material(
                 color: Colors.transparent,
                 child: Column(
                   children: [
                     Transform.translate(
-                      offset: Offset.zero,
+                      offset: Offset(serviceBoxDx, 0),
                       child: Container(
                         width: 260,
                         decoration: BoxDecoration(
