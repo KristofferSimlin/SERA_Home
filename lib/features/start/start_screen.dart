@@ -315,11 +315,10 @@ class _StartScreenState extends State<StartScreen>
                           SizedBox(height: config.callToActionSpacing),
                           Container(
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
+                              gradient: LinearGradient(
                                 colors: [
-                                  Color(0xFF6EE7FF),
-                                  Color(0xFF8A6DFF),
-                                  Color(0xFF55F273),
+                                  cs.primary.withOpacity(0.75),
+                                  cs.secondary.withOpacity(0.75),
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
@@ -329,7 +328,7 @@ class _StartScreenState extends State<StartScreen>
                             padding: const EdgeInsets.all(1.5),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.6),
+                                color: const Color(0xFF0E121A), // solid inner background so gradient only on frame
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               padding: const EdgeInsets.symmetric(
