@@ -190,7 +190,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             if (_hintStep < 1 || _hintStep > 3) return const SizedBox.shrink();
             final w = MediaQuery.of(ctx).size.width;
             final isMobile = w < 720;
-            final serviceBoxOffset = (isMobile && _hintStep == 1) ? 40.0 : 0.0;
+            final serviceBoxDx = (isMobile && _hintStep == 1) ? 80.0 : 0.0; // flytta service-hint i x-led på mobil
             final double padding = 12;
             final double gap = 76;
             final double rowWidth = w - padding * 2;
@@ -229,13 +229,13 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
             return Positioned(
               bottom: 15,
-              left: cx - 130,
+              left: cx - 130 + serviceBoxDx,
               child: Material(
                 color: Colors.transparent,
                 child: Column(
                   children: [
                     Transform.translate(
-                      offset: Offset(serviceBoxOffset, 80),
+                      offset: Offset.zero,
                       child: Container(
                         width: 260,
                         decoration: BoxDecoration(
