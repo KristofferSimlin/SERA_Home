@@ -190,6 +190,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             if (_hintStep < 1 || _hintStep > 3) return const SizedBox.shrink();
             final w = MediaQuery.of(ctx).size.width;
             final isMobile = w < 720;
+            final serviceBoxOffset = (isMobile && _hintStep == 1) ? 40.0 : 0.0;
             final double padding = 12;
             final double gap = 76;
             final double rowWidth = w - padding * 2;
@@ -234,13 +235,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 child: Column(
                   children: [
                     Transform.translate(
-                      offset: (isMobile && _hintStep == 1)
-                          ? const Offset(80, 0)
-                          : Offset.zero,
+                      offset: Offset(serviceBoxOffset, 0),
                       child: Container(
                         width: 260,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1F2228),
+                          color: Colors.black.withOpacity(0.78),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.black.withOpacity(0.4)),
                         ),
@@ -360,7 +359,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                                 : const BoxConstraints(),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1F2228),
+                                color: Colors.black.withOpacity(0.78),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(color: Colors.black.withOpacity(0.4)),
                               ),
