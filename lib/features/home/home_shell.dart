@@ -120,7 +120,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       onLogout: () async {
         await supabase.auth.signOut();
         if (!mounted) return;
-        Navigator.pushNamedAndRemoveUntil(context, '/', (r) => false);
+        Navigator.pushNamedAndRemoveUntil(context, '/start', (r) => false);
       },
       currentUserEmail: supabase.auth.currentUser?.email,
       currentUserRole:
