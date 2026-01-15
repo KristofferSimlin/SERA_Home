@@ -317,18 +317,19 @@ class _StartScreenState extends State<StartScreen>
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [
-                                  Color(0xFF5EE7DF),
-                                  Color(0xFFB490CA),
+                                  Color(0xFF6EE7FF),
+                                  Color(0xFF8A6DFF),
+                                  Color(0xFF55F273),
                                 ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
                               ),
                               borderRadius: BorderRadius.circular(14),
                             ),
                             padding: const EdgeInsets.all(1.5),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: cs.surface.withOpacity(0.9),
+                                color: Colors.black.withOpacity(0.6),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               padding: const EdgeInsets.symmetric(
