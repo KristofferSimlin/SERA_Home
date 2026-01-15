@@ -235,7 +235,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                   children: [
                     Transform.translate(
                       offset: (isMobile && _hintStep == 1)
-                          ? const Offset(32, 0)
+                          ? const Offset(80, 0)
                           : Offset.zero,
                       child: Container(
                         width: 260,
