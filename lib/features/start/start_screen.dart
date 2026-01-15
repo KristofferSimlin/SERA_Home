@@ -333,15 +333,14 @@ class _StartScreenState extends State<StartScreen>
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 14,
+                                horizontal: 18,
+                                vertical: 18,
                               ),
                               child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   SizedBox(
-                                    width: config.fullWidthButton
-                                        ? double.infinity
-                                        : null,
+                                    width: double.infinity,
                                     child: FilledButton.icon(
                                       style: FilledButton.styleFrom(
                                         shape: RoundedRectangleBorder(
