@@ -234,53 +234,51 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 color: Colors.transparent,
                 child: Column(
                   children: [
-                    Transform.translate(
-                      offset: Offset(serviceBoxDx, 0),
-                      child: Container(
-                        width: 260,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.78),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black.withOpacity(0.4)),
-                        ),
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                text,
-                                style: const TextStyle(color: Colors.white),
-                              ),
+                    Container(
+                      margin: EdgeInsets.only(left: serviceBoxDx),
+                      width: 260,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.78),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.black.withOpacity(0.4)),
+                      ),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              text,
+                              style: const TextStyle(color: Colors.white),
                             ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            counter,
+                            style: const TextStyle(
+                                color: Colors.white, fontWeight: FontWeight.w700),
+                          ),
+                          if (!isLast) ...[
                             const SizedBox(width: 8),
-                            Text(
-                              counter,
-                              style: const TextStyle(
-                                  color: Colors.white, fontWeight: FontWeight.w700),
-                            ),
-                            if (!isLast) ...[
-                              const SizedBox(width: 8),
-                              TextButton(
-                                onPressed: () => setState(() => _hintStep++),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: const Text('Next'),
+                            TextButton(
+                              onPressed: () => setState(() => _hintStep++),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
-                            ],
-                            const SizedBox(width: 8),
-                            GestureDetector(
-                              onTap: _dismissOnboarding,
-                              child: const Icon(Icons.close, size: 16, color: Colors.white),
+                              child: const Text('Next'),
                             ),
                           ],
-                        ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: _dismissOnboarding,
+                            child: const Icon(Icons.close, size: 16, color: Colors.white),
+                          ),
+                        ],
                       ),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey, size: 28),
