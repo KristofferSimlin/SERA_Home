@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sera/l10n/app_localizations.dart';
 import '../chats/chat_models.dart';
 import '../chats/chat_providers.dart' show sessionsProvider;
@@ -23,6 +24,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   final _search = TextEditingController();
   int _hintStep = 0; // 0=admin,1=service,2=felsökning,3=arbetsorder, -1=ingen
   bool _isAdmin = false;
+  static const _hintPrefsPrefix = 'hints_seen_';
 
   Future<void> _newChat() async {
     final id = await ref.read(chatRepoProvider).createSession();
@@ -71,16 +73,41 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
   Future<void> _initOnboarding() async {
     final role = supabase.auth.currentUser?.appMetadata['role']?.toString();
-    _isAdmin = role == 'admin';
-    _hintStep = _isAdmin ? 0 : 1; // om user: hoppa direkt till service (1/3)
+    final userId = supabase.auth.currentUser?.id ?? 'anon';
+    final prefs = await SharedPreferences.getInstance();
+    final seen = prefs.getBool('$_hintPrefsPrefix$userId') ?? false;
+    if (!mounted) return;
+    setState(() {
+      _isAdmin = role == 'admin';
+      _hintStep = seen ? -1 : (_isAdmin ? 0 : 1); // om user: hoppa direkt till service (1/3)
+    });
+  }
+
+  Future<void> _markOnboardingSeen() async {
+    final userId = supabase.auth.currentUser?.id ?? 'anon';
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('$_hintPrefsPrefix$userId', true);
   }
 
   Future<void> _dismissOnboarding() async {
-    if (mounted) {
-      setState(() {
-        _hintStep = -1;
-      });
+    await _markOnboardingSeen();
+    if (!mounted) return;
+    setState(() {
+      _hintStep = -1;
+    });
+  }
+
+  Future<void> _nextHint() async {
+    final last = 3; // både admin och user avslutar på steg 3
+    final next = _hintStep + 1;
+    if (next > last) {
+      await _dismissOnboarding();
+      return;
     }
+    if (!mounted) return;
+    setState(() {
+      _hintStep = next;
+    });
   }
 
   @override
@@ -106,6 +133,13 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       },
       searchCtrl: _search,
       showNavLinks: !isWide,
+      onShowTips: () {
+        setState(() {
+          final role = supabase.auth.currentUser?.appMetadata['role']?.toString();
+          _isAdmin = role == 'admin';
+          _hintStep = _isAdmin ? 0 : 1;
+        });
+      },
     );
 
     final bodyContent = Row(
@@ -262,7 +296,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                           if (!isLast) ...[
                             const SizedBox(width: 8),
                             TextButton(
-                              onPressed: () => setState(() => _hintStep++),
+                              onPressed: _nextHint,
                               style: TextButton.styleFrom(
                                 foregroundColor: Colors.white,
                                 padding:
@@ -424,6 +458,7 @@ class _Sidebar extends ConsumerWidget {
     required this.onOpenChat,
     required this.searchCtrl,
     required this.showNavLinks,
+    this.onShowTips,
   });
 
   final Future<void> Function() onLogout;
@@ -433,6 +468,7 @@ class _Sidebar extends ConsumerWidget {
   final void Function(String id) onOpenChat;
   final TextEditingController searchCtrl;
   final bool showNavLinks;
+  final VoidCallback? onShowTips;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -472,6 +508,14 @@ class _Sidebar extends ConsumerWidget {
                 onPressed: onLogout,
                 icon: const Icon(Icons.logout, size: 18),
                 label: const Text('Logga ut'),
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: onShowTips,
+                icon: const Icon(Icons.tips_and_updates, size: 18),
+                label: const Text("Tips"),
               ),
             ),
             const SizedBox(height: 8),
