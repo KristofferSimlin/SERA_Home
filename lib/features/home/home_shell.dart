@@ -235,7 +235,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 child: Column(
                   children: [
                     Transform.translate(
-                      offset: Offset(serviceBoxOffset, 0),
+                      offset: Offset(serviceBoxOffset, 40),
                       child: Container(
                         width: 260,
                         decoration: BoxDecoration(
