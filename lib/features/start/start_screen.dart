@@ -242,7 +242,7 @@ class _StartScreenState extends State<StartScreen>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Image.asset(
-                                      'sera_logo/SERA-Text-blank.png',
+                                      'sera_logo/SERA-text-blank.png',
                                       height: titleHeight,
                                       semanticLabel: 'SERA wordmark',
                                     ),
@@ -282,7 +282,7 @@ class _StartScreenState extends State<StartScreen>
                                 ),
                                 SizedBox(width: logoSpacing),
                                 Image.asset(
-                                  'sera_logo/SERA-Text-blank.png',
+                                  'sera_logo/SERA-text-blank.png',
                                   height: titleHeight,
                                   semanticLabel: 'SERA wordmark',
                                 ),

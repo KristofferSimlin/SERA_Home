@@ -812,7 +812,7 @@ class _LandingArea extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Image.asset(
-                          'sera_logo/SERA-Text-blank.png',
+                          'sera_logo/SERA-text-blank.png',
                           height: titleHeight,
                           semanticLabel: 'SERA wordmark',
                         ),
