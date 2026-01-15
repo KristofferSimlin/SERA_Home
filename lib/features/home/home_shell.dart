@@ -189,6 +189,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           Builder(builder: (ctx) {
             if (_hintStep < 1 || _hintStep > 3) return const SizedBox.shrink();
             final w = MediaQuery.of(ctx).size.width;
+            final isMobile = w < 720;
             final double padding = 12;
             final double gap = 76;
             final double rowWidth = w - padding * 2;
@@ -232,50 +233,55 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 color: Colors.transparent,
                 child: Column(
                   children: [
-                    Container(
-                      width: 260,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1F2228),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.black.withOpacity(0.4)),
-                      ),
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              text,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            counter,
-                            style: const TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.w700),
-                          ),
-                          if (!isLast) ...[
-                            const SizedBox(width: 8),
-                            TextButton(
-                              onPressed: () => setState(() => _hintStep++),
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    Transform.translate(
+                      offset: (isMobile && _hintStep == 1)
+                          ? const Offset(32, 0)
+                          : Offset.zero,
+                      child: Container(
+                        width: 260,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1F2228),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.black.withOpacity(0.4)),
+                        ),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                text,
+                                style: const TextStyle(color: Colors.white),
                               ),
-                              child: const Text('Next'),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              counter,
+                              style: const TextStyle(
+                                  color: Colors.white, fontWeight: FontWeight.w700),
+                            ),
+                            if (!isLast) ...[
+                              const SizedBox(width: 8),
+                              TextButton(
+                                onPressed: () => setState(() => _hintStep++),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: const Text('Next'),
+                              ),
+                            ],
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: _dismissOnboarding,
+                              child: const Icon(Icons.close, size: 16, color: Colors.white),
                             ),
                           ],
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: _dismissOnboarding,
-                            child: const Icon(Icons.close, size: 16, color: Colors.white),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                     const Icon(Icons.arrow_drop_down, color: Colors.grey, size: 28),
