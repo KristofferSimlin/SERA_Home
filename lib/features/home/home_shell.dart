@@ -79,7 +79,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     if (!mounted) return;
     setState(() {
       _isAdmin = role == 'admin';
-      _hintStep = seen ? -1 : (_isAdmin ? 0 : 1); // om user: hoppa direkt till service (1/3)
+      _hintStep = seen
+          ? -1
+          : (_isAdmin ? 0 : 1); // om user: hoppa direkt till service (1/3)
     });
   }
 
@@ -135,7 +137,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       showNavLinks: !isWide,
       onShowTips: () {
         setState(() {
-          final role = supabase.auth.currentUser?.appMetadata['role']?.toString();
+          final role =
+              supabase.auth.currentUser?.appMetadata['role']?.toString();
           _isAdmin = role == 'admin';
           _hintStep = _isAdmin ? 0 : 1;
         });
@@ -224,7 +227,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             if (_hintStep < 1 || _hintStep > 3) return const SizedBox.shrink();
             final w = MediaQuery.of(ctx).size.width;
             final isMobile = w < 720;
-            final serviceBoxDx = (isMobile && _hintStep == 1) ? 80.0 : 0.0; // flytta service-hint i x-led på mobil
+            final serviceBoxDx = (isMobile && _hintStep == 1)
+                ? 80.0
+                : 0.0; // flytta service-hint i x-led på mobil
             final double padding = 12;
             final double gap = 76;
             final double rowWidth = w - padding * 2;
@@ -274,10 +279,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.78),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.black.withOpacity(0.4)),
+                        border:
+                            Border.all(color: Colors.black.withOpacity(0.4)),
                       ),
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -291,7 +297,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                           Text(
                             counter,
                             style: const TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.w700),
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700),
                           ),
                           if (!isLast) ...[
                             const SizedBox(width: 8),
@@ -299,8 +306,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                               onPressed: _nextHint,
                               style: TextButton.styleFrom(
                                 foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
                                 minimumSize: Size.zero,
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
@@ -310,12 +317,14 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                           const SizedBox(width: 8),
                           GestureDetector(
                             onTap: _dismissOnboarding,
-                            child: const Icon(Icons.close, size: 16, color: Colors.white),
+                            child: const Icon(Icons.close,
+                                size: 16, color: Colors.white),
                           ),
                         ],
                       ),
                     ),
-                    const Icon(Icons.arrow_drop_down, color: Colors.grey, size: 28),
+                    const Icon(Icons.arrow_drop_down,
+                        color: Colors.grey, size: 28),
                   ],
                 ),
               ),
@@ -327,7 +336,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               final isMobile = w < 720;
               final rightOffset = isMobile ? 8.0 : 88.0;
               final columnWidth = isMobile ? w - 16 : null;
-              final boxMaxWidth = isMobile ? (w - 72).clamp(220.0, 280.0) : null;
+              final boxMaxWidth =
+                  isMobile ? (w - 72).clamp(220.0, 280.0) : null;
               final arrowOffset = isMobile ? const Offset(248, 0) : Offset.zero;
 
               Widget controlsRow() {
@@ -346,7 +356,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                       onPressed: () => setState(() => _hintStep = 1),
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
@@ -355,7 +366,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                     const SizedBox(width: 8),
                     GestureDetector(
                       onTap: _dismissOnboarding,
-                      child: const Icon(Icons.close, size: 16, color: Colors.white),
+                      child: const Icon(Icons.close,
+                          size: 16, color: Colors.white),
                     ),
                   ],
                 );
@@ -372,8 +384,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Align(
-                          alignment:
-                              isMobile ? Alignment.centerLeft : Alignment.centerRight,
+                          alignment: isMobile
+                              ? Alignment.centerLeft
+                              : Alignment.centerRight,
                           child: Transform.translate(
                             offset: arrowOffset,
                             child: const Icon(
@@ -393,13 +406,15 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                               decoration: BoxDecoration(
                                 color: Colors.black.withOpacity(0.78),
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.black.withOpacity(0.4)),
+                                border: Border.all(
+                                    color: Colors.black.withOpacity(0.4)),
                               ),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
                               child: isMobile
                                   ? Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         const Text(
                                           'Adminpanel: hantera abonnemang och användardata.\nLägg till/ta bort licenser och användare.',
@@ -420,7 +435,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                                           width: 220,
                                           child: Text(
                                             'Adminpanel: hantera abonnemang och användardata.\nLägg till/ta bort licenser och användare.',
-                                            style: TextStyle(color: Colors.white),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                         ),
                                         const SizedBox(width: 12),
@@ -436,8 +452,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 ),
               );
             }),
-            ],
-          ),
+        ],
+      ),
       bottomNavigationBar: _MobileBottomBar(
         onService: _openService,
         onFelsokning: _newChat,
@@ -493,14 +509,12 @@ class _Sidebar extends ConsumerWidget {
             if ((currentUserRole ?? '').isNotEmpty)
               Align(
                 alignment: Alignment.centerLeft,
-              child: Text(
-                'Roll: ${currentUserRole!}',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                child: Text(
+                  'Roll: ${currentUserRole!}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
               ),
-            ),
             const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerLeft,
@@ -726,7 +740,15 @@ class _LandingArea extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final baseTextColor = isDark ? Colors.white : Colors.black87;
     final mutedTextColor = isDark ? Colors.white70 : Colors.black54;
-    final badgeBg = isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.08);
+    final badgeBg = isDark
+        ? Colors.white.withOpacity(0.08)
+        : Colors.black.withOpacity(0.08);
+    final titleStyle = Theme.of(context).textTheme.displaySmall?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: baseTextColor,
+        );
+    final titleHeight =
+        (titleStyle?.fontSize ?? 36) * (titleStyle?.height ?? 1.0);
     const isWeb = kIsWeb;
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
     final lineCount = isWeb ? const [4, 6, 8] : const [8, 12, 16];
@@ -789,21 +811,15 @@ class _LandingArea extends StatelessWidget {
                           semanticLabel: 'SERA logo',
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'SERA',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .displaySmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: baseTextColor,
-                              ),
+                        Image.asset(
+                          'sera_logo/SERA-Text-blank.png',
+                          height: titleHeight,
+                          semanticLabel: 'SERA wordmark',
                         ),
                         const SizedBox(width: 6),
                         Container(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: badgeBg,
                             borderRadius: BorderRadius.circular(999),
@@ -930,7 +946,8 @@ class _FeatureCardsState extends State<_FeatureCards> {
                           });
                         }
                       : card.onTap;
-                  final expandedOverride = isMobile ? _mobileExpanded == i : null;
+                  final expandedOverride =
+                      isMobile ? _mobileExpanded == i : null;
 
                   return SizedBox(
                     width: itemWidth,

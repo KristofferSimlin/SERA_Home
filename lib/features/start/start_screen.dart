@@ -166,6 +166,8 @@ class _StartScreenState extends State<StartScreen>
             : Theme.of(context).textTheme.displayLarge)
         ?.copyWith(
             fontWeight: FontWeight.bold, letterSpacing: titleLetterSpacing);
+    final titleHeight =
+        (titleStyle?.fontSize ?? 32) * (titleStyle?.height ?? 1.0);
     final loginBoxMaxWidth =
         isSmallPhone ? config.maxContentWidth : config.maxContentWidth * 0.55;
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
@@ -239,10 +241,10 @@ class _StartScreenState extends State<StartScreen>
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      'SERA',
-                                      textAlign: TextAlign.center,
-                                      style: titleStyle,
+                                    Image.asset(
+                                      'sera_logo/SERA-Text-blank.png',
+                                      height: titleHeight,
+                                      semanticLabel: 'SERA wordmark',
                                     ),
                                     const SizedBox(width: 6),
                                     Container(
@@ -279,10 +281,10 @@ class _StartScreenState extends State<StartScreen>
                                   semanticLabel: 'SERA logo',
                                 ),
                                 SizedBox(width: logoSpacing),
-                                Text(
-                                  'SERA',
-                                  textAlign: TextAlign.center,
-                                  style: titleStyle,
+                                Image.asset(
+                                  'sera_logo/SERA-Text-blank.png',
+                                  height: titleHeight,
+                                  semanticLabel: 'SERA wordmark',
                                 ),
                                 SizedBox(width: logoSpacing),
                                 Container(
