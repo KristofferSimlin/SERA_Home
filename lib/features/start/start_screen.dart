@@ -313,45 +313,82 @@ class _StartScreenState extends State<StartScreen>
                                 ),
                           ),
                           SizedBox(height: config.callToActionSpacing),
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: config.fullWidthButton
-                                    ? double.infinity
-                                    : null,
-                                child: FilledButton.icon(
-                                  onPressed: _handleBusinessLogin,
-                                  icon: const Icon(Icons.business_center),
-                                  label: Text(l.startLoginBusiness),
-                                ),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF5EE7DF),
+                                  Color(0xFFB490CA),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
-                              const SizedBox(height: 10),
-                              SizedBox(
-                                width: config.fullWidthButton
-                                    ? double.infinity
-                                    : null,
-                                child: FilledButton.icon(
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor:
-                                        cs.primary.withOpacity(0.85),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            padding: const EdgeInsets.all(1.5),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: cs.surface.withOpacity(0.9),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 14,
+                              ),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    width: config.fullWidthButton
+                                        ? double.infinity
+                                        : null,
+                                    child: FilledButton.icon(
+                                      style: FilledButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      onPressed: _handleBusinessLogin,
+                                      icon: const Icon(Icons.business_center),
+                                      label: Text(l.startLoginBusiness),
+                                    ),
                                   ),
-                                  onPressed: _handlePersonalAccess,
-                                  icon: const Icon(Icons.person),
-                                  label: Text(l.startLoginPersonal),
-                                ),
+                                  const SizedBox(height: 10),
+                                  SizedBox(
+                                    width: config.fullWidthButton
+                                        ? double.infinity
+                                        : null,
+                                    child: FilledButton.icon(
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor:
+                                            cs.primary.withOpacity(0.85),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      onPressed: _handlePersonalAccess,
+                                      icon: const Icon(Icons.person),
+                                      label: Text(l.startLoginPersonal),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  SizedBox(
+                                    width: config.fullWidthButton
+                                        ? double.infinity
+                                        : null,
+                                    child: OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      onPressed: _enterApp,
+                                      icon: const Icon(Icons.play_arrow_rounded),
+                                      label: Text(l.startCta),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 12),
-                              SizedBox(
-                                width: config.fullWidthButton
-                                    ? double.infinity
-                                    : null,
-                                child: OutlinedButton.icon(
-                                  onPressed: _enterApp,
-                                  icon: const Icon(Icons.play_arrow_rounded),
-                                  label: Text(l.startCta),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                           const Spacer(),
                           Text(
