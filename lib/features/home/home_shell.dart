@@ -749,6 +749,7 @@ class _LandingArea extends StatelessWidget {
         );
     final titleHeight =
         (titleStyle?.fontSize ?? 36) * (titleStyle?.height ?? 1.0);
+    final wordmarkHeight = titleHeight * 0.75;
     const isWeb = kIsWeb;
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
     final lineCount = isWeb ? const [4, 6, 8] : const [8, 12, 16];
@@ -812,8 +813,8 @@ class _LandingArea extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Image.asset(
-                          'sera_logo/SERA-text-blank.png',
-                          height: titleHeight,
+                          'sera_logo/sera_text_blank.png',
+                          height: wordmarkHeight,
                           semanticLabel: 'SERA wordmark',
                         ),
                         const SizedBox(width: 6),

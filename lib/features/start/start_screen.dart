@@ -168,6 +168,7 @@ class _StartScreenState extends State<StartScreen>
             fontWeight: FontWeight.bold, letterSpacing: titleLetterSpacing);
     final titleHeight =
         (titleStyle?.fontSize ?? 32) * (titleStyle?.height ?? 1.0);
+    final wordmarkHeight = titleHeight * 0.75;
     final loginBoxMaxWidth =
         isSmallPhone ? config.maxContentWidth : config.maxContentWidth * 0.55;
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
@@ -242,8 +243,8 @@ class _StartScreenState extends State<StartScreen>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Image.asset(
-                                      'sera_logo/SERA-text-blank.png',
-                                      height: titleHeight,
+                                      'sera_logo/sera_text_blank.png',
+                                      height: wordmarkHeight,
                                       semanticLabel: 'SERA wordmark',
                                     ),
                                     const SizedBox(width: 6),
@@ -282,8 +283,8 @@ class _StartScreenState extends State<StartScreen>
                                 ),
                                 SizedBox(width: logoSpacing),
                                 Image.asset(
-                                  'sera_logo/SERA-text-blank.png',
-                                  height: titleHeight,
+                                  'sera_logo/sera_text_blank.png',
+                                  height: wordmarkHeight,
                                   semanticLabel: 'SERA wordmark',
                                 ),
                                 SizedBox(width: logoSpacing),
