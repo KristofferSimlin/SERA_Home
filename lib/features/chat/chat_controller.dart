@@ -235,7 +235,7 @@ class ChatController extends StateNotifier<ChatState> {
       final intro = Message(
         role: ChatRole.assistant,
         text:
-            'Hej! Jag är SERA – Service & Equipment Repair Assistant. Fyll gärna i märke, modell, årsmodell och din kunskapsnivå så kan jag hjälpa dig mer träffsäkert.',
+            'Hej jag är SERA! Vad behöver du hjälp med? Jag guidar dig säkert genom material, verktyg och steg-för-steg.',
       );
       msgs = [intro];
       await repo.appendMessages(sessionId, [intro.toDto()]);

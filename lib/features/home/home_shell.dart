@@ -919,7 +919,12 @@ class _FeatureCardsState extends State<_FeatureCards> {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         const spacing = 10.0;
-        final isMobile = width < 720;
+        final supportsHover = kIsWeb ||
+            {
+              TargetPlatform.windows,
+              TargetPlatform.macOS,
+              TargetPlatform.linux,
+            }.contains(defaultTargetPlatform);
         final textColor = widget.isDark ? Colors.white : Colors.black87;
         final mutedTextColor = widget.isDark ? Colors.white70 : Colors.black54;
         final borderBaseColor = widget.isDark ? Colors.white : Colors.black87;
@@ -942,15 +947,16 @@ class _FeatureCardsState extends State<_FeatureCards> {
               for (var i = 0; i < cards.length; i++)
                 Builder(builder: (context) {
                   final card = cards[i];
-                  final onTap = isMobile
-                      ? () {
+                  final onTap = supportsHover
+                      ? card.onTap
+                      : () {
                           setState(() {
-                            _mobileExpanded = _mobileExpanded == i ? null : i;
+                            _mobileExpanded =
+                                _mobileExpanded == i ? null : i;
                           });
-                        }
-                      : card.onTap;
+                        };
                   final expandedOverride =
-                      isMobile ? _mobileExpanded == i : null;
+                      supportsHover ? null : _mobileExpanded == i;
 
                   return SizedBox(
                     width: itemWidth,
@@ -962,7 +968,7 @@ class _FeatureCardsState extends State<_FeatureCards> {
                       textColor: textColor,
                       mutedTextColor: mutedTextColor,
                       borderBaseColor: borderBaseColor,
-                      showActionButton: isMobile,
+                      showActionButton: !supportsHover,
                       action: card.onTap,
                     ),
                   );

@@ -278,14 +278,14 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get workOrderSubhead =>
-      'Skriv kort vad som ska göras på maskinen så genererar SERA en proffsig arbetsbeskrivning.';
+      'Skriv kort vad du vill få gjort med din renovering så genererar SERA en proffsig beskrivning på vad som ska göras och hur.';
 
   @override
   String get workOrderDescriptionLabel => 'Beskrivning';
 
   @override
   String get workOrderDescriptionHint =>
-      'Exempel: Byta hydraulfilter på Volvo EC250E, kontrollera läckage, verifiera tryck efter byte.';
+      'Beskriv jobbet: vad som ska göras, var (rum/ute), mått/antal, underlag (trä/gips/betong), nuvarande skick och önskat resultat. Skriv också om det är våtrum, bärande eller el.';
 
   @override
   String get workOrderGenerate => 'Generera';
@@ -531,7 +531,34 @@ class AppLocalizationsSv extends AppLocalizations {
   String get chatYearLabel => 'Årsmodell';
 
   @override
-  String get chatYearHint => 'ex. 2019';
+  String get chatYearHint => 'Välj byggår (ungefär)';
+
+  @override
+  String get chatYearOption2020s => '2020-tal (2020–nu)';
+
+  @override
+  String get chatYearOption2010s => '2010-tal';
+
+  @override
+  String get chatYearOption2000s => '2000-tal';
+
+  @override
+  String get chatYearOption1990s => '1990-tal';
+
+  @override
+  String get chatYearOption1980s => '1980-tal';
+
+  @override
+  String get chatYearOption1970s => '1970-tal';
+
+  @override
+  String get chatYearOption1950s1960s => '1950-60-tal';
+
+  @override
+  String get chatYearOption1900s => '1900-tal (1900-1949)';
+
+  @override
+  String get chatYearOptionPre1900 => 'Före 1900';
 
   @override
   String get chatExpertiseLabel => 'Kunskapsnivå';
@@ -551,7 +578,7 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get chatStatusNone => 'Ingen utrustning vald ännu.';
+  String get chatStatusNone => 'Var god välj boende och arbetstyp.';
 
   @override
   String get chatStatusLocked => ' • Låst';

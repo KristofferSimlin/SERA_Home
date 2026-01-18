@@ -605,7 +605,7 @@ abstract class AppLocalizations {
   /// No description provided for @workOrderSubhead.
   ///
   /// In en, this message translates to:
-  /// **'Describe the job briefly and SERA will generate a concise, professional work order.'**
+  /// **'Briefly describe what you want done for your renovation and SERA will generate a professional description of what to do and how.'**
   String get workOrderSubhead;
 
   /// No description provided for @workOrderDescriptionLabel.
@@ -617,7 +617,7 @@ abstract class AppLocalizations {
   /// No description provided for @workOrderDescriptionHint.
   ///
   /// In en, this message translates to:
-  /// **'Example: Replace hydraulic filter on Volvo EC250E, check for leaks, verify pressure after replacement.'**
+  /// **'Describe the job: what to do, where (room/outdoor), measurements/quantity, substrate (wood/drywall/concrete), current condition, and desired result. Also note if it is a wet area, load-bearing, or electrical.'**
   String get workOrderDescriptionHint;
 
   /// No description provided for @workOrderGenerate.
@@ -1073,8 +1073,62 @@ abstract class AppLocalizations {
   /// No description provided for @chatYearHint.
   ///
   /// In en, this message translates to:
-  /// **'e.g. 2019'**
+  /// **'Select build era (approx.)'**
   String get chatYearHint;
+
+  /// No description provided for @chatYearOption2020s.
+  ///
+  /// In en, this message translates to:
+  /// **'2020s (2020–now)'**
+  String get chatYearOption2020s;
+
+  /// No description provided for @chatYearOption2010s.
+  ///
+  /// In en, this message translates to:
+  /// **'2010s'**
+  String get chatYearOption2010s;
+
+  /// No description provided for @chatYearOption2000s.
+  ///
+  /// In en, this message translates to:
+  /// **'2000s'**
+  String get chatYearOption2000s;
+
+  /// No description provided for @chatYearOption1990s.
+  ///
+  /// In en, this message translates to:
+  /// **'1990s'**
+  String get chatYearOption1990s;
+
+  /// No description provided for @chatYearOption1980s.
+  ///
+  /// In en, this message translates to:
+  /// **'1980s'**
+  String get chatYearOption1980s;
+
+  /// No description provided for @chatYearOption1970s.
+  ///
+  /// In en, this message translates to:
+  /// **'1970s'**
+  String get chatYearOption1970s;
+
+  /// No description provided for @chatYearOption1950s1960s.
+  ///
+  /// In en, this message translates to:
+  /// **'1950s–1960s'**
+  String get chatYearOption1950s1960s;
+
+  /// No description provided for @chatYearOption1900s.
+  ///
+  /// In en, this message translates to:
+  /// **'1900s (1900–1949)'**
+  String get chatYearOption1900s;
+
+  /// No description provided for @chatYearOptionPre1900.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-1900'**
+  String get chatYearOptionPre1900;
 
   /// No description provided for @chatExpertiseLabel.
   ///
@@ -1109,7 +1163,7 @@ abstract class AppLocalizations {
   /// No description provided for @chatStatusNone.
   ///
   /// In en, this message translates to:
-  /// **'No equipment selected yet.'**
+  /// **'Please select housing and work type.'**
   String get chatStatusNone;
 
   /// No description provided for @chatStatusLocked.

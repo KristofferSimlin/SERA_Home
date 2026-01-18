@@ -277,14 +277,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get workOrderSubhead =>
-      'Describe the job briefly and SERA will generate a concise, professional work order.';
+      'Briefly describe what you want done for your renovation and SERA will generate a professional description of what to do and how.';
 
   @override
   String get workOrderDescriptionLabel => 'Description';
 
   @override
   String get workOrderDescriptionHint =>
-      'Example: Replace hydraulic filter on Volvo EC250E, check for leaks, verify pressure after replacement.';
+      'Describe the job: what to do, where (room/outdoor), measurements/quantity, substrate (wood/drywall/concrete), current condition, and desired result. Also note if it is a wet area, load-bearing, or electrical.';
 
   @override
   String get workOrderGenerate => 'Generate';
@@ -530,7 +530,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatYearLabel => 'Year';
 
   @override
-  String get chatYearHint => 'e.g. 2019';
+  String get chatYearHint => 'Select build era (approx.)';
+
+  @override
+  String get chatYearOption2020s => '2020s (2020–now)';
+
+  @override
+  String get chatYearOption2010s => '2010s';
+
+  @override
+  String get chatYearOption2000s => '2000s';
+
+  @override
+  String get chatYearOption1990s => '1990s';
+
+  @override
+  String get chatYearOption1980s => '1980s';
+
+  @override
+  String get chatYearOption1970s => '1970s';
+
+  @override
+  String get chatYearOption1950s1960s => '1950s–1960s';
+
+  @override
+  String get chatYearOption1900s => '1900s (1900–1949)';
+
+  @override
+  String get chatYearOptionPre1900 => 'Pre-1900';
 
   @override
   String get chatExpertiseLabel => 'Expertise';
@@ -550,7 +577,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get chatStatusNone => 'No equipment selected yet.';
+  String get chatStatusNone => 'Please select housing and work type.';
 
   @override
   String get chatStatusLocked => ' • Locked';

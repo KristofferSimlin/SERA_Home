@@ -86,13 +86,14 @@ String _expertiseAddon(int? level) {
 
 String _equipmentAddon({String? brand, String? model, String? year}) {
   final parts = <String>[];
-  if ((brand ?? '').isNotEmpty) parts.add('Märke: $brand');
-  if ((model ?? '').isNotEmpty) parts.add('Modell: $model');
-  if ((year ?? '').isNotEmpty) parts.add('Årsmodell: $year');
+  if ((brand ?? '').isNotEmpty) parts.add('Boendetyp: $brand');
+  if ((model ?? '').isNotEmpty) parts.add('Arbetstyp: $model');
+  if ((year ?? '').isNotEmpty) parts.add('Husets byggår/ålder: $year');
   if (parts.isEmpty) {
-    return '\nUTRUSTNING: okänd (be användaren om märke, modell, årsmodell).';
+    return '\nBOENDE/ARBETE: okänt (be användaren om boendetyp, arbetstyp, byggår).';
   }
-  return '\nUTRUSTNING: ${parts.join(', ')}';
+  return '\nBOENDE/ARBETE: ${parts.join(', ')}'
+      '\nBYGGÅR: Om byggår/ålder anges, anpassa råd efter tidstypiska material och uppbyggnad.';
 }
 
 String _webNotesAddon(String? webNotes) {

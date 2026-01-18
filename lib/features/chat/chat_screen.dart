@@ -29,8 +29,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   late final TextEditingController _modelCtrl;
   late final TextEditingController _yearCtrl;
 
-  final _yearFocus = FocusNode();
-
   bool _lock = false;
   bool _equipmentCollapsed = false;
   bool _showSafetyBanner = true;
@@ -63,7 +61,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _brandCtrl.dispose();
     _modelCtrl.dispose();
     _yearCtrl.dispose();
-    _yearFocus.dispose();
     super.dispose();
   }
 
@@ -228,7 +225,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       _modelCtrl.selection =
           TextSelection.collapsed(offset: _modelCtrl.text.length);
     }
-    if (!_yearFocus.hasFocus && _yearCtrl.text != (state.year ?? '')) {
+    if (_yearCtrl.text != (state.year ?? '')) {
       _yearCtrl.text = state.year ?? '';
       _yearCtrl.selection = TextSelection.collapsed(offset: _yearCtrl.text.length);
     }
@@ -274,6 +271,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       l.chatWorkPaintingTitle,
       l.chatWorkPlumbingTitle,
       l.chatWorkElectricalTitle,
+    ];
+    final houseYearOptions = <String>[
+      l.chatYearOption2020s,
+      l.chatYearOption2010s,
+      l.chatYearOption2000s,
+      l.chatYearOption1990s,
+      l.chatYearOption1980s,
+      l.chatYearOption1970s,
+      l.chatYearOption1950s1960s,
+      l.chatYearOption1900s,
+      l.chatYearOptionPre1900,
     ];
     final workTypeDescriptions = <String, String>{
       l.chatWorkCarpentryTitle: l.chatWorkCarpentryDesc,
@@ -338,17 +346,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           Row(
             children: [
               ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 140),
-                child: TextField(
-                  focusNode: _yearFocus,
-                  controller: _yearCtrl,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
+                constraints: const BoxConstraints(maxWidth: 200),
+                child: DropdownButtonFormField<String>(
+                  value: _yearCtrl.text.isEmpty ? null : _yearCtrl.text,
+                  isExpanded: true,
                   decoration: InputDecoration(
                     labelText: l.chatYearLabel,
                     hintText: l.chatYearHint,
                   ),
-                  onChanged: (_) => _applyEquipment(silent: true),
+                  items: houseYearOptions
+                      .map(
+                        (option) => DropdownMenuItem(
+                          value: option,
+                          child: Text(option),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (val) {
+                    _yearCtrl.text = val ?? '';
+                    _applyEquipment(silent: true);
+                  },
                 ),
               ),
               const SizedBox(width: 10),
@@ -443,17 +460,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
               const SizedBox(width: 8),
               SizedBox(
-                width: 120,
-                child: TextField(
-                  focusNode: _yearFocus,
-                  controller: _yearCtrl,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
+                width: 180,
+                child: DropdownButtonFormField<String>(
+                  value: _yearCtrl.text.isEmpty ? null : _yearCtrl.text,
+                  isExpanded: true,
                   decoration: InputDecoration(
                     labelText: l.chatYearLabel,
                     hintText: l.chatYearHint,
                   ),
-                  onChanged: (_) => _applyEquipment(silent: true),
+                  items: houseYearOptions
+                      .map(
+                        (option) => DropdownMenuItem(
+                          value: option,
+                          child: Text(option),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (val) {
+                    _yearCtrl.text = val ?? '';
+                    _applyEquipment(silent: true);
+                  },
                 ),
               ),
               const SizedBox(width: 8),
