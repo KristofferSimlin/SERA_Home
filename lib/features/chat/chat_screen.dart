@@ -29,8 +29,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   late final TextEditingController _modelCtrl;
   late final TextEditingController _yearCtrl;
 
-  final _brandFocus = FocusNode();
-  final _modelFocus = FocusNode();
   final _yearFocus = FocusNode();
 
   bool _lock = false;
@@ -65,8 +63,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _brandCtrl.dispose();
     _modelCtrl.dispose();
     _yearCtrl.dispose();
-    _brandFocus.dispose();
-    _modelFocus.dispose();
     _yearFocus.dispose();
     super.dispose();
   }
@@ -222,13 +218,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
 
     // Synka fält ↔ state (skriv inte över när fältet är fokuserat)
-    if (!_brandFocus.hasFocus && _brandCtrl.text != (state.brand ?? '')) {
+    if (_brandCtrl.text != (state.brand ?? '')) {
       _brandCtrl.text = state.brand ?? '';
-      _brandCtrl.selection = TextSelection.collapsed(offset: _brandCtrl.text.length);
+      _brandCtrl.selection =
+          TextSelection.collapsed(offset: _brandCtrl.text.length);
     }
-    if (!_modelFocus.hasFocus && _modelCtrl.text != (state.model ?? '')) {
+    if (_modelCtrl.text != (state.model ?? '')) {
       _modelCtrl.text = state.model ?? '';
-      _modelCtrl.selection = TextSelection.collapsed(offset: _modelCtrl.text.length);
+      _modelCtrl.selection =
+          TextSelection.collapsed(offset: _modelCtrl.text.length);
     }
     if (!_yearFocus.hasFocus && _yearCtrl.text != (state.year ?? '')) {
       _yearCtrl.text = state.year ?? '';
@@ -260,29 +258,81 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         break;
     }
 
+    final housingOptions = <String>[
+      l.chatHousingVilla,
+      l.chatHousingTownhouse,
+      l.chatHousingSemiDetached,
+      l.chatHousingApartment,
+      l.chatHousingStudentApartment,
+      l.chatHousingCabin,
+      l.chatHousingVacationHome,
+      l.chatHousingFarmhouse,
+      l.chatHousingAttefall,
+    ];
+    final workTypeOptions = <String>[
+      l.chatWorkCarpentryTitle,
+      l.chatWorkPaintingTitle,
+      l.chatWorkPlumbingTitle,
+      l.chatWorkElectricalTitle,
+    ];
+    final workTypeDescriptions = <String, String>{
+      l.chatWorkCarpentryTitle: l.chatWorkCarpentryDesc,
+      l.chatWorkPaintingTitle: l.chatWorkPaintingDesc,
+      l.chatWorkPlumbingTitle: l.chatWorkPlumbingDesc,
+      l.chatWorkElectricalTitle: l.chatWorkElectricalDesc,
+    };
     final equipmentForm = Column(
       children: [
         if (isCompact) ...[
-          TextField(
-            focusNode: _brandFocus,
-            controller: _brandCtrl,
-            textInputAction: TextInputAction.next,
+          DropdownButtonFormField<String>(
+            value: _brandCtrl.text.isEmpty ? null : _brandCtrl.text,
+            isExpanded: true,
             decoration: InputDecoration(
               labelText: l.chatBrandLabel,
               hintText: l.chatBrandHint,
             ),
-            onChanged: (_) => _applyEquipment(silent: true),
+            items: housingOptions
+                .map(
+                  (option) => DropdownMenuItem(
+                    value: option,
+                    child: Text(option),
+                  ),
+                )
+                .toList(),
+            onChanged: (val) {
+              _brandCtrl.text = val ?? '';
+              _applyEquipment(silent: true);
+            },
           ),
           const SizedBox(height: 10),
-          TextField(
-            focusNode: _modelFocus,
-            controller: _modelCtrl,
-            textInputAction: TextInputAction.next,
+          DropdownButtonFormField<String>(
+            value: _modelCtrl.text.isEmpty ? null : _modelCtrl.text,
+            isExpanded: true,
             decoration: InputDecoration(
               labelText: l.chatModelLabel,
               hintText: l.chatModelHint,
             ),
-            onChanged: (_) => _applyEquipment(silent: true),
+            items: workTypeOptions
+                .map(
+                  (option) => DropdownMenuItem(
+                    value: option,
+                    child: Tooltip(
+                      message: workTypeDescriptions[option] ?? '',
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(option),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+            onChanged: (val) {
+              _modelCtrl.text = val ?? '';
+              _applyEquipment(silent: true);
+            },
           ),
           const SizedBox(height: 10),
           Row(
@@ -338,28 +388,57 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           Row(
             children: [
               Expanded(
-                child: TextField(
-                  focusNode: _brandFocus,
-                  controller: _brandCtrl,
-                  textInputAction: TextInputAction.next,
+                child: DropdownButtonFormField<String>(
+                  value: _brandCtrl.text.isEmpty ? null : _brandCtrl.text,
+                  isExpanded: true,
                   decoration: InputDecoration(
                     labelText: l.chatBrandLabel,
                     hintText: l.chatBrandHint,
                   ),
-                  onChanged: (_) => _applyEquipment(silent: true),
+                  items: housingOptions
+                      .map(
+                        (option) => DropdownMenuItem(
+                          value: option,
+                          child: Text(option),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (val) {
+                    _brandCtrl.text = val ?? '';
+                    _applyEquipment(silent: true);
+                  },
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: TextField(
-                  focusNode: _modelFocus,
-                  controller: _modelCtrl,
-                  textInputAction: TextInputAction.next,
+                child: DropdownButtonFormField<String>(
+                  value: _modelCtrl.text.isEmpty ? null : _modelCtrl.text,
+                  isExpanded: true,
                   decoration: InputDecoration(
                     labelText: l.chatModelLabel,
                     hintText: l.chatModelHint,
                   ),
-                  onChanged: (_) => _applyEquipment(silent: true),
+                  items: workTypeOptions
+                      .map(
+                        (option) => DropdownMenuItem(
+                          value: option,
+                          child: Tooltip(
+                            message: workTypeDescriptions[option] ?? '',
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(option),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (val) {
+                    _modelCtrl.text = val ?? '';
+                    _applyEquipment(silent: true);
+                  },
                 ),
               ),
               const SizedBox(width: 8),

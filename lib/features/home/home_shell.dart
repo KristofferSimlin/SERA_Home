@@ -22,7 +22,7 @@ class HomeShell extends ConsumerStatefulWidget {
 
 class _HomeShellState extends ConsumerState<HomeShell> {
   final _search = TextEditingController();
-  int _hintStep = 0; // 0=admin,1=service,2=felsökning,3=arbetsorder, -1=ingen
+  int _hintStep = 0; // 0=admin,1=service,2=projekt,3=arbetsorder, -1=ingen
   bool _isAdmin = false;
   static const _hintPrefsPrefix = 'hints_seen_';
 
@@ -256,7 +256,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               case 2:
                 cx = centerFor(1);
                 text =
-                    'Felsökning: modellspecifik felsökning i chatformat. Ange maskin och din expertis för träffsäkra svar.';
+                    'Projekt: modellspecifik felsökning i chatformat. Ange maskin och din expertis för träffsäkra svar.';
                 counter = _isAdmin ? '3/4' : '2/3';
                 break;
               default:
@@ -752,8 +752,8 @@ class _LandingArea extends StatelessWidget {
     final wordmarkHeight = titleHeight * 0.75;
     const isWeb = kIsWeb;
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
-    final lineCount = isWeb ? const [4, 6, 8] : const [8, 12, 16];
-    final lineDistance = isWeb ? const [10.0, 8.0, 6.0] : const [7.0, 5.0, 4.0];
+    final lineCount = isWeb ? const [4, 6, 8] : const [5, 7, 9];
+    final lineDistance = isWeb ? const [10.0, 8.0, 6.0] : const [8.0, 6.0, 5.0];
     final backgroundLayers = isDark
         ? <Widget>[
             Container(
@@ -774,7 +774,7 @@ class _LandingArea extends StatelessWidget {
                 // Färre linjer och långsammare animering på web för bättre prestanda
                 lineCount: lineCount,
                 lineDistance: lineDistance,
-                animationSpeed: isWeb ? 0.08 : 0.16,
+                animationSpeed: isWeb ? 0.08 : 0.12,
                 opacity: isWeb ? 0.55 : 0.8,
               ),
             ),
@@ -826,7 +826,7 @@ class _LandingArea extends StatelessWidget {
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
-                            'BETA',
+                            l.startBadge,
                             style: Theme.of(context)
                                 .textTheme
                                 .labelLarge
@@ -841,12 +841,14 @@ class _LandingArea extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      l.startSubtitle,
+                      l.startSubtitle.replaceAll('\n', '  •  '),
                       textAlign: TextAlign.center,
                       style: Theme.of(context)
                           .textTheme
                           .titleMedium
                           ?.copyWith(color: mutedTextColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 20),
                     _FeatureCards(

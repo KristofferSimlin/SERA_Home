@@ -60,7 +60,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     final sessions = ref.watch(sessionsProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SERA — Chattar'),
+        title: const Text('SERA Home — Chattar'),
         actions: [
           IconButton(
             tooltip: 'Ny chatt',

@@ -9,16 +9,20 @@ class AppLocalizationsSv extends AppLocalizations {
   AppLocalizationsSv([String locale = 'sv']) : super(locale);
 
   @override
-  String get appTitle => 'SERA';
+  String get appTitle => 'SERA Home';
 
   @override
-  String get beta => 'BETA';
+  String get beta => 'SERA Home';
 
   @override
-  String get startTitle => 'SERA';
+  String get startTitle => 'SERA Home';
 
   @override
-  String get startSubtitle => 'Service & Equipment Repair Assistant';
+  String get startBadge => 'HOME';
+
+  @override
+  String get startSubtitle =>
+      'Hemförbättring\nOptimerade inköp\nMinskat svinn\nExpertråd';
 
   @override
   String get startCta => 'Logga in - test';
@@ -87,7 +91,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get startVersion => 'Version 1.0 • För tekniker och supportteam';
 
   @override
-  String get homeAppBarTitle => 'SERA';
+  String get homeAppBarTitle => 'SERA Home';
 
   @override
   String get homeAcademy => 'Academy';
@@ -99,7 +103,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get comingSoon => 'Kommer snart';
 
   @override
-  String get homeNewChat => 'Felsökning';
+  String get homeNewChat => 'Projekt';
 
   @override
   String get homeSettings => 'Inställningar';
@@ -132,14 +136,14 @@ class AppLocalizationsSv extends AppLocalizations {
   String get homeRenameSave => 'Spara';
 
   @override
-  String get homeCardTroubleshootingTitle => 'Felsökning';
+  String get homeCardTroubleshootingTitle => 'Projekt';
 
   @override
-  String get homeCardTroubleshootingBadge => 'FELSÖKNING';
+  String get homeCardTroubleshootingBadge => 'PROJEKT';
 
   @override
   String get homeCardTroubleshootingBody =>
-      'SERA hjälper dig att snabbt identifiera fel i entreprenadmaskiner med AI-drivna analyser.\nFörklara symtom, få förslag på orsaker och steg-för-steg-lösningar.\nPerfekt för både fälttekniker och mekaniker som behöver snabba svar.\nAlltid tillgängligt och uppdaterat.';
+      'Här hittar du guider för planerade jobb och renoveringar – från idé till färdigt resultat.\nSteg-för-steg-instruktioner, materialval, verktygslistor, tids- och kostnadsuppskattning samt smarta proffstips för att undvika misstag och omarbete.';
 
   @override
   String get homeCardMaintenanceTitle => 'Underhåll';
@@ -149,7 +153,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get homeCardMaintenanceBody =>
-      'Få tydliga instruktioner för service, inspektion och planerat underhåll.\nSERA guidar dig genom rätt intervaller, rekommenderade åtgärder och vanliga problem.\nMindre gissande, mer struktur.\nHjälper dig hålla maskinerna driftsäkra längre.';
+      'Här finns allt för att hålla hemmet i bra skick året runt.\nChecklista per säsong, snabbfixar, felsökning av vanliga problem (drag, fukt, knarr, stopp, sprickor), samt råd om när det räcker att göra själv och när det är dags att ta in fackman.';
 
   @override
   String get homeCardTrainingTitle => 'Utbildning';
@@ -257,11 +261,11 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get generalChatNotice =>
-      'Du är i den generella chatten. För maskinspecifik felsökning – gå till Felsökning. För rapport: Arbetsorder. För serviceplan: Service.';
+      'Du ?r i den generella chatten. F?r maskinspecifik fels?kning ? g? till Projekt. F?r rapport: Arbetsorder. F?r serviceplan: Service.';
 
   @override
   String get generalChatInfo =>
-      'Informationen är vägledande. För specifik felsökning, använd Felsökning-flödet.';
+      'Informationen ?r v?gledande. F?r specifik fels?kning, anv?nd Projekt-fl?det.';
 
   @override
   String get workOrderCta => 'Arbetsorder';
@@ -323,7 +327,7 @@ class AppLocalizationsSv extends AppLocalizations {
       'Nätverksfel – kunde inte skapa arbetsorder.';
 
   @override
-  String get sidebarTipsTitle1 => 'Felsökning – motor startar inte';
+  String get sidebarTipsTitle1 => 'Projekt ? motor startar inte';
 
   @override
   String get sidebarTipsTitle2 => 'Läs felkod & nästa steg';
@@ -376,7 +380,7 @@ class AppLocalizationsSv extends AppLocalizations {
       'Tips: Kör proxy-läge i produktion. Direktläge exponerar nyckeln i klienten.';
 
   @override
-  String get settingsWebSearchTitle => 'Webbsök (beta)';
+  String get settingsWebSearchTitle => 'Webbsök (SERA Home)';
 
   @override
   String get settingsWebSearchToggle => 'Aktivera webbsök via proxy /search';
@@ -454,19 +458,74 @@ class AppLocalizationsSv extends AppLocalizations {
       'Integritetspolicy – SERA\\n\\nSenast uppdaterad: 2025-11-29\\nGäller för: SERA (iOS, Android och Web)\\n\\n1. Vem är personuppgiftsansvarig?\\n\\nFöretag: SimlinGroup\\nAdress: Ullevivägen 45, 746 51 Bålsta\\nE-post: support@sera.chat\\n\\nVi ansvarar för behandlingen av personuppgifter i samband med din användning av SERA.\\n\\n2. Kort sammanfattning\\n• SERA låter dig felsöka maskinproblem och chattfunktionalitet.\\n• Ditt chattinnehåll och utrustningsdata (t.ex. märke, modell, årsmodell) skickas via vår server (\"proxy\") till en tredjeparts AI-leverantör som sedan använder sig av information från vårat egna kunskapsbibliotek för att generera svar.\\n• All trafik sker över HTTPS. Vi säljer inte dina personuppgifter.\\n• Du kan begära radering av chattloggar och utöva dina GDPR-rättigheter (se avsnitt 11).\\n\\n3. Vilka uppgifter samlar vi in?\\n\\nBeroende på hur du använder SERA kan vi behandla följande kategorier:\\n\\nA. Användarinnehåll\\n• Text du skriver i chatten, valda utrustningsfält (märke, modell, årsmodell), ev. bifogade bilder/anteckningar.\\n\\nB. Tekniska data & loggar\\n• IP-adress (i serverloggar), tidsstämplar, enhets- och webbläsarinfo (för felsökning och säkerhet).\\n• Krasch- och prestandadata om du samtycker till det i appen.\\n\\nC. Kontouppgifter (om konton införs)\\n• Namn, e-post, autentiseringsuppgifter, betalningsrelaterade uppgifter (hanteras via betalpartner).\\n\\nD. Support\\n• Meddelanden du skickar till support och relaterad korrespondens.\\n\\nVi samlar inte in exakt geolokalisering. Kamerabibliotek, mikrofon, notiser etc. används bara om du uttryckligen aktiverar en sådan funktion.\\n\\n4. Varför behandlar vi uppgifterna? (ändamål och rättslig grund)\\n• Leverera tjänsten (avtal): Generera svar och felsökningsförslag, spara historik till dig, visa källor.\\n• Säkerhet & missbruksförebyggande (berättigat intresse): Upptäcka spam/missbruk, skydda system.\\n• Förbättring & felsökning (berättigat intresse eller samtycke): Prestanda, kraschloggar, kvalitetsuppföljning.\\n• Juridiska skyldigheter (rättslig förpliktelse): Ex. bokföring, hantering av rättsliga krav.\\n• Marknad/kommunikation (samtycke): Endast om du aktivt har godkänt.\\n\\n5. Hur genereras AI-svar och hur används SERA:s kunskapsbibliotek?\\n\\nNär du använder chatten skickas ditt meddelande och eventuell utrustningsinformation från appen till vår server/proxy. Proxyn vidarebefordrar nödvändigt innehåll till en tredjeparts AI-leverantör för att generera ett svar. För att förbättra kvalitet och precision använder SERA även ett eget, kuraterat kunskapsbibliotek (\"SERA:s bibliotek\").\\n\\nSå här fungerar det i korthet:\\n• 1) Din fråga: Ditt chattinnehåll och valda utrustningsfält (märke, modell, årsmodell) tas emot av vår server.\\n• 2) Sök i SERA:s bibliotek: Vår server söker efter relevanta utdrag i SERA:s bibliotek (t.ex. manualer, servicebulletiner, säkerhetsföreskrifter och tekniska fakta som vi får använda).\\n• 3) Minimal delning: Endast de nödvändiga utdragen från biblioteket samt din fråga (och utrustningsfält) skickas vidare till AI-leverantören för att generera svaret. Vi delar inte hela dokument om det inte behövs för att uppfylla din förfrågan.\\n• 4) Svar + källor: AI-svaret returneras till appen, ofta med källhänvisningar till de biblioteksposter som användes.\\n\\nOm SERA:s bibliotek:\\n• Biblioteket ägs och förvaltas av SERA och består av innehåll som vi har rätt att använda (eget material, licensierat material eller material som omfattas av lagliga undantag).\\n• Biblioteket innehåller inte dina personuppgifter. Vi för inte in individuellt chattinnehåll i biblioteket, annat än möjligen i aggregerad/anonymiserad form för att förbättra täckning och kvalitet.\\n• Biblioteket kan lagras och uppdateras löpande oberoende av din appinstallation (så att du får förbättringar utan att uppdatera appen).\\n\\nTredjeparts AI-leverantör:\\n• Vi konfigurerar leverantören så att data inte används för generell modellträning där sådana kontroller finns tillgängliga.\\n• Leverantören kan behålla begränsade loggar under en kort period för att motverka missbruk och säkerställa driften.\\n• All kommunikation sker över HTTPS.\\n\\nDin kontroll:\\n• Dela inte känsliga personuppgifter i chatten (t.ex. hälsodata, personnummer).\\n• Om du inte vill att ditt chattinnehåll ska delas med en tredjeparts AI-leverantör kan du avstå från att använda chattfunktionen; andra delar av appen kan vara begränsade.\\n• Du kan begära radering av chattloggar enligt GDPR (se §11).\\n\\n6. Delning av uppgifter\\n\\nVi delar inte dina personuppgifter för försäljning. Vi kan dela uppgifter med:\\n• Tredjeparts AI-leverantör (endast för att generera det svar du begär).\\n• Drift- och infrastrukturpartners (hosting, CDN, e-post, logghantering).\\n• Betalpartner (om köp införs).\\n• Myndigheter om lagen kräver det eller för att skydda rättigheter/säkerhet.\\n\\nAlla parter behandlar uppgifter enligt avtal (personuppgiftsbiträdesavtal eller motsvarande).\\n\\n7. Överföring utanför EU/EES\\n\\nVissa mottagare kan finnas i länder utanför EU/EES (t.ex. USA). Vi säkerställer lämpliga skyddsåtgärder, t.ex. Standardavtalsklausuler (SCC). Du kan kontakta oss för mer information om tillämpliga skydd.\\n\\n8. Lagringstider\\n• Chattinnehåll: Som standard upp till 12 månader, eller tills du raderar det i appen eller begär radering.\\n• Serverloggar (IP, fel, prestanda): upp till 90 dagar för felsökning/säkerhet.\\n• Kontodata (om tillämpligt): så länge kontot är aktivt och därefter enligt rättsliga krav. Vi kan anonymisera/aggreggera data för statistik.\\n\\n9. Säkerhet\\n\\nVi använder tekniska och organisatoriska åtgärder för att skydda uppgifter, inklusive kryptering i transit (HTTPS), åtkomstkontroller och loggning. Ingen metod är 100 % säker, men vi arbetar kontinuerligt med förbättringar.\\n\\n10. Cookies och lokal lagring (Web)\\n\\nPå webben kan vi använda nödvändiga cookies och/eller localStorage/IndexedDB för inställningar, sessionshantering och cache. Analys- eller marknadsföringscookies används endast om du samtycker.\\n\\n11. Dina rättigheter (GDPR)\\n\\nDu har rätt att:\\n• få tillgång till dina personuppgifter,\\n• begära rättning eller radering,\\n• begära begränsning av behandling,\\n• invända mot behandling som sker med stöd av berättigat intresse,\\n• få dataportabilitet i vissa fall,\\n• återkalla samtycke när behandling grundas på samtycke.\\n\\nKontakta oss på support@sera.chat. Du kan även lämna klagomål till Integritetsskyddsmyndigheten (IMY) eller motsvarande tillsynsmyndighet inom EU.\\n\\n12. Barns integritet\\n\\nSERA riktar sig inte till barn. Om du tror att ett barn under 16 har lämnat uppgifter till oss, kontakta oss så tar vi bort informationen.\\n\\n13. Dina val och kontroller\\n• Du kan när som helst stänga av insamling av krasch/diagnostik (om funktionen finns).\\n• Du kan rensa chatt i appen och be oss radera serverloggar som är kopplade till dig.\\n• Samtycke för AI-behandling: vid första chattanvändningen visar vi en tydlig dialog. Du kan välja att inte fortsätta; då kan vissa funktioner vara begränsade.\\n\\n14. Tredjepartslänkar och källor\\n\\nSERA kan visa källhänvisningar (t.ex. till manualer, dokumentation). Vi ansvarar inte för tredjeparts webbplatser och deras policys.\\n\\n15. Förändringar i policyn\\n\\nVi kan uppdatera denna policy. Ny version publiceras här med uppdaterat datum. Vid väsentliga ändringar informerar vi i appen eller via e-post (om uppgifter finns).\\n\\n16. Kontakt\\n\\nFrågor om integritet? Kontakta: support@sera.chat\\nPostadress: Ullevivägen 45, 746 51 Bålsta';
 
   @override
-  String get chatAppBarTitle => 'SERA – Chatt';
+  String get chatAppBarTitle => 'SERA Home – Chatt';
 
   @override
-  String get chatBrandLabel => 'Märke';
+  String get chatBrandLabel => 'Boendetyp';
 
   @override
-  String get chatBrandHint => 'ex. Volvo, CAT, Wacker Neuson';
+  String get chatBrandHint => 't.ex. hus, lägenhet, stuga';
 
   @override
-  String get chatModelLabel => 'Modell';
+  String get chatHousingVilla => 'Villa';
 
   @override
-  String get chatModelHint => 'ex. EC250E, 320 GC';
+  String get chatHousingTownhouse => 'Radhus';
+
+  @override
+  String get chatHousingSemiDetached => 'Parhus';
+
+  @override
+  String get chatHousingApartment => 'Lägenhet';
+
+  @override
+  String get chatHousingStudentApartment => 'Studentlägenhet';
+
+  @override
+  String get chatHousingCabin => 'Stuga';
+
+  @override
+  String get chatHousingVacationHome => 'Fritidshus';
+
+  @override
+  String get chatHousingFarmhouse => 'Gård';
+
+  @override
+  String get chatHousingAttefall => 'Attefallshus';
+
+  @override
+  String get chatModelLabel => 'Arbetstyp';
+
+  @override
+  String get chatModelHint => 'Välj typ av arbete';
+
+  @override
+  String get chatWorkCarpentryTitle => 'Snickeri & bygg';
+
+  @override
+  String get chatWorkCarpentryDesc =>
+      'Bygg, montera och förstärk: väggar, golv, lister, dörrar, altan och smarta konstruktioner.';
+
+  @override
+  String get chatWorkPaintingTitle => 'Målning & ytskikt';
+
+  @override
+  String get chatWorkPaintingDesc =>
+      'Spackla, slipa och måla rätt – inne och ute. Tapet, grundning och proffsig finish.';
+
+  @override
+  String get chatWorkPlumbingTitle => 'VVS & rör';
+
+  @override
+  String get chatWorkPlumbingDesc =>
+      'Fixa stopp, läckage och byten. Blandare, vattenlås, radiatorer och flöde/funktion.';
+
+  @override
+  String get chatWorkElectricalTitle => 'El & belysning';
+
+  @override
+  String get chatWorkElectricalDesc =>
+      'Lampor, armaturer och felsymptom – säkra kontroller och tips. Fast el = elektriker';
 
   @override
   String get chatYearLabel => 'Årsmodell';

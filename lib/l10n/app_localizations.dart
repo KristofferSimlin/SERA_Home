@@ -101,25 +101,31 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'SERA'**
+  /// **'SERA Home'**
   String get appTitle;
 
   /// No description provided for @beta.
   ///
   /// In en, this message translates to:
-  /// **'BETA'**
+  /// **'SERA Home'**
   String get beta;
 
   /// No description provided for @startTitle.
   ///
   /// In en, this message translates to:
-  /// **'SERA'**
+  /// **'SERA Home'**
   String get startTitle;
+
+  /// No description provided for @startBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'HOME'**
+  String get startBadge;
 
   /// No description provided for @startSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Service & Equipment Repair Assistant'**
+  /// **'Home improvement\nOptimized purchasing\nMinimized waste\nExpert guidance'**
   String get startSubtitle;
 
   /// No description provided for @startCta.
@@ -245,7 +251,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeAppBarTitle.
   ///
   /// In en, this message translates to:
-  /// **'SERA'**
+  /// **'SERA Home'**
   String get homeAppBarTitle;
 
   /// No description provided for @homeAcademy.
@@ -335,19 +341,19 @@ abstract class AppLocalizations {
   /// No description provided for @homeCardTroubleshootingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Troubleshooting'**
+  /// **'Projects'**
   String get homeCardTroubleshootingTitle;
 
   /// No description provided for @homeCardTroubleshootingBadge.
   ///
   /// In en, this message translates to:
-  /// **'TROUBLESHOOTING'**
+  /// **'PROJECTS'**
   String get homeCardTroubleshootingBadge;
 
   /// No description provided for @homeCardTroubleshootingBody.
   ///
   /// In en, this message translates to:
-  /// **'SERA helps you quickly identify faults in heavy equipment with AI-powered analysis.\nDescribe symptoms, get suggested causes and step-by-step fixes.\nPerfect for field techs and mechanics who need answers fast.\nAlways available and up to date.'**
+  /// **'Here you will find guides for planned jobs and renovations—from idea to finished result.\nStep-by-step instructions, material choices, tool lists, time and cost estimates, plus smart pro tips to avoid mistakes and rework.'**
   String get homeCardTroubleshootingBody;
 
   /// No description provided for @homeCardMaintenanceTitle.
@@ -365,7 +371,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeCardMaintenanceBody.
   ///
   /// In en, this message translates to:
-  /// **'Clear instructions for service, inspections and planned maintenance.\nSERA guides you through the right intervals, recommended actions and common issues.\nLess guesswork, more structure.\nHelps you keep machines reliable longer.'**
+  /// **'Everything you need to keep the home in great shape year-round.\nSeasonal checklists, quick fixes, troubleshooting common problems (drafts, moisture, squeaks, clogs, cracks), plus guidance on when DIY is enough and when it is time to call a professional.'**
   String get homeCardMaintenanceBody;
 
   /// No description provided for @homeCardTrainingTitle.
@@ -569,13 +575,13 @@ abstract class AppLocalizations {
   /// No description provided for @generalChatNotice.
   ///
   /// In en, this message translates to:
-  /// **'This is the general chat. For machine-specific troubleshooting, use Felsökning. For reports: Arbetsorder. For service plan: Service.'**
+  /// **'This is the general chat. For machine-specific troubleshooting, use Projects. For reports: Work order. For service plan: Service.'**
   String get generalChatNotice;
 
   /// No description provided for @generalChatInfo.
   ///
   /// In en, this message translates to:
-  /// **'Information is guidance only. For targeted troubleshooting, switch to Felsökning.'**
+  /// **'Information is guidance only. For targeted troubleshooting, switch to Projects.'**
   String get generalChatInfo;
 
   /// No description provided for @workOrderCta.
@@ -689,7 +695,7 @@ abstract class AppLocalizations {
   /// No description provided for @sidebarTipsTitle1.
   ///
   /// In en, this message translates to:
-  /// **'Troubleshooting – engine will not start'**
+  /// **'Project ? engine will not start'**
   String get sidebarTipsTitle1;
 
   /// No description provided for @sidebarTipsTitle2.
@@ -785,7 +791,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsWebSearchTitle.
   ///
   /// In en, this message translates to:
-  /// **'Web search (beta)'**
+  /// **'Web search (SERA Home)'**
   String get settingsWebSearchTitle;
 
   /// No description provided for @settingsWebSearchToggle.
@@ -929,32 +935,134 @@ abstract class AppLocalizations {
   /// No description provided for @chatAppBarTitle.
   ///
   /// In en, this message translates to:
-  /// **'SERA – Chat'**
+  /// **'SERA Home – Chat'**
   String get chatAppBarTitle;
 
   /// No description provided for @chatBrandLabel.
   ///
   /// In en, this message translates to:
-  /// **'Brand'**
+  /// **'Housing type'**
   String get chatBrandLabel;
 
   /// No description provided for @chatBrandHint.
   ///
   /// In en, this message translates to:
-  /// **'e.g. Volvo, CAT, Wacker Neuson'**
+  /// **'e.g. house, apartment, cabin'**
   String get chatBrandHint;
+
+  /// No description provided for @chatHousingVilla.
+  ///
+  /// In en, this message translates to:
+  /// **'Villa'**
+  String get chatHousingVilla;
+
+  /// No description provided for @chatHousingTownhouse.
+  ///
+  /// In en, this message translates to:
+  /// **'Townhouse'**
+  String get chatHousingTownhouse;
+
+  /// No description provided for @chatHousingSemiDetached.
+  ///
+  /// In en, this message translates to:
+  /// **'Semi-detached'**
+  String get chatHousingSemiDetached;
+
+  /// No description provided for @chatHousingApartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Apartment'**
+  String get chatHousingApartment;
+
+  /// No description provided for @chatHousingStudentApartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Student apartment'**
+  String get chatHousingStudentApartment;
+
+  /// No description provided for @chatHousingCabin.
+  ///
+  /// In en, this message translates to:
+  /// **'Cabin'**
+  String get chatHousingCabin;
+
+  /// No description provided for @chatHousingVacationHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Vacation home'**
+  String get chatHousingVacationHome;
+
+  /// No description provided for @chatHousingFarmhouse.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmhouse'**
+  String get chatHousingFarmhouse;
+
+  /// No description provided for @chatHousingAttefall.
+  ///
+  /// In en, this message translates to:
+  /// **'Attefall house'**
+  String get chatHousingAttefall;
 
   /// No description provided for @chatModelLabel.
   ///
   /// In en, this message translates to:
-  /// **'Model'**
+  /// **'Work type'**
   String get chatModelLabel;
 
   /// No description provided for @chatModelHint.
   ///
   /// In en, this message translates to:
-  /// **'e.g. EC250E, 320 GC'**
+  /// **'Choose a work type'**
   String get chatModelHint;
+
+  /// No description provided for @chatWorkCarpentryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Carpentry & build'**
+  String get chatWorkCarpentryTitle;
+
+  /// No description provided for @chatWorkCarpentryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Build, assemble, and reinforce: walls, floors, trim, doors, decks, and smart structures.'**
+  String get chatWorkCarpentryDesc;
+
+  /// No description provided for @chatWorkPaintingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Painting & finishes'**
+  String get chatWorkPaintingTitle;
+
+  /// No description provided for @chatWorkPaintingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill, sand, and paint correctly—indoors and out. Wallpaper, primer, and pro-level finish.'**
+  String get chatWorkPaintingDesc;
+
+  /// No description provided for @chatWorkPlumbingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plumbing'**
+  String get chatWorkPlumbingTitle;
+
+  /// No description provided for @chatWorkPlumbingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fix clogs, leaks, and replacements. Faucets, traps, radiators, and flow/function.'**
+  String get chatWorkPlumbingDesc;
+
+  /// No description provided for @chatWorkElectricalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Electrical & lighting'**
+  String get chatWorkElectricalTitle;
+
+  /// No description provided for @chatWorkElectricalDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Lights, fixtures, and fault symptoms—safe checks and tips. Fixed wiring = electrician'**
+  String get chatWorkElectricalDesc;
 
   /// No description provided for @chatYearLabel.
   ///

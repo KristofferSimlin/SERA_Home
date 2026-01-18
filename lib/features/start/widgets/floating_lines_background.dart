@@ -254,9 +254,9 @@ class _FloatingLinesPainter extends CustomPainter {
 
     final rect = Offset.zero & size;
     final glowPaint = Paint()
-      ..maskFilter = lightMode ? null : const MaskFilter.blur(BlurStyle.normal, 8)
+      ..maskFilter = lightMode ? null : const MaskFilter.blur(BlurStyle.normal, 5)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = lightMode ? 1.1 : 1.3;
+      ..strokeWidth = lightMode ? 1.0 : 1.2;
 
     for (final wave in waves) {
       if (!wave.enabled || wave.lineCount <= 0) continue;
@@ -313,8 +313,8 @@ class _FloatingLinesPainter extends CustomPainter {
     final amplitude = size.height * wave.amplitudeScale * (0.7 + normalizedIndex * 0.4);
     // Lower sample count on web to reduce CanvasKit work on large viewports.
     final steps = lightMode
-        ? math.max(16, (size.width / 44).round())
-        : math.max(40, (size.width / 12).round());
+        ? math.max(14, (size.width / 52).round())
+        : math.max(24, (size.width / 20).round());
     final double phase = progress * math.pi * 2 * (0.5 + wave.speed) + wave.position.rotate;
     for (int step = 0; step <= steps; step++) {
       final x = step / steps * size.width;

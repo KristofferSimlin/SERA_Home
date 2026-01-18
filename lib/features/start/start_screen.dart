@@ -64,9 +64,9 @@ const _startConfigs = <_StartVariant, _StartViewConfig>{
     titleSpacing: 24,
     callToActionSpacing: 48,
     enabledWaves: ['top', 'middle', 'bottom'],
-    lineCount: [10, 15, 20],
-    lineDistance: [8.0, 6.0, 4.0],
-    animationSpeed: 0.1375,
+    lineCount: [6, 9, 12],
+    lineDistance: [9.0, 7.0, 5.0],
+    animationSpeed: 0.12,
     opacity: 0.85,
     maxContentWidth: 720,
     fullWidthButton: true,
@@ -258,7 +258,7 @@ class _StartScreenState extends State<StartScreen>
                                             BorderRadius.circular(999),
                                       ),
                                       child: Text(
-                                        l.beta,
+                                        l.startBadge,
                                         style: Theme.of(context)
                                             .textTheme
                                             .labelLarge
@@ -296,7 +296,7 @@ class _StartScreenState extends State<StartScreen>
                                     borderRadius: BorderRadius.circular(999),
                                   ),
                                   child: Text(
-                                    l.beta,
+                                    l.startBadge,
                                     style: Theme.of(context)
                                         .textTheme
                                         .labelLarge
@@ -310,7 +310,7 @@ class _StartScreenState extends State<StartScreen>
                             ),
                           SizedBox(height: config.titleSpacing),
                           Text(
-                            l.startSubtitle,
+                            l.startSubtitle.replaceAll('\n', '  •  '),
                             textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme
@@ -318,6 +318,8 @@ class _StartScreenState extends State<StartScreen>
                                 ?.copyWith(
                                   color: cs.onSurface.withOpacity(0.75),
                                 ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           SizedBox(height: config.callToActionSpacing),
                           Align(
