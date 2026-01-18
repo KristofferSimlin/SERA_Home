@@ -49,9 +49,9 @@ class PersonalPricingScreen extends StatelessWidget {
             const Positioned.fill(
               child: FloatingLinesBackground(
                 enabledWaves: ['middle'],
-                lineCount: [6, 8],
-                lineDistance: [10.0, 8.0],
-                animationSpeed: 0.08,
+                lineCount: [10, 15, 20],
+                lineDistance: [8.0, 6.0, 4.0],
+                animationSpeed: 0.1375,
                 opacity: 0.6,
               ),
             ),

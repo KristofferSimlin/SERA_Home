@@ -13,9 +13,9 @@ class SuccessScreen extends StatelessWidget {
         children: [
           const FloatingLinesBackground(
             enabledWaves: ['middle'],
-            lineCount: [6, 8],
-            lineDistance: [12.0, 9.0],
-            animationSpeed: 0.08,
+            lineCount: [10, 15, 20],
+            lineDistance: [8.0, 6.0, 4.0],
+            animationSpeed: 0.1375,
             opacity: 0.55,
           ),
           Container(
@@ -68,12 +68,14 @@ class SuccessScreen extends StatelessWidget {
                                 end: Alignment.bottomRight,
                               ),
                             ),
-                            child: const Icon(Icons.check, size: 38, color: Colors.white),
+                            child: const Icon(Icons.check,
+                                size: 38, color: Colors.white),
                           ),
                           const SizedBox(height: 14),
                           const Text(
                             'Tack för ditt köp!',
-                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                            style: TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.w700),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 10),

@@ -275,9 +275,9 @@ class _ActivateScreenState extends State<ActivateScreen> {
         children: [
           const FloatingLinesBackground(
             enabledWaves: ['middle'],
-            lineCount: [7, 9],
-            lineDistance: [12.0, 9.0],
-            animationSpeed: 0.08,
+            lineCount: [10, 15, 20],
+            lineDistance: [8.0, 6.0, 4.0],
+            animationSpeed: 0.1375,
             opacity: 0.55,
           ),
           Container(
