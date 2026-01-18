@@ -48,6 +48,7 @@ Future<void> main() async {
     await dotenv.load(fileName: ".env");
   } catch (_) {
     // Ignore missing .env in web/production; rely on runtime env or defaults.
+    dotenv.testLoad(fileInput: '');
   }
   final stripeKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'];
   if (!kIsWeb && stripeKey != null && stripeKey.isNotEmpty) {
