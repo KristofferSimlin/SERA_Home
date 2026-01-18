@@ -176,7 +176,7 @@ class AppLocalizationsSv extends AppLocalizations {
       'Ett forum där tekniker, förare och entusiaster kan dela kunskap och erfarenheter.\nStäll frågor, diskutera lösningar och hjälp andra i branschen.\nBygger en stark gemenskap runt SERA och entreprenadmaskiner.\nEn plats att lära, inspireras och växa tillsammans.';
 
   @override
-  String get serviceCta => 'Service';
+  String get serviceCta => 'Underhåll';
 
   @override
   String get serviceTitle => 'Serviceplan';
