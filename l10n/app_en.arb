@@ -86,7 +86,7 @@
   "workOrderCta": "Work order",
   "workOrderTitle": "Work order",
   "workOrderHeadline": "Create work order",
-  "workOrderSubhead": "Briefly describe what you want done for your renovation and SERA will generate a professional description of what to do and how.",
+  "workOrderSubhead": "Briefly describe what type of work you want to carry out and SERA will generate a clear, professional work order.",
   "workOrderDescriptionLabel": "Description",
   "workOrderDescriptionHint": "Describe the job: what to do, where (room/outdoor), measurements/quantity, substrate (wood/drywall/concrete), current condition, and desired result. Also note if it is a wet area, load-bearing, or electrical.",
   "workOrderGenerate": "Generate",

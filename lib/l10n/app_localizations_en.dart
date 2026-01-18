@@ -277,7 +277,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get workOrderSubhead =>
-      'Briefly describe what you want done for your renovation and SERA will generate a professional description of what to do and how.';
+      'Briefly describe what type of work you want to carry out and SERA will generate a clear, professional work order.';
 
   @override
   String get workOrderDescriptionLabel => 'Description';

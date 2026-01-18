@@ -605,7 +605,7 @@ abstract class AppLocalizations {
   /// No description provided for @workOrderSubhead.
   ///
   /// In en, this message translates to:
-  /// **'Briefly describe what you want done for your renovation and SERA will generate a professional description of what to do and how.'**
+  /// **'Briefly describe what type of work you want to carry out and SERA will generate a clear, professional work order.'**
   String get workOrderSubhead;
 
   /// No description provided for @workOrderDescriptionLabel.

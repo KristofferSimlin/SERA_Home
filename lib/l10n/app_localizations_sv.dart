@@ -278,14 +278,14 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get workOrderSubhead =>
-      'Skriv kort vad du vill f? gjort med din renovering s? genererar SERA en proffsig beskrivning p? vad som ska g?ras och hur.';
+      'Skriv kort en beskrivning på vad för typ av arbete du vill utföra så genererar SERA en tydlig och proffsig arbetsorder.';
 
   @override
   String get workOrderDescriptionLabel => 'Beskrivning';
 
   @override
   String get workOrderDescriptionHint =>
-      'Beskriv jobbet: vad som ska g?ras, var (rum/ute), m?tt/antal, underlag (tr?/gips/betong), nuvarande skick och ?nskat resultat. Skriv ocks? om det ?r v?trum, b?rande eller el.';
+      'Beskriv jobbet: vad som ska göras, var (rum/ute), mått/antal, underlag (trä/gips/betong), nuvarande skick och önskat resultat. Skriv också om det är våtrum, bärande eller el.';
 
   @override
   String get workOrderGenerate => 'Generera';
